@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="rectangle" >
+    <stroke android:dashGap="0dp"
+            android:width="2px"
+            android:color="@color/lsq_color_transparent">
+    </stroke>
+    <solid android:color="@color/lsq_color_transparent">
+
+    </solid>
+</shape>

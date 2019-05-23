@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
+    tools:ignore="MergeRootFrame">
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.urtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView
+                android:id="@+id/localview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+            <ProgressBar
+                android:id="@+id/processlocal"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_width="5dp"
+                android:layout_height="match_parent"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/processbar_style_v" />
+        </FrameLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/remoteGridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="bottom|center_horizontal"
+            />
+
+        <FrameLayout
+            android:id="@+id/call_fragment_container"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/titlebar"
+                    android:textColor="@color/colorWhite"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:gravity="center_horizontal"
+                    android:layout_gravity="center_horizontal">
+                </TextView>
+
+                <Chronometer
+                    android:id="@+id/timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:format="%s"
+                    android:textColor="@color/colorWhite"
+                    android:layout_gravity="center_horizontal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:visibility="visible"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_marginTop="5dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageButton
+                    android:id="@+id/button_call_disconnect"
+                    android:background="@mipmap/close_phone"
+                    android:contentDescription="@string/disconnect_call"
+                    android:layout_marginEnd="16dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"/>
+
+                <ImageButton
+                    android:id="@+id/button_call_toggle_cam"
+                    android:background="#0000"
+                    android:src="@mipmap/video_open"
+                    android:contentDescription="toggle cam"
+                    android:layout_marginEnd="16dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"/>
+
+                <ImageButton
+                    android:id="@+id/button_call_switch_camera"
+                    android:background="#0000"
+                    android:src="@mipmap/camera_switch_front"
+                    android:contentDescription="@string/switch_camera"
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"/>
+
+                <ImageButton
+                    android:id="@+id/button_call_toggle_mic"
+                    android:background="#0000"
+                    android:src="@mipmap/microphone"
+                    android:contentDescription="@string/toggle_mic"
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"/>
+
+                <ImageButton
+                    android:id="@+id/button_call_loundspeaker"
+                    android:background="#0000"
+                    android:src="@mipmap/loudspeaker"
+                    android:contentDescription="loud speaker on/off"
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+</RelativeLayout>
