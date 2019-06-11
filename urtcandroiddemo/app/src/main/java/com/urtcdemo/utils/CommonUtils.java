@@ -15,7 +15,7 @@ public class CommonUtils  {
     public static final String capture_mode = "CAPTURE_MODE" ;
     public static final String SDK_MODE_KEY = "SDK_MODE_KEY" ;
     public static final String APPID_KEY = "APPID_KEY" ;
-    public static final String APP_ID = "";
-    public static final String SECID_KEY = "SECID_KEY" ;
-    public static final String SEC_KEY = "" ;
+
+    public static final String APP_ID = "urtc-0brsq4nj";
+    public static final String SEC_KEY = "15bb6b823569b787f7154f66c38277a9" ;
 }
