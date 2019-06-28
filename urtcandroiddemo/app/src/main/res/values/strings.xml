@@ -218,6 +218,16 @@
     <string name="dev_env">开发环境</string>
     <string name="test_env">测试环境</string>
 
+    <string name="pub_auto">自动发布</string>
+    <string name="pub_manual">手动发布</string>
+
+    <string name="scribe_auto">自动订阅</string>
+    <string name="scribe_manual">手动订阅</string>
+
+    <string name="role_pub">上行</string>
+    <string name="role_scribe">下行</string>
+    <string name="role_both">全部</string>
+
     <string name="screen_capture">屏幕采集</string>
     <string name="camera_capture">视频通话</string>
     <string name="audio_capture">音频通话</string>

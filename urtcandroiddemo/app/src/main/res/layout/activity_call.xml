@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- tools:ignore is needed because lint thinks this can be replaced with a merge. Replacing this
+     with a merge causes the fullscreen SurfaceView not to be centered. -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:ignore="MergeRootFrame">
+
+    <RelativeLayout
+        android:id="@+id/titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/color_FF121832"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/close"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:scaleType="fitCenter"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:src="@drawable/back"/>
+
+        <TextView
+            android:id="@+id/roomTextview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:text="22223"
+            android:textColor="@color/lsq_color_white"
+            android:textSize="14sp"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_above="@id/connect_button"
+        android:layout_height="match_parent"
+        android:background="@color/color_666666"
+        android:layout_below="@+id/titlebar">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/local_video_view"
+            android:layout_gravity="center"
+            ></FrameLayout>
+        <!--<com.pplive.meeting.PPMVideoView-->
+            <!--android:id="@+id/fullscreen_video_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="center"/>-->
+
+        <Button
+            android:id="@+id/id_test_btn"
+            android:layout_alignParentRight="true"
+            android:text="ICEDISCONNECT测试"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/remoteGridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            />
+
+        <ImageView
+            android:id="@+id/info_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:src="@drawable/setting"/>
+
+        <TextView
+            android:id="@+id/id_tv_stats"
+            android:layout_margin="5dp"
+            android:textSize="10sp"
+            android:textColor="#8800ff00"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/connect_button"
+        android:text="@string/connect"
+        android:textSize="14sp"
+        android:padding="15dp"
+        android:background="@drawable/blue_button"
+        android:textColor="@color/colorWhite"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
+    <!--<CheckBox-->
+    <!--android:button="@null"-->
+    <!--android:gravity="center"-->
+    <!--android:id="@+id/connect_button"-->
+    <!--android:text="@string/connect"-->
+    <!--android:textSize="14sp"-->
+    <!--android:padding="15dp"-->
+    <!--android:layout_alignParentBottom="true"-->
+    <!--android:background="@drawable/blue_button"-->
+    <!--android:textColor="@color/colorWhite"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content" />-->
+</RelativeLayout>

@@ -46,7 +46,7 @@ public class UnhandledExceptionHandler implements Thread.UncaughtExceptionHandle
 //                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
 //                    @Override
 //                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
+//                        diaURTCLogUtils.dismiss();
 //                        System.exit(1);
 //                    }
 //                };

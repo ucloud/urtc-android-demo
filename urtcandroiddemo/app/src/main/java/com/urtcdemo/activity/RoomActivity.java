@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -25,33 +26,42 @@ import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.ToastUtils;
-import com.urtcdemo.mode.URTCVideoViewInfo;
-import com.urtclib.sdkengine.UCloudRtcSdkEnv;
+import com.urtcdemo.utils.UiHelper;
+import com.urtcdemo.view.CustomerClickListener;
+import com.urtcdemo.view.SteamScribePopupWindow;
+import com.urtcdemo.view.URTCVideoViewInfo;
 import com.urtclib.sdkengine.UCloudRtcSdkEngine;
+import com.urtclib.sdkengine.UCloudRtcSdkEnv;
 import com.urtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.urtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.urtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.urtclib.sdkengine.define.UCloudRtcSdkMediatype;
-import com.urtclib.sdkengine.listener.UCloudRtcSdkEventListener;
-import com.urtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.urtclib.sdkengine.define.UCloudRtcSdkStats;
 import com.urtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
-import com.urtclib.sdkengine.define.UCloudRtcSdkStreamRole;
 import com.urtclib.sdkengine.define.UCloudRtcSdkTrackType;
-import com.urtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView ;
+import com.urtclib.sdkengine.listener.UCloudRtcSdkEventListener;
+import com.urtclib.sdkengine.define.UCloudRtcSdkScaleType;
+import com.urtclib.sdkengine.define.UCloudRtcSdkStreamRole;
+import com.urtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.urtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.urtclib.sdkengine.define.UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_SCREEN;
+import static com.urtclib.sdkengine.define.UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_VIDEO;
 
 
 public class RoomActivity extends AppCompatActivity {
-    private static final String TAG = "RoomActivity" ;
-    private String mUserid = "ucloud" ;
-    private String mRoomid = "urtc" ;
-    private String mRoomToken = "" ;
-    private String mAppid = "" ;
+    private static final String TAG = "RoomActivity";
+    private String mUserid = "test001";
+    private String mRoomid = "urtc1";
+    private String mRoomToken = "test token";
+    private String mAppid = "";
 
-    TextView title = null ;
-    UCloudRtcSdkSurfaceVideoView localrenderview = null ;
-    ProgressBar localprocess = null ;
+    TextView title = null;
+    UCloudRtcSdkSurfaceVideoView localrenderview = null;
+    ProgressBar localprocess = null;
 
     final int COL_SIZE_P = 3;
     final int COL_SIZE_L = 6;
@@ -59,18 +69,35 @@ public class RoomActivity extends AppCompatActivity {
     private RemoteVideoAdapter mVideoAdapter;
     RecyclerView mRemoteGridView = null;
 
-    UCloudRtcSdkEngine sdkEngine = null ;
+    UCloudRtcSdkEngine sdkEngine = null;
+    ImageButton mPublish = null;
+    ImageButton mHangup = null;
+    ImageButton mSwitchcam = null;
+    ImageButton mMuteMic = null;
+    ImageButton mLoudSpkeader = null;
+    ImageButton mMuteCam = null;
+    private SteamScribePopupWindow mSpinnerPopupWindowScribe;
+    private View mStreamSelect;
+    private TextView mTextStream;
+    int mCaptureMode;
+    int mVideoProfile;
+    @CommonUtils.PubScribeMode
+    int mPublishMode;
+    @CommonUtils.PubScribeMode
+    int mScribeMode;
+    UCloudRtcSdkStreamRole mRole;
+    boolean isScreenCaptureSupport;
+    private List<UCloudRtcSdkStreamInfo> mSteamList;
 
-    ImageButton mHangup = null ;
-    ImageButton mSwitchcam = null ;
-    ImageButton mMuteMic = null ;
-    ImageButton mLoudSpkeader = null ;
-    ImageButton mMuteCam = null ;
-    int mCaptureMode ;
-    int mVideoProfile ;
-    boolean isScreenCaptureSupport ;
+    Chronometer timeshow;
 
-    Chronometer timeshow ;
+    private void refreshStreamInfoText(){
+        if(mSteamList == null || mSteamList.isEmpty()){
+            mTextStream.setText("当前没有流可以订阅");
+        }else{
+            mTextStream.setText(String.format("当前有%d路流可以订阅",mSteamList.size()));
+        }
+    }
 
     UCloudRtcSdkEventListener eventListener = new UCloudRtcSdkEventListener() {
         @Override
@@ -80,7 +107,7 @@ public class RoomActivity extends AppCompatActivity {
                 public void run() {
                     ToastUtils.shortShow(RoomActivity.this, " 服务器已断开");
                     stopTimeShow();
-                    onMediaServerDisconnect() ;
+                    onMediaServerDisconnect();
                 }
             });
         }
@@ -93,9 +120,13 @@ public class RoomActivity extends AppCompatActivity {
                     if (code == 0) {
                         ToastUtils.shortShow(RoomActivity.this, " 加入房间成功");
                         startTimeShow();
-                    }else {
-                        ToastUtils.shortShow(RoomActivity.this, " 加入房间失败 "+
-                                code +" errmsg "+ msg);
+                    } else {
+                        ToastUtils.shortShow(RoomActivity.this, " 加入房间失败 " +
+                                code + " errmsg " + msg);
+                        Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
+                        onMediaServerDisconnect();
+                        startActivity(intent);
+                        finish();
                     }
 
                 }
@@ -107,11 +138,11 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ToastUtils.shortShow(RoomActivity.this, " 离开房间 "+
-                            code +" errmsg "+ msg);
+                    ToastUtils.shortShow(RoomActivity.this, " 离开房间 " +
+                            code + " errmsg " + msg);
                     Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
-                    onMediaServerDisconnect() ;
-                    startActivity(intent) ;
+                    onMediaServerDisconnect();
+                    startActivity(intent);
                     finish();
                 }
             });
@@ -147,8 +178,8 @@ public class RoomActivity extends AppCompatActivity {
 
                     if (code == 0) {
                         ToastUtils.shortShow(RoomActivity.this, "发布视频成功");
-                        int mediatype = info.getmMediatype().ordinal() ;
-                        if (mediatype == UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
+                        int mediatype = info.getmMediatype().ordinal();
+                        if (mediatype == URTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
                             if (!sdkEngine.isAudioOnlyMode()) {
                                 localrenderview.setBackgroundColor(Color.TRANSPARENT);
                                 sdkEngine.startPreview(info.getmMediatype(),
@@ -157,13 +188,13 @@ public class RoomActivity extends AppCompatActivity {
 
                         } else if (mediatype == UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_SCREEN.ordinal()) {
                             if (mCaptureMode == CommonUtils.screen_capture_mode) {
-                                sdkEngine.startPreview(info.getmMediatype(), localrenderview) ;
+                                sdkEngine.startPreview(info.getmMediatype(), localrenderview);
                             }
                         }
 
-                    }else {
+                    } else {
                         ToastUtils.shortShow(RoomActivity.this,
-                                "发布视频失败 "+code +" errmsg "+ msg);
+                                "发布视频失败 " + code + " errmsg " + msg);
                     }
 
                 }
@@ -175,11 +206,11 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (info.getmMediatype() == UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_VIDEO) {
+                    if (info.getmMediatype() == URTC_SDK_MEDIA_TYPE_VIDEO) {
                         if (localrenderview != null) {
                             localrenderview.refrush();
                         }
-                    }else if (info.getmMediatype() == UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_SCREEN){
+                    } else if (info.getmMediatype() == UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_SCREEN) {
                         if (mCaptureMode == CommonUtils.screen_capture_mode) {
                             if (localrenderview != null) {
                                 localrenderview.refrush();
@@ -189,9 +220,9 @@ public class RoomActivity extends AppCompatActivity {
 
                     if (code == 0) {
                         ToastUtils.shortShow(RoomActivity.this, "取消发布视频成功");
-                    }else {
+                    } else {
                         ToastUtils.shortShow(RoomActivity.this, "取消发布视频失败 "
-                        +code +" errmsg "+ msg);
+                                + code + " errmsg " + msg);
                     }
 
                 }
@@ -204,10 +235,9 @@ public class RoomActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     ToastUtils.shortShow(RoomActivity.this, " 用户 "
-                            + uid +" 加入房间 ");
+                            + uid + " 加入房间 ");
                 }
-            }) ;
-
+            });
         }
 
         @Override
@@ -215,12 +245,12 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "uid "+ uid) ;
-                    onUserLeave(uid) ;
-                    ToastUtils.shortShow(RoomActivity.this, " 用户 "+
-                            uid +" 离开房间，离开原因： "+ reson);
+                    Log.d(TAG, "uid " + uid);
+                    onUserLeave(uid);
+                    ToastUtils.shortShow(RoomActivity.this, " 用户 " +
+                            uid + " 离开房间，离开原因： " + reson);
                 }
-            }) ;
+            });
         }
 
         @Override
@@ -228,11 +258,15 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (!sdkEngine.isAutoPublish()) {
-                        sdkEngine.subscribe(info) ;
+                    if (sdkEngine.isAutoSubscribe()) {
+                        sdkEngine.subscribe(info);
+                    }else{
+                        mSteamList.add(info);
+                        mSpinnerPopupWindowScribe.notifyUpdate();
+                        refreshStreamInfoText();
                     }
                 }
-            }) ;
+            });
         }
 
         @Override
@@ -240,14 +274,16 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, " onRemoteUnPublish "+ info.getmMediatype() +" "+info.getmUid()) ;
-                    ToastUtils.shortShow(RoomActivity.this, " 用户 "+
-                            info.getmUid() +" 取消媒体流 "+ info.getmMediatype());
-                    String mkey = info.getmUid()+ info.getmMediatype().toString() ;
+                    Log.d(TAG, " onRemoteUnPublish " + info.getmMediatype() + " " + info.getmUid());
+                    ToastUtils.shortShow(RoomActivity.this, " 用户 " +
+                            info.getmUid() + " 取消媒体流 " + info.getmMediatype());
+                    String mkey = info.getmUid() + info.getmMediatype().toString();
 
                     if (mVideoAdapter != null) {
                         mVideoAdapter.removeStreamView(mkey);
                     }
+                    mSpinnerPopupWindowScribe.removeStreamInfoByUid(info.getmUid());
+                    refreshStreamInfoText();
                 }
             });
         }
@@ -259,11 +295,11 @@ public class RoomActivity extends AppCompatActivity {
                 public void run() {
                     if (code == 0) {
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo(null);
-                        UCloudRtcSdkSurfaceVideoView videoView = null ;
-                        Log.d(TAG, " info. "+info.getmUid() + " hasvideo"+ info.ismHasvideo() );
+                        UCloudRtcSdkSurfaceVideoView videoView = null;
+                        Log.d(TAG, " info. " + info.getmUid() + " hasvideo" + info.ismHasvideo());
                         if (info.ismHasvideo()) {
-                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext()) ;
-                            videoView.init();
+                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
+                            videoView.init(false);
                             videoView.setScalingType(UCloudRtcSdkScaleType.URTC_SCALE_ASPECT_FIT);
                             vinfo.setmRenderview(videoView);
                         }
@@ -271,20 +307,22 @@ public class RoomActivity extends AppCompatActivity {
                         vinfo.setmMediatype(info.getmMediatype());
                         vinfo.setmEanbleVideo(info.ismHasvideo());
                         String mkey = info.getmUid() + info.getmMediatype().toString();
-                        if (mVideoAdapter != null ) {
+                        if (mVideoAdapter != null) {
                             mVideoAdapter.addStreamView(mkey, vinfo);
                         }
                         if (vinfo != null && videoView != null) {
                             sdkEngine.startRemoteView(info, videoView);
                         }
-
+                        //如果订阅成功就删除待订阅列表中的数据
+                        mSpinnerPopupWindowScribe.removeStreamInfoByUid(info.getmUid());
+                        refreshStreamInfoText();
                     } else {
                         ToastUtils.shortShow(RoomActivity.this, " 订阅用户  " +
                                 info.getmUid() + " 流 " + info.getmMediatype() + " 失败 " +
                                 " code " + code + " msg " + msg);
                     }
                 }
-            }) ;
+            });
         }
 
         @Override
@@ -292,29 +330,31 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ToastUtils.shortShow(RoomActivity.this, " 取消订阅用户 "+
-                            info.getmUid() + " 类型 "+ info.getmMediatype());
+                    ToastUtils.shortShow(RoomActivity.this, " 取消订阅用户 " +
+                            info.getmUid() + " 类型 " + info.getmMediatype());
                     if (mVideoAdapter != null) {
-                        mVideoAdapter.removeStreamView(info.getmUid()+info.getmMediatype().toString());
+                        mVideoAdapter.removeStreamView(info.getmUid() + info.getmMediatype().toString());
                     }
+                    //取消订阅又变成可订阅
+                    mSpinnerPopupWindowScribe.addStreamInfo(info,true);
                 }
             });
         }
 
         @Override
         public void onLocalStreamMuteRsp(int code, String msg, UCloudRtcSdkMediatype mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
-            Log.d(TAG, " code " + code + " mediatype "+ mediatype + " ttype "+ tracktype + " mute "+ mute) ;
+            Log.d(TAG, " code " + code + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (code == 0) {
-                        if (mediatype == UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_VIDEO) {
+                        if (mediatype == URTC_SDK_MEDIA_TYPE_VIDEO) {
                             if (tracktype == UCloudRtcSdkTrackType.URTC_SDK_TRACK_TYPE_AUDIO) {
                                 onMuteMicResult(mute);
-                            }else if (tracktype == UCloudRtcSdkTrackType.URTC_SDK_TRACK_TYPE_VIDEO){
+                            } else if (tracktype == UCloudRtcSdkTrackType.URTC_SDK_TRACK_TYPE_VIDEO) {
                                 onMuteCamResult(mute);
                             }
-                        }else if (mediatype == UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_SCREEN) {
+                        } else if (mediatype == UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_SCREEN) {
                             onMuteCamResult(mute);
                         }
                     }
@@ -324,17 +364,17 @@ public class RoomActivity extends AppCompatActivity {
 
         @Override
         public void onRemoteStreamMuteRsp(int code, String msg, String uid, UCloudRtcSdkMediatype mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
-            Log.d(TAG, " code " + code + " uid "+ uid+ " mediatype "+ mediatype + " ttype "+ tracktype + " mute "+ mute) ;
+            Log.d(TAG, " code " + code + " uid " + uid + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (code == 0) {
-                        String mkey = uid+mediatype.toString() ;
-                        Log.d(TAG, " onRemoteStreamMuteRsp " + mkey +" "+ mVideoAdapter) ;
+                        String mkey = uid + mediatype.toString();
+                        Log.d(TAG, " onRemoteStreamMuteRsp " + mkey + " " + mVideoAdapter);
                         if (tracktype == UCloudRtcSdkTrackType.URTC_SDK_TRACK_TYPE_AUDIO) {
                             if (mVideoAdapter != null) {
                             }
-                        }else if (tracktype == UCloudRtcSdkTrackType.URTC_SDK_TRACK_TYPE_VIDEO) {
+                        } else if (tracktype == UCloudRtcSdkTrackType.URTC_SDK_TRACK_TYPE_VIDEO) {
                             if (mVideoAdapter != null) {
                             }
                         }
@@ -345,24 +385,24 @@ public class RoomActivity extends AppCompatActivity {
 
         @Override
         public void onRemoteTrackNotify(String uid, UCloudRtcSdkMediatype mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
-            Log.d(TAG, " uid "+ uid+ " mediatype "+ mediatype + " ttype "+ tracktype + " mute "+ mute) ;
+            Log.d(TAG, " uid " + uid + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (mediatype == UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_VIDEO) {
-                        String cmd = mute? "关闭":"打开" ;
+                    if (mediatype == URTC_SDK_MEDIA_TYPE_VIDEO) {
+                        String cmd = mute ? "关闭" : "打开";
                         if (tracktype == UCloudRtcSdkTrackType.URTC_SDK_TRACK_TYPE_AUDIO) {
-                            ToastUtils.shortShow(RoomActivity.this, " 用户 "+
-                                    uid +cmd+" 麦克风");
-                        }else if (tracktype == UCloudRtcSdkTrackType.URTC_SDK_TRACK_TYPE_VIDEO) {
-                            ToastUtils.shortShow(RoomActivity.this, " 用户 "+
-                                    uid +cmd+" 摄像头");
+                            ToastUtils.shortShow(RoomActivity.this, " 用户 " +
+                                    uid + cmd + " 麦克风");
+                        } else if (tracktype == UCloudRtcSdkTrackType.URTC_SDK_TRACK_TYPE_VIDEO) {
+                            ToastUtils.shortShow(RoomActivity.this, " 用户 " +
+                                    uid + cmd + " 摄像头");
                         }
 
-                    }else if (mediatype == UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_SCREEN) {
-                        String cmd = mute? "关闭":"打开" ;
-                        ToastUtils.shortShow(RoomActivity.this, " 用户 "+
-                                uid +cmd+" 桌面流");
+                    } else if (mediatype == UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_SCREEN) {
+                        String cmd = mute ? "关闭" : "打开";
+                        ToastUtils.shortShow(RoomActivity.this, " 用户 " +
+                                uid + cmd + " 桌面流");
                     }
                 }
             });
@@ -370,12 +410,22 @@ public class RoomActivity extends AppCompatActivity {
 
         @Override
         public void onSendRTCStats(UCloudRtcSdkStats rtstats) {
-
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // localprocess.setProgress(volume);
+                }
+            });
         }
 
         @Override
         public void onRemoteRTCStats(UCloudRtcSdkStats rtstats) {
-
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //localprocess.setProgress(volume);
+                }
+            });
         }
 
         @Override
@@ -393,9 +443,9 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                      if (mVideoAdapter != null) {
-                          String mkey = uid+UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_VIDEO.toString() ;
-                      }
+                    if (mVideoAdapter != null) {
+                        String mkey = uid + URTC_SDK_MEDIA_TYPE_VIDEO.toString();
+                    }
                 }
             });
         }
@@ -405,12 +455,12 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ToastUtils.longShow(RoomActivity.this, " 被踢出会议 code "+
+                    ToastUtils.longShow(RoomActivity.this, " 被踢出会议 code " +
                             code);
-                    Log.d(TAG, " user kickoff reason "+ code) ;
+                    Log.d(TAG, " user kickoff reason " + code);
                     Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
                     onMediaServerDisconnect();
-                    startActivity(intent) ;
+                    startActivity(intent);
                     finish();
                 }
             });
@@ -426,19 +476,21 @@ public class RoomActivity extends AppCompatActivity {
 
         }
     };
+    private int mSelectPos;
 
     private void onUserLeave(String uid) {
         if (mVideoAdapter != null) {
-            mVideoAdapter.removeStreamView(uid+UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_VIDEO);
-            mVideoAdapter.removeStreamView(uid+UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_SCREEN);
+            mVideoAdapter.removeStreamView(uid + URTC_SDK_MEDIA_TYPE_VIDEO);
+            mVideoAdapter.removeStreamView(uid + UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_SCREEN);
         }
     }
 
     private void onMediaServerDisconnect() {
         localrenderview.release();
-        clearGridItem() ;
+        clearGridItem();
         UCloudRtcSdkEngine.destory();
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -449,156 +501,263 @@ public class RoomActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility());
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_room);
-        timeshow = findViewById(R.id.timer) ;
+        timeshow = findViewById(R.id.timer);
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
-        mCaptureMode = preferences.getInt(CommonUtils.capture_mode, CommonUtils.camera_capture_mode) ;
-        mVideoProfile = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel) ;
+        mCaptureMode = preferences.getInt(CommonUtils.capture_mode, CommonUtils.camera_capture_mode);
+        mVideoProfile = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
         mRemoteGridView = findViewById(R.id.remoteGridView);
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             gridLayoutManager = new GridLayoutManager(this, COL_SIZE_L);
-        }else {
+        } else {
             gridLayoutManager = new GridLayoutManager(this, COL_SIZE_P);
         }
         mRemoteGridView.setLayoutManager(gridLayoutManager);
         mVideoAdapter = new RemoteVideoAdapter(this, null);
         mRemoteGridView.setAdapter(mVideoAdapter);
-        sdkEngine = UCloudRtcSdkEngine.createEngnine(eventListener) ;
-
+        sdkEngine = UCloudRtcSdkEngine.createEngnine(eventListener);
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
-//        mRoomToken = getIntent().getStringExtra("token") ;
-//        mAppid = getIntent().getStringExtra("app_id") ;
-        mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID) ;
-
-        mHangup = findViewById(R.id.button_call_disconnect) ;
-        mSwitchcam = findViewById(R.id.button_call_switch_camera) ;
-        mMuteMic = findViewById(R.id.button_call_toggle_mic) ;
-        mLoudSpkeader = findViewById(R.id.button_call_loundspeaker) ;
-        mMuteCam = findViewById(R.id.button_call_toggle_cam) ;
-
-        mHangup.setOnClickListener(new View.OnClickListener() {
+        mRoomToken = getIntent().getStringExtra("token");
+        mAppid = getIntent().getStringExtra("app_id");
+        mHangup = findViewById(R.id.button_call_disconnect);
+        mSwitchcam = findViewById(R.id.button_call_switch_camera);
+        mMuteMic = findViewById(R.id.button_call_toggle_mic);
+        mLoudSpkeader = findViewById(R.id.button_call_loundspeaker);
+        mMuteCam = findViewById(R.id.button_call_toggle_cam);
+        mStreamSelect = findViewById(R.id.stream_select);
+        mTextStream = findViewById(R.id.stream_text_view);
+        refreshStreamInfoText();
+        mTextStream.setOnClickListener(new CustomerClickListener() {
             @Override
-            public void onClick(View v) {
-                callHangUp();
+            protected void onSingleClick() {
+                showPopupWindow();
+            }
+
+            @Override
+            protected void onFastClick() {
+
             }
         });
-
-        mSwitchcam.setOnClickListener(new View.OnClickListener() {
+        mSteamList = new ArrayList<>();
+        mSpinnerPopupWindowScribe = new SteamScribePopupWindow(this,mSteamList);
+        mSpinnerPopupWindowScribe.setAnimationStyle(0);
+        mSpinnerPopupWindowScribe.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
-            public void onClick(View v) {
-                switchCamera();
+            public void onDismiss() {
+                getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility());
             }
         });
-
-        mMuteMic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onToggleMic() ;
+        ((SteamScribePopupWindow) mSpinnerPopupWindowScribe).setmOnSubScribeListener(mOnSubscribeListener);
+        //手动发布
+        mPublish = findViewById(R.id.button_call_pub);
+        mPublish.setOnClickListener(v -> {
+            List<Integer> results = new ArrayList<>();
+            StringBuffer errorMessage = new StringBuffer();
+            switch (mCaptureMode) {
+                case CommonUtils.audio_capture_mode:
+                    results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_VIDEO,false,true));
+                    break;
+                case CommonUtils.camera_capture_mode:
+                    results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_VIDEO,true,true));
+                    break;
+                case CommonUtils.screen_capture_mode:
+                    if (isScreenCaptureSupport) {
+                        results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_SCREEN,true,false)) ;
+                    } else {
+                        errorMessage.append("设备不支持屏幕捕捉\n");
+                        results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_VIDEO,true,true));
+                    }
+                    break;
+                case CommonUtils.screen_Audio_mode:
+                    if (isScreenCaptureSupport) {
+                        //推一路桌面一路音频,桌面流不需要带音频
+                        results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_SCREEN,false,false));
+                        results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_VIDEO,false,true));
+                    } else {
+                        results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_VIDEO,false,true));
+                    }
+                    break;
+                case CommonUtils.multi_capture_mode:
+                    if (isScreenCaptureSupport) {
+                        results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_SCREEN,true,false));
+                        results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_VIDEO,true,true));
+                    } else {
+                        results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_VIDEO,true,true));
+                    }
+                    break;
             }
-        });
 
-        mLoudSpkeader.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onLoudSpeaker(!mSpeakerOn);
+//            List<Integer> errorCodes = results.stream()
+//                    .filter(result -> result != 0)
+//                    .collect(Collectors.toList());
+            List<Integer> errorCodes = new ArrayList<>();
+            for (Integer result : results) {
+                if(result != 0)
+                    errorCodes.add(result);
             }
-        });
-
-        mMuteCam.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onToggleCamera() ;
+            if(!errorCodes.isEmpty()){
+                for (Integer errorCode : errorCodes) {
+                    errorMessage.append("错误码:errorCode:" + errorCode+"\n");
+                }
             }
+            if(errorMessage.length() > 0)
+                ToastUtils.shortShow(RoomActivity.this,errorMessage.toString());
         });
+        mHangup.setOnClickListener(v -> callHangUp());
 
-        title =  findViewById(R.id.titlebar) ;
-        title.setText("roomid: "+mRoomid+"\nuid: "+ mUserid);
+        mSwitchcam.setOnClickListener(v -> switchCamera());
 
-        localrenderview = findViewById(R.id.localview) ;
-        localrenderview.init();
+        mMuteMic.setOnClickListener(v -> onToggleMic());
+
+        mLoudSpkeader.setOnClickListener(v -> onLoudSpeaker(!mSpeakerOn));
+
+        mMuteCam.setOnClickListener(v -> onToggleCamera());
+
+        title = findViewById(R.id.titlebar);
+        title.setText("roomid: " + mRoomid);
+        //title.setText("roomid: "+mRoomid+"\nuid: "+ mUserid);
+
+        localrenderview = findViewById(R.id.localview);
+        localrenderview.init(true);
         localrenderview.setScalingType(UCloudRtcSdkScaleType.URTC_SCALE_ASPECT_FIT);
         localrenderview.setZOrderMediaOverlay(false);
         localrenderview.setMirror(false);
-
-        localprocess =  findViewById(R.id.processlocal) ;
-        isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture() ;
-        Log.d(TAG, " mCaptureMode " + mCaptureMode) ;
+        localprocess = findViewById(R.id.processlocal);
+        isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture();
+        Log.d(TAG, " mCaptureMode " + mCaptureMode);
         switch (mCaptureMode) {
-            case CommonUtils.audio_capture_mode :
-                sdkEngine.setAudioOnlyMode(true) ;
-                sdkEngine.configLocalCameraPublish(false) ;
-                sdkEngine.configLocalAudioPublish(true) ;
-                sdkEngine.configLocalScreenPublish(false) ;
+            case CommonUtils.audio_capture_mode:
+                sdkEngine.setAudioOnlyMode(true);
+                sdkEngine.configLocalCameraPublish(false);
+                sdkEngine.configLocalAudioPublish(true);
+                sdkEngine.configLocalScreenPublish(false);
                 break;
-            case CommonUtils.camera_capture_mode :
-                sdkEngine.configLocalCameraPublish(true) ;
-                sdkEngine.configLocalAudioPublish(true) ;
-                sdkEngine.configLocalScreenPublish(false) ;
+            case CommonUtils.camera_capture_mode:
+                sdkEngine.configLocalCameraPublish(true);
+                sdkEngine.configLocalAudioPublish(true);
+                sdkEngine.configLocalScreenPublish(false);
                 break;
-            case CommonUtils.screen_capture_mode :
+            case CommonUtils.screen_capture_mode:
                 if (isScreenCaptureSupport) {
-                    sdkEngine.configLocalScreenPublish(true) ;
-                    sdkEngine.configLocalCameraPublish(false) ;
-                    sdkEngine.configLocalAudioPublish(false) ;
-                }else {
-                    sdkEngine.configLocalCameraPublish(true) ;
-                    sdkEngine.configLocalAudioPublish(true) ;
-                    sdkEngine.configLocalScreenPublish(false) ;
+                    sdkEngine.configLocalScreenPublish(true);
+                    sdkEngine.configLocalCameraPublish(false);
+                    sdkEngine.configLocalAudioPublish(false);
+                } else {
+                    sdkEngine.configLocalCameraPublish(true);
+                    sdkEngine.configLocalAudioPublish(true);
+                    sdkEngine.configLocalScreenPublish(false);
                 }
                 break;
             case CommonUtils.screen_Audio_mode:
                 if (isScreenCaptureSupport) {
-                    sdkEngine.configLocalScreenPublish(true) ;
-                    sdkEngine.configLocalCameraPublish(false) ;
-                    sdkEngine.configLocalAudioPublish(true) ;
-                }else {
-                    sdkEngine.configLocalScreenPublish(false) ;
-                    sdkEngine.configLocalCameraPublish(false) ;
-                    sdkEngine.configLocalAudioPublish(true) ;
+                    sdkEngine.configLocalScreenPublish(true);
+                    sdkEngine.configLocalCameraPublish(false);
+                    sdkEngine.configLocalAudioPublish(true);
+                } else {
+                    sdkEngine.configLocalScreenPublish(false);
+                    sdkEngine.configLocalCameraPublish(false);
+                    sdkEngine.configLocalAudioPublish(true);
                 }
                 break;
             case CommonUtils.multi_capture_mode:
                 if (isScreenCaptureSupport) {
-                    sdkEngine.configLocalScreenPublish(true) ;
-                    sdkEngine.configLocalCameraPublish(true) ;
-                    sdkEngine.configLocalAudioPublish(true) ;
-                }else {
-                    sdkEngine.configLocalScreenPublish(false) ;
-                    sdkEngine.configLocalCameraPublish(true) ;
-                    sdkEngine.configLocalAudioPublish(true) ;
+                    sdkEngine.configLocalScreenPublish(true);
+                    sdkEngine.configLocalCameraPublish(true);
+                    sdkEngine.configLocalAudioPublish(true);
+                } else {
+                    sdkEngine.configLocalScreenPublish(false);
+                    sdkEngine.configLocalCameraPublish(true);
+                    sdkEngine.configLocalAudioPublish(true);
                 }
                 break;
-
         }
 
         sdkEngine.setAudioDevice(UCloudRtcSdkAudioDevice.URTC_SDK_AUDIODEVICE_NONE);
-        defaultAudioDevice = sdkEngine.getDefaultAudioDevice() ;
+        defaultAudioDevice = sdkEngine.getDefaultAudioDevice();
         if (defaultAudioDevice == UCloudRtcSdkAudioDevice.URTC_SDK_AUDIODEVICE_SPEAKER) {
             mLoudSpkeader.setImageResource(R.mipmap.loudspeaker);
-            mSpeakerOn = true ;
-        }else {
-            mSpeakerOn = false ;
+            mSpeakerOn = true;
+        } else {
+            mSpeakerOn = false;
             mLoudSpkeader.setImageResource(R.mipmap.loudspeaker_disable);
         }
-        sdkEngine.setStreamRole(UCloudRtcSdkStreamRole.URTC_SDK_STREAM_ROLE_BOTH);
-        sdkEngine.setAutoPublish(true) ;
-        sdkEngine.setAutoSubscribe(true) ;
-        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfile)) ;
-
-        UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo() ;
+        int role = preferences.getInt(CommonUtils.SDK_STREAM_ROLE,UCloudRtcSdkStreamRole.URTC_SDK_STREAM_ROLE_BOTH.ordinal());
+        mRole = UCloudRtcSdkStreamRole.valueOf(role);
+        sdkEngine.setStreamRole(mRole);
+        mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
+        sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
+        mScribeMode = preferences.getInt(CommonUtils.SCRIBE_MODE, CommonUtils.AUTO_MODE);
+        if(mScribeMode == CommonUtils.AUTO_MODE){
+            mStreamSelect.setVisibility(View.GONE);
+        }else{
+            mStreamSelect.setVisibility(View.VISIBLE);
+        }
+        sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
+        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfile));
+        initButtonSize();
+        UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo();
         info.setmAppId(mAppid);
         info.setmToken(mRoomToken);
         info.setmRoomid(mRoomid);
         info.setmUid(mUserid);
-        int ret = sdkEngine.joinChannel(info) ;
-        if (ret != UCloudRtcSdkErrorCode.NET_ERR_CODE_OK.ordinal()) {
-            ToastUtils.shortShow(getApplicationContext(), "加入房间失败 errorcode "+ ret);
-            Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
-            onMediaServerDisconnect();
-            startActivity(intent) ;
-            finish();
+        Log.d(TAG, " roomtoken = " + mRoomToken);
+        sdkEngine.joinChannel(info);
+    }
+
+//    SteamScribePopupWindow.OnSpinnerItemClickListener mOnSubscribe = new SteamScribePopupWindow.OnSpinnerItemClickListener() {
+//        @Override
+//        public void onItemClick(int pos) {
+//            mSelectPos = pos;
+//            mTextStream.setText(pos);
+//            mSpinnerPopupWindowScribe.dismiss();
+//        }
+//    };
+
+    //手动订阅
+    SteamScribePopupWindow.OnSubscribeListener mOnSubscribeListener = new SteamScribePopupWindow.OnSubscribeListener() {
+        @Override
+        public void onSubscribe(List<UCloudRtcSdkStreamInfo> dataInfo) {
+            for (UCloudRtcSdkStreamInfo streamInfo : dataInfo) {
+                int error = sdkEngine.subscribe(streamInfo);
+                if(error != 0){
+                    ToastUtils.shortShow(RoomActivity.this,"订阅失败，错误码:"+error);
+                }
+            }
+            mSpinnerPopupWindowScribe.dismiss();
         }
+    };
+
+    private void showPopupWindow() {
+        if(!mSpinnerPopupWindowScribe.isShowing()){
+            mSpinnerPopupWindowScribe.setWidth(mTextStream.getWidth());
+            mSpinnerPopupWindowScribe.showAsDropDown(mTextStream);
+        }
+    }
+
+    private void initButtonSize() {
+        int screenWidth = UiHelper.getScreenPixWidth(this);
+        int leftRightMargin = UiHelper.dipToPx(this,30*2);
+        int gap = UiHelper.dipToPx(this,8);
+        int buttonSize ;
+        if(mPublishMode == CommonUtils.AUTO_MODE){
+            buttonSize = (screenWidth - leftRightMargin - gap*4)/5;
+            mPublish.setVisibility(View.GONE);
+        }else{
+            buttonSize = (screenWidth - leftRightMargin - gap*5)/6;
+            mPublish.setVisibility(View.VISIBLE);
+            setButtonSize(mPublish,buttonSize);
+        }
+        setButtonSize(mHangup,buttonSize);
+        setButtonSize(mLoudSpkeader,buttonSize);
+        setButtonSize(mSwitchcam,buttonSize);
+        setButtonSize(mMuteCam,buttonSize);
+        setButtonSize(mMuteMic,buttonSize);
+    }
+
+    private void setButtonSize(View button,int buttonSize){
+        button.getLayoutParams().width = buttonSize;
+        button.getLayoutParams().height = buttonSize;
     }
 
     @Override
@@ -613,10 +772,10 @@ public class RoomActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "activity destory") ;
+        Log.d(TAG, "activity destory");
         super.onDestroy();
         localrenderview.release();
-        clearGridItem() ;
+        clearGridItem();
         UCloudRtcSdkEngine.destory();
     }
 
@@ -630,66 +789,70 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void callHangUp() {
-       int ret = sdkEngine.leaveChannel() ;
-       if (ret != UCloudRtcSdkErrorCode.NET_ERR_CODE_OK.ordinal()) {
-           Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
-           onMediaServerDisconnect();
-           startActivity(intent) ;
-           finish();
-       }
+        int ret = sdkEngine.leaveChannel();
+        if (ret != UCloudRtcSdkErrorCode.NET_ERR_CODE_OK.ordinal()) {
+            Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
+            onMediaServerDisconnect();
+            startActivity(intent);
+            finish();
+        }
     }
 
-    boolean mSwitchCam = false ;
+    boolean mSwitchCam = false;
+
     private void switchCamera() {
-        sdkEngine.switchCamera() ;
-        mSwitchcam.setImageResource(mSwitchCam? R.mipmap.camera_switch_front :
+        sdkEngine.switchCamera();
+        mSwitchcam.setImageResource(mSwitchCam ? R.mipmap.camera_switch_front :
                 R.mipmap.camera_switch_end);
-        mSwitchCam = !mSwitchCam ;
+        mSwitchCam = !mSwitchCam;
     }
 
-    boolean mMuteMicBool = false ;
+    boolean mMuteMicBool = false;
+
     private boolean onToggleMic() {
-        sdkEngine.muteLocalMic(!mMuteMicBool) ;
+        sdkEngine.muteLocalMic(!mMuteMicBool);
         return false;
     }
 
-    boolean mMuteCamBool = false ;
+    boolean mMuteCamBool = false;
+
     private boolean onToggleCamera() {
         if (mCaptureMode == CommonUtils.camera_capture_mode) {
-            sdkEngine.muteLocalVideo(!mMuteCamBool, UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_VIDEO) ;
-        }else if (mCaptureMode == CommonUtils.screen_capture_mode) {
+            sdkEngine.muteLocalVideo(!mMuteCamBool, URTC_SDK_MEDIA_TYPE_VIDEO);
+        } else if (mCaptureMode == CommonUtils.screen_capture_mode) {
             if (isScreenCaptureSupport) {
-                sdkEngine.muteLocalVideo(!mMuteCamBool, UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_SCREEN) ;
-            }else {
-                sdkEngine.muteLocalVideo(!mMuteCamBool, UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_VIDEO) ;
+                sdkEngine.muteLocalVideo(!mMuteCamBool, UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_SCREEN);
+            } else {
+                sdkEngine.muteLocalVideo(!mMuteCamBool, URTC_SDK_MEDIA_TYPE_VIDEO);
             }
-        }else if (mCaptureMode == CommonUtils.multi_capture_mode) {
-            sdkEngine.muteLocalVideo(!mMuteCamBool, UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_VIDEO) ;
+        } else if (mCaptureMode == CommonUtils.multi_capture_mode) {
+            sdkEngine.muteLocalVideo(!mMuteCamBool, URTC_SDK_MEDIA_TYPE_VIDEO);
         }
 
         return false;
     }
 
     private void onMuteCamResult(boolean mute) {
-        mMuteCamBool = mute ;
+        mMuteCamBool = mute;
         mMuteCam.setImageResource(mute ? R.mipmap.video_close : R.mipmap.video_open);
         if (mute) {
             localrenderview.refrush();
             localrenderview.setVisibility(View.INVISIBLE);
-        }else {
+        } else {
             localrenderview.setVisibility(View.VISIBLE);
         }
     }
 
     private void onMuteMicResult(boolean mute) {
-        mMuteMicBool = mute ;
+        mMuteMicBool = mute;
         mMuteMic.setImageResource(mute ? R.mipmap.microphone_disable : R.mipmap.microphone);
     }
 
-    boolean mSpeakerOn = true ;
-    UCloudRtcSdkAudioDevice defaultAudioDevice ;
+    boolean mSpeakerOn = true;
+    UCloudRtcSdkAudioDevice defaultAudioDevice;
+
     private void onLoudSpeaker(boolean enable) {
-        mSpeakerOn = !mSpeakerOn ;
+        mSpeakerOn = !mSpeakerOn;
         sdkEngine.setSpeakerOn(enable);
         mLoudSpkeader.setImageResource(enable ? R.mipmap.loudspeaker : R.mipmap.loudspeaker_disable);
     }

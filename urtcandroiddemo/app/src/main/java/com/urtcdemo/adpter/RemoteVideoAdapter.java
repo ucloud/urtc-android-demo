@@ -13,7 +13,7 @@ import android.widget.ImageView;
 
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
-import com.urtcdemo.mode.URTCVideoViewInfo;
+import com.urtcdemo.view.URTCVideoViewInfo;
 import com.urtcdemo.listener.VideoViewEventListener;
 import com.urtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 

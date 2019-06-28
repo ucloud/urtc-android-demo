@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="MergeRootFrame">
+
+    <ProgressBar
+        android:id="@+id/volprocess"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:max="100"
+        android:progress="0"
+        android:layout_alignParentLeft="true"
+        android:progressDrawable="@drawable/processbar_style_v" />
+    
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/viewcontainer"
+        android:layout_toRightOf="@+id/volprocess"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/buttonglayout"
+        android:orientation="horizontal"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/button_call_mute_paly"
+            android:background="@mipmap/loudspeaker"
+            android:visibility="visible"
+            android:layout_width="32dp"
+            android:layout_height="32dp"/>
+
+        <ImageButton
+            android:id="@+id/button_call_mute_video"
+            android:background="@mipmap/video_open"
+            android:visibility="visible"
+            android:layout_marginLeft="20dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
+
+
+

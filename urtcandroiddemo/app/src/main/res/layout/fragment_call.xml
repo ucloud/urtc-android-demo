@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TableLayout
+        android:id="@+id/bottom_button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_alignParentBottom="true"
+        android:stretchColumns="0,2,4,6"
+        android:gravity="bottom">
+        <TableRow
+            android:layout_marginBottom="24dp">
+            <ImageView />
+            <ImageButton
+                android:id="@+id/microphone_button"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_gravity="center"
+                android:src="@mipmap/microphone"
+                android:background="#0000" />
+            <ImageView />
+            <ImageButton
+                android:id="@+id/speaker_button"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_gravity="center"
+                android:src="@mipmap/loudspeaker"
+                android:background="#0000" />
+            <ImageView />
+            <ImageButton
+                android:id="@+id/camera_button"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_gravity="center"
+                android:src="@mipmap/video_open"
+                android:background="#0000" />
+            <ImageView />
+        </TableRow>
+        <TableRow
+            android:gravity="center">
+            <ImageView />
+            <ImageButton
+                android:id="@+id/disconnect_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@mipmap/close_phone"
+                android:background="#0000" />
+            <ImageView />
+        </TableRow>
+    </TableLayout>
+
+    <LinearLayout
+           android:id="@+id/buttons_call_container"
+           android:visibility="gone"
+           android:orientation="horizontal"
+           android:layout_alignWithParentIfMissing="true"
+           android:layout_marginTop="10dp"
+           android:layout_centerHorizontal="true"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content">
+
+       <ImageButton
+           android:id="@+id/button_call_disconnect"
+           android:background="@mipmap/close_phone"
+           android:contentDescription="@string/disconnect_call"
+           android:layout_marginEnd="16dp"
+           android:layout_width="48dp"
+           android:layout_height="48dp"/>
+
+        <ImageButton
+            android:id="@+id/button_call_toggle_cam"
+            android:background="@mipmap/video_open"
+            android:contentDescription="toggle cam"
+            android:layout_marginEnd="16dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"/>
+
+       <ImageButton
+           android:id="@+id/button_call_switch_camera"
+           android:background="@mipmap/camera_switch_front"
+           android:contentDescription="@string/switch_camera"
+           android:layout_marginEnd="8dp"
+           android:layout_width="48dp"
+           android:layout_height="48dp"/>
+
+       <ImageButton
+           android:id="@+id/button_call_toggle_mic"
+           android:background="@mipmap/loudspeaker"
+           android:contentDescription="@string/toggle_mic"
+           android:layout_marginEnd="8dp"
+           android:layout_width="48dp"
+           android:layout_height="48dp"/>
+    </LinearLayout>
+</RelativeLayout>

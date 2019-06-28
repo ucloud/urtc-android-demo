@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="MergeRootFrame">
+
+    <TextView
+        android:id="@+id/titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:background="@color/color_FF121832"
+        android:padding="10dp">
+    </TextView>
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/titlebar">
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.urtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView
+                android:id="@+id/screenrview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <com.urtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView
+                android:id="@+id/camrview"
+                android:layout_marginTop="60dp"
+                android:layout_toStartOf="@+id/processlocal"
+                android:layout_alignParentRight="true"
+                android:layout_width="90dp"
+                android:layout_height="120dp" />
+
+            <ProgressBar
+                android:id="@+id/processlocal"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_marginTop="60dp"
+                android:layout_alignParentRight="true"
+                android:layout_width="90dp"
+                android:layout_height="5dp"
+                android:layout_gravity="right"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/processbar_style" />
+
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <Button
+                android:id="@+id/connect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:text="连接" />
+
+            <Button
+                android:id="@+id/leaveroom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:visibility="gone"
+                android:text="离开房间" />
+
+            <Button
+                android:id="@+id/startcam"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/leaveroom"
+                android:enabled="false"
+                android:visibility="gone"
+                android:text="打开摄像头" />
+            <Button
+                android:id="@+id/stopcam"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:visibility="gone"
+                android:text="关闭摄像头" />
+
+            <FrameLayout
+                android:id="@+id/view1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/view2"
+                android:layout_toRightOf ="@+id/view1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/view3"
+                android:layout_toRightOf ="@+id/view2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/view4"
+                android:layout_toRightOf ="@+id/view3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+            </FrameLayout>
+
+        </RelativeLayout>
+
+        <FrameLayout
+            android:id="@+id/call_fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </FrameLayout>
+    </FrameLayout>
+
+</RelativeLayout>

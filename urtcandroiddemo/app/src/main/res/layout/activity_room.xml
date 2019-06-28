@@ -37,8 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="10dp"
-            android:layout_gravity="bottom|center_horizontal"
-            />
+            android:layout_gravity="bottom|center_horizontal" />
 
         <FrameLayout
             android:id="@+id/call_fragment_container"
@@ -62,12 +61,12 @@
 
                 <TextView
                     android:id="@+id/titlebar"
-                    android:textColor="@color/colorWhite"
                     android:layout_width="match_parent"
-                    android:layout_height="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
                     android:gravity="center_horizontal"
-                    android:layout_gravity="center_horizontal">
-                </TextView>
+                    android:text=""
+                    android:textColor="@color/colorWhite"></TextView>
 
                 <Chronometer
                     android:id="@+id/timer"
@@ -77,6 +76,38 @@
                     android:textColor="@color/colorWhite"
                     android:layout_gravity="center_horizontal" />
             </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/stream_select"
+                android:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/back_btn"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/oval_edit_text_background"
+                android:gravity="center_horizontal"
+                android:paddingStart="15dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="15dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:id="@+id/stream_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:textColor="@color/textcolor" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/arrow_down" />
+            </RelativeLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -88,10 +119,20 @@
                 android:layout_height="wrap_content">
 
                 <ImageButton
+                    android:id="@+id/button_call_pub"
+                    android:background="@drawable/publish_layer"
+                    android:src="@drawable/publish"
+                    android:contentDescription="@string/disconnect_call"
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:visibility="visible"/>
+
+                <ImageButton
                     android:id="@+id/button_call_disconnect"
                     android:background="@mipmap/close_phone"
                     android:contentDescription="@string/disconnect_call"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:layout_width="54dp"
                     android:layout_height="54dp"/>
 
@@ -99,14 +140,16 @@
                     android:id="@+id/button_call_toggle_cam"
                     android:background="#0000"
                     android:src="@mipmap/video_open"
+                    android:scaleType="fitCenter"
                     android:contentDescription="toggle cam"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:layout_width="54dp"
                     android:layout_height="54dp"/>
 
                 <ImageButton
                     android:id="@+id/button_call_switch_camera"
                     android:background="#0000"
+                    android:scaleType="fitCenter"
                     android:src="@mipmap/camera_switch_front"
                     android:contentDescription="@string/switch_camera"
                     android:layout_marginEnd="8dp"
@@ -117,6 +160,7 @@
                     android:id="@+id/button_call_toggle_mic"
                     android:background="#0000"
                     android:src="@mipmap/microphone"
+                    android:scaleType="fitCenter"
                     android:contentDescription="@string/toggle_mic"
                     android:layout_marginEnd="8dp"
                     android:layout_width="54dp"
@@ -126,8 +170,8 @@
                     android:id="@+id/button_call_loundspeaker"
                     android:background="#0000"
                     android:src="@mipmap/loudspeaker"
+                    android:scaleType="fitCenter"
                     android:contentDescription="loud speaker on/off"
-                    android:layout_marginEnd="8dp"
                     android:layout_width="54dp"
                     android:layout_height="54dp"/>
             </LinearLayout>
