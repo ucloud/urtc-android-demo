@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,7 +19,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,9 +27,9 @@ import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.PermissionUtils;
 import com.urtcdemo.utils.ToastUtils;
-import com.urtclib.sdkengine.UCloudRtcSdkEnv;
 import com.urtclib.sdkengine.UCloudRtcSdkEngine;
-
+import com.urtclib.sdkengine.UCloudRtcSdkEnv;
+import com.urtclib.sdkengine.define.UCloudRtcSdkMode;
 
 import java.util.UUID;
 
@@ -58,7 +56,7 @@ public class ConnectActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show() ;
             return;
         }
-        if (requestCode != UCloudRtcSdkEngine.SCREEN_CAPTURE_RESULTCODE) {
+        if (requestCode != UCloudRtcSdkEngine.SCREEN_CAPTURE_REQUEST_CODE) {
             Toast.makeText(this, "获取桌面采集权限失败",
                     Toast.LENGTH_LONG).show() ;
             return;
@@ -108,13 +106,14 @@ public class ConnectActivity extends AppCompatActivity {
             }
             else
             {
-                UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
-//                if (URTCSdkEnv.isTestEnv()) {
-//                    mRoomToken = "testoken" ;
-//                    Log.d(TAG, " appid "+ mAppid) ;
-//                    URTCSdkEngine.requestScreenCapture(ConnectActivity.this);
-//                    URTCSdkEngine.requestScreenCapture(ConnectActivity.this);
-//                }else {
+                //测试环境下SDK自动生成token
+                if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.RTC_SDK_MODE_TRIVAL) {
+                    mRoomToken = "testoken" ;
+                    Log.d(TAG, " appid "+ mAppid) ;
+                    UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
+                }else {
+                    //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
+                    ToastUtils.shortShow(this,"正式环境下请获取自己服务器的token");
 //                    new Thread(new Runnable() {
 //                        @Override
 //                        public void run() {
@@ -134,10 +133,9 @@ public class ConnectActivity extends AppCompatActivity {
 //                                                        mRoomToken = data.getString("access_token" );
 //                                                        Log.d(TAG, " token "+ mRoomToken) ;
 //                                                        if (mRoomToken.length()>0) {
-//                                                            URTCSdkEngine.requestScreenCapture(ConnectActivity.this);
+//                                                            UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
 //                                                        }
 //                                                    }
-//
 //                                                }
 //                                            }catch (JSONException e) {
 //                                                e.printStackTrace();
@@ -157,12 +155,9 @@ public class ConnectActivity extends AppCompatActivity {
 //                                });
 //
 //                            }
-//
-//
 //                        }
 //                    }).start() ;
-//                }
-//
+                }
             }
         });
 

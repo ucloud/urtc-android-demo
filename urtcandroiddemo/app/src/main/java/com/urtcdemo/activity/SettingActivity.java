@@ -218,7 +218,7 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (group.getCheckedRadioButtonId()) {
-                    case R.id.env_mode:
+                    case R.id.dev_env:
                         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.URTC_SDK_MODE_NORMAL);
                         break;
                     case R.id.test_env:

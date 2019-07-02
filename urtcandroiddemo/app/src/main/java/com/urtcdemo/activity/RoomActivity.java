@@ -36,14 +36,14 @@ import com.urtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.urtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.urtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.urtclib.sdkengine.define.UCloudRtcSdkMediatype;
+import com.urtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.urtclib.sdkengine.define.UCloudRtcSdkStats;
 import com.urtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
-import com.urtclib.sdkengine.define.UCloudRtcSdkTrackType;
-import com.urtclib.sdkengine.listener.UCloudRtcSdkEventListener;
-import com.urtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.urtclib.sdkengine.define.UCloudRtcSdkStreamRole;
 import com.urtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
+import com.urtclib.sdkengine.define.UCloudRtcSdkTrackType;
 import com.urtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
+import com.urtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -473,7 +473,14 @@ public class RoomActivity extends AppCompatActivity {
 
         @Override
         public void onError(int error) {
-
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(error == UCloudRtcSdkErrorCode.NET_ERR_SDP_SWAP_FAIL.ordinal()){
+                        ToastUtils.shortShow(RoomActivity.this,"sdp swap failed");
+                    }
+                }
+            });
         }
     };
     private int mSelectPos;
@@ -531,7 +538,7 @@ public class RoomActivity extends AppCompatActivity {
         mTextStream.setOnClickListener(new CustomerClickListener() {
             @Override
             protected void onSingleClick() {
-                showPopupWindow();
+                  showPopupWindow();
             }
 
             @Override
@@ -555,12 +562,15 @@ public class RoomActivity extends AppCompatActivity {
             List<Integer> results = new ArrayList<>();
             StringBuffer errorMessage = new StringBuffer();
             switch (mCaptureMode) {
+                    //音频
                 case CommonUtils.audio_capture_mode:
                     results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_VIDEO,false,true));
                     break;
+                    //视频
                 case CommonUtils.camera_capture_mode:
                     results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_VIDEO,true,true));
                     break;
+                    //屏幕捕捉
                 case CommonUtils.screen_capture_mode:
                     if (isScreenCaptureSupport) {
                         results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_SCREEN,true,false)) ;
@@ -569,6 +579,7 @@ public class RoomActivity extends AppCompatActivity {
                         results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_VIDEO,true,true));
                     }
                     break;
+                    //音频+屏幕捕捉
                 case CommonUtils.screen_Audio_mode:
                     if (isScreenCaptureSupport) {
                         //推一路桌面一路音频,桌面流不需要带音频
@@ -578,6 +589,7 @@ public class RoomActivity extends AppCompatActivity {
                         results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_VIDEO,false,true));
                     }
                     break;
+                    //视频+屏幕捕捉
                 case CommonUtils.multi_capture_mode:
                     if (isScreenCaptureSupport) {
                         results.add(sdkEngine.publish(URTC_SDK_MEDIA_TYPE_SCREEN,true,false));
@@ -602,7 +614,7 @@ public class RoomActivity extends AppCompatActivity {
                 }
             }
             if(errorMessage.length() > 0)
-                ToastUtils.shortShow(RoomActivity.this,errorMessage.toString());
+            ToastUtils.shortShow(RoomActivity.this,errorMessage.toString());
         });
         mHangup.setOnClickListener(v -> callHangUp());
 
@@ -682,7 +694,7 @@ public class RoomActivity extends AppCompatActivity {
             mSpeakerOn = false;
             mLoudSpkeader.setImageResource(R.mipmap.loudspeaker_disable);
         }
-        int role = preferences.getInt(CommonUtils.SDK_STREAM_ROLE,UCloudRtcSdkStreamRole.URTC_SDK_STREAM_ROLE_BOTH.ordinal());
+        int role = preferences.getInt(CommonUtils.SDK_STREAM_ROLE, UCloudRtcSdkStreamRole.URTC_SDK_STREAM_ROLE_BOTH.ordinal());
         mRole = UCloudRtcSdkStreamRole.valueOf(role);
         sdkEngine.setStreamRole(mRole);
         mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
@@ -714,8 +726,8 @@ public class RoomActivity extends AppCompatActivity {
 //        }
 //    };
 
-    //手动订阅
-    SteamScribePopupWindow.OnSubscribeListener mOnSubscribeListener = new SteamScribePopupWindow.OnSubscribeListener() {
+        //手动订阅
+        SteamScribePopupWindow.OnSubscribeListener mOnSubscribeListener = new SteamScribePopupWindow.OnSubscribeListener() {
         @Override
         public void onSubscribe(List<UCloudRtcSdkStreamInfo> dataInfo) {
             for (UCloudRtcSdkStreamInfo streamInfo : dataInfo) {
