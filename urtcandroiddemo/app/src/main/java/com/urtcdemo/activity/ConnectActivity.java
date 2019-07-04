@@ -107,7 +107,7 @@ public class ConnectActivity extends AppCompatActivity {
             else
             {
                 //测试环境下SDK自动生成token
-                if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.RTC_SDK_MODE_TRIVAL) {
+                if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL) {
                     mRoomToken = "testoken" ;
                     Log.d(TAG, " appid "+ mAppid) ;
                     UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);

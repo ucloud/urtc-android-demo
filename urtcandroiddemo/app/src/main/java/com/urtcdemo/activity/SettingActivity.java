@@ -192,21 +192,21 @@ public class SettingActivity extends AppCompatActivity {
                 break;
         }
 
-        int roleInt = preferences.getInt(CommonUtils.SDK_STREAM_ROLE, UCloudRtcSdkStreamRole.URTC_SDK_STREAM_ROLE_BOTH.ordinal());
+        int roleInt = preferences.getInt(CommonUtils.SDK_STREAM_ROLE, UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH.ordinal());
         mRole = UCloudRtcSdkStreamRole.valueOf(roleInt);
         switch (mRole) {
-            case URTC_SDK_STREAM_ROLE_BOTH:
+            case UCLOUD_RTC_SDK_STREAM_ROLE_BOTH:
                 mRBRoleBoth.setChecked(true);
                 break;
-            case URTC_SDK_STREAM_ROLE_PUB:
+            case UCLOUD_RTC_SDK_STREAM_ROLE_PUB:
                 mRBRolePublish.setChecked(true);
                 break;
-            case URTC_SDK_STREAM_ROLE_SUB:
+            case UCLOUD_RTC_SDK_STREAM_ROLE_SUB:
                 mRBRoleScribe.setChecked(true);
                 break;
         }
 
-        if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.RTC_SDK_MODE_TRIVAL) {
+        if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL) {
             mDevenv.setChecked(false);
             mTestenv.setChecked(true);
         } else {
@@ -219,10 +219,10 @@ public class SettingActivity extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (group.getCheckedRadioButtonId()) {
                     case R.id.dev_env:
-                        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.URTC_SDK_MODE_NORMAL);
+                        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_NORMAL);
                         break;
                     case R.id.test_env:
-                        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.RTC_SDK_MODE_TRIVAL);
+                        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
                         break;
                 }
             }
@@ -254,13 +254,13 @@ public class SettingActivity extends AppCompatActivity {
         mRGRole.setOnCheckedChangeListener((group, checkedId) -> {
             switch (group.getCheckedRadioButtonId()) {
                 case R.id.rb_role_pub:
-                    mRole = UCloudRtcSdkStreamRole.URTC_SDK_STREAM_ROLE_PUB;
+                    mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_PUB;
                     break;
                 case R.id.rb_role_scribe:
-                    mRole = UCloudRtcSdkStreamRole.URTC_SDK_STREAM_ROLE_SUB;
+                    mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_SUB;
                     break;
                 case R.id.rb_role_both:
-                    mRole = UCloudRtcSdkStreamRole.URTC_SDK_STREAM_ROLE_BOTH;
+                    mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH;
                     break;
             }
         });

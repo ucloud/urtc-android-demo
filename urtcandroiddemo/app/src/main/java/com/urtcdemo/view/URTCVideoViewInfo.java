@@ -13,7 +13,7 @@ public class URTCVideoViewInfo {
         mRenderview = view ;
         mUid = "" ;
         mEanbleVideo = false ;
-        mMediatype = UCloudRtcSdkMediatype.URTC_SDK_MEDIA_TYPE_NULL ;
+        mMediatype = UCloudRtcSdkMediatype.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
     }
 
     public UCloudRtcSdkSurfaceVideoView getmRenderview() {

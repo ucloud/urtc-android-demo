@@ -15,8 +15,8 @@ public class URTCApplication extends Application {
     public void onCreate() {
         super.onCreate();
         UCloudRtcSdkEnv.initEnv(getApplicationContext(), this);
-        UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.URTC_SDK_LogLevelInfo) ;
-        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.RTC_SDK_MODE_TRIVAL);
+        UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo) ;
+        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
         UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.SEC_KEY);
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics outMetrics = new DisplayMetrics();
