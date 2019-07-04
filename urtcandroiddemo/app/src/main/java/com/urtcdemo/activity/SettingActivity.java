@@ -16,13 +16,13 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.RadioGroupFlow;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
-import com.urtclib.sdkengine.UCloudRtcSdkEnv;
-import com.urtclib.sdkengine.define.UCloudRtcSdkMode;
-import com.urtclib.sdkengine.define.UCloudRtcSdkStreamRole;
 
 import java.util.ArrayList;
 import java.util.Arrays;

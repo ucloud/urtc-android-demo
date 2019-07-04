@@ -3,8 +3,7 @@ package com.urtcdemo.utils;
 import android.content.Context;
 import android.widget.Toast;
 
-import com.urtclib.sdkengine.UCloudRtcSdkEnv;
-import com.urtclib.sdkengine.UCloudRtcSdkEnv;
+import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 
 public class ToastUtils {
     public static void shortShow(Context context, String msg) {

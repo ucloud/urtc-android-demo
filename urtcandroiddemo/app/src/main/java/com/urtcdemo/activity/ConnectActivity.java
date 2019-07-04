@@ -23,13 +23,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
+import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.PermissionUtils;
 import com.urtcdemo.utils.ToastUtils;
-import com.urtclib.sdkengine.UCloudRtcSdkEngine;
-import com.urtclib.sdkengine.UCloudRtcSdkEnv;
-import com.urtclib.sdkengine.define.UCloudRtcSdkMode;
 
 import java.util.UUID;
 

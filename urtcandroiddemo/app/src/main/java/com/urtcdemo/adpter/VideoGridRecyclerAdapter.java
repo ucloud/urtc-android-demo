@@ -12,11 +12,11 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.urtcdemo.R;
+import com.urtcdemo.listener.VideoViewEventListener;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
-import com.urtcdemo.listener.VideoViewEventListener;
-import com.urtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -258,7 +258,7 @@ public class VideoGridRecyclerAdapter extends RecyclerView.Adapter<VideoGridRecy
             mMuteVideoView = mute ;
             if (mute) {
                 muteRemoteView.setBackground(mContext.getResources().getDrawable(R.mipmap.video_close));
-                view.refrush();
+                view.refresh();
             }else {
                 muteRemoteView.setBackground(mContext.getResources().getDrawable(R.mipmap.video_open));
             }

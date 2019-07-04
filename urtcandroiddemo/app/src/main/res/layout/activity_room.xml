@@ -15,7 +15,7 @@
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <com.urtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView
+            <com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView
                 android:id="@+id/localview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

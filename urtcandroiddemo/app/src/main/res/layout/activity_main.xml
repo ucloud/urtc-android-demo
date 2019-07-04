@@ -23,12 +23,12 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-            <com.urtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView
+            <com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView
                 android:id="@+id/screenrview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-            <com.urtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView
+            <com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView
                 android:id="@+id/camrview"
                 android:layout_marginTop="60dp"
                 android:layout_toStartOf="@+id/processlocal"

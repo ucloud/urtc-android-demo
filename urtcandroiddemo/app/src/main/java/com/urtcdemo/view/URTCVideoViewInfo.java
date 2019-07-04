@@ -1,19 +1,19 @@
 package com.urtcdemo.view;
 
-import com.urtclib.sdkengine.define.UCloudRtcSdkMediatype;
-import com.urtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 
 public class URTCVideoViewInfo {
     private UCloudRtcSdkSurfaceVideoView mRenderview ;
     private String mUid ;
     private boolean mEanbleVideo ;
-    private UCloudRtcSdkMediatype mMediatype ;
+    private UCloudRtcSdkMediaType mMediatype ;
 
     public URTCVideoViewInfo(UCloudRtcSdkSurfaceVideoView view) {
         mRenderview = view ;
         mUid = "" ;
         mEanbleVideo = false ;
-        mMediatype = UCloudRtcSdkMediatype.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
+        mMediatype = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
     }
 
     public UCloudRtcSdkSurfaceVideoView getmRenderview() {
@@ -40,17 +40,17 @@ public class URTCVideoViewInfo {
         this.mUid = mUid;
     }
 
-    public UCloudRtcSdkMediatype getmMediatype() {
+    public UCloudRtcSdkMediaType getmMediatype() {
         return mMediatype;
     }
 
-    public void setmMediatype(UCloudRtcSdkMediatype mMediatype) {
+    public void setmMediatype(UCloudRtcSdkMediaType mMediatype) {
         this.mMediatype = mMediatype;
     }
 
     public void release() {
         if (mRenderview != null) {
-            mRenderview.refrush();
+            mRenderview.refresh();
             mRenderview.release();
             mRenderview = null ;
         }

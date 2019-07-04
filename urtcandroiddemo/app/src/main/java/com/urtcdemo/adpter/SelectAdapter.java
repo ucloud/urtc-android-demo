@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.urtcdemo.R;
-import com.urtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class SelectAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public UCloudRtcSdkStreamInfo findStreamInfoByUId(String uid){
         UCloudRtcSdkStreamInfo info = null;
         for (int i = 0; i < mList.size(); i++) {
-            if(mList.get(i).getmUid().equals(uid)){
+            if(mList.get(i).getUId().equals(uid)){
                 info = mList.get(i);
                 break;
             }
@@ -104,7 +104,7 @@ public class SelectAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int i) {
         //设置条目状态
         UCloudRtcSdkStreamInfo streamInfo = mList.get(i);
-        ((ListItemViewHolder) holder).mainTitle.setText(streamInfo.getmUid());
+        ((ListItemViewHolder) holder).mainTitle.setText(streamInfo.getUId());
         ((ListItemViewHolder) holder).checkBox.setChecked(isItemChecked(i));
 
         //checkBox的监听
