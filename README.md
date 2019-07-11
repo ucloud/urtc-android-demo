@@ -19,6 +19,7 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
 * 支持权限（上行/下行/全部）控制
 * 支持音量提示
 * 支持获取sdk版本
+* 支持大班小班切换功能
 
 ## 2.2 增值功能
 * 终端智能测试（摄像头、麦克风、网络、播放器）
@@ -31,6 +32,9 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
 * 手势
 * 虚拟形象
 * 变声
+
+## 2.3 文档地址
+* https://docs.ucloud.cn/video/urtc/index.html 
 
 # 3 方案优势
 
