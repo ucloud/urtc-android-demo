@@ -8,6 +8,7 @@ public class URTCVideoViewInfo {
     private String mUid ;
     private boolean mEanbleVideo ;
     private UCloudRtcSdkMediaType mMediatype ;
+    private String key;
 
     public URTCVideoViewInfo(UCloudRtcSdkSurfaceVideoView view) {
         mRenderview = view ;
@@ -46,6 +47,14 @@ public class URTCVideoViewInfo {
 
     public void setmMediatype(UCloudRtcSdkMediaType mMediatype) {
         this.mMediatype = mMediatype;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public void release() {

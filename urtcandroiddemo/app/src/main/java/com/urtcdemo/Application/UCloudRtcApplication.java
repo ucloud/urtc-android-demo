@@ -5,10 +5,11 @@ import android.content.Context;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import com.urtcdemo.utils.CommonUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkLogLevel;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
-import com.urtcdemo.utils.CommonUtils;
+import com.urtcdemo.utils.UiHelper;
 
 public class UCloudRtcApplication extends Application {
     @Override
@@ -21,7 +22,7 @@ public class UCloudRtcApplication extends Application {
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics outMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(outMetrics);
-        CommonUtils.mItemWidth = outMetrics.widthPixels / 3;
+        CommonUtils.mItemWidth = (outMetrics.widthPixels - UiHelper.dipToPx(this,15))/ 3;
         CommonUtils.mItemHeight = CommonUtils.mItemWidth;
     }
 

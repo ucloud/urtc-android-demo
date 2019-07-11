@@ -8,8 +8,8 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.urtcdemo.R;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 
 import java.util.ArrayList;
 import java.util.List;

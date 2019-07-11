@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.PopupWindow;
 
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.SelectAdapter;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class SteamScribePopupWindow extends PopupWindow {
         void onSubscribe(List<UCloudRtcSdkStreamInfo> selectStream);
     }
 
-    public SteamScribePopupWindow(Context context, List<UCloudRtcSdkStreamInfo> streamInfos) {
+    public SteamScribePopupWindow(Context context,List<UCloudRtcSdkStreamInfo> streamInfos) {
         super(context);
         mContext = context;
         mSteamList = streamInfos;
@@ -45,7 +45,7 @@ public class SteamScribePopupWindow extends PopupWindow {
         mAdapter.notifyDataSetChanged();
     }
 
-    public void addStreamInfo(UCloudRtcSdkStreamInfo info, boolean notify){
+    public void addStreamInfo(UCloudRtcSdkStreamInfo info,boolean notify){
         mAdapter.addStreamInfo(info,notify);
     }
 
