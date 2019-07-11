@@ -21,6 +21,8 @@ public class CommonUtils {
     public static final String PUBLISH_MODE = "PUBLISH_MODE";
     public static final String SCRIBE_MODE = "SCRIBE_MODE";
     public static final String SDK_STREAM_ROLE = "SDK_STREAM_ROLE";
+    public static final String SDK_CLASS_TYPE = "SDK_CLASS_TYPE";
+
     public static final String APPID_KEY = "APPID_KEY";
     //    public static final String APP_ID = "urtc-cwykkqyx";
 ////    public static final String SEC_KEY = "b3b59d28dea5e4eb3318d0a441c0801c" ;

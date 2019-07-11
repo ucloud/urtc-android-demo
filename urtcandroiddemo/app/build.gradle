@@ -42,7 +42,7 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     testImplementation 'junit:junit:4.12'
-    implementation (name: 'ucloudrtclib_1.0.1_c5d06613', ext: 'aar')
+    implementation (name: 'ucloudrtclib_1.1.1_db8ac850', ext: 'aar')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

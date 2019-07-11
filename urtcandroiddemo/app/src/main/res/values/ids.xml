@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="index" />
+    <item type="id" name="swap_info" />
+    <item type="id" name="view_info" />
+    <item type="id" name="video_view" />
+    <item type="id" name="remote_video" />
+    <item type="id" name="remote_audio" />
+</resources>

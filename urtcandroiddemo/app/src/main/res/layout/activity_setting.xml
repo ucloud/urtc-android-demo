@@ -250,15 +250,48 @@
             android:text="@string/role_both"
             android:textColor="@color/textcolor" />
 
-
     </com.urtcdemo.utils.RadioGroupFlow>
 
+    <com.urtcdemo.utils.RadioGroupFlow
+        android:id="@+id/rg_room_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rg_role"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="15dp"
+        android:orientation="horizontal"
+        android:paddingStart="0dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="0dp"
+        android:paddingBottom="2dp"
+        android:visibility="visible">
+
+        <RadioButton
+            android:id="@+id/rb_type_small_room"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:shadowColor="@color/color_FF007AFF"
+            android:text="@string/room_small"
+            android:textColor="@color/textcolor" />
+
+        <RadioButton
+            android:id="@+id/rb_type_large_room"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:shadowColor="@color/color_FF007AFF"
+            android:text="@string/room_large"
+            android:textColor="@color/textcolor" />
+
+    </com.urtcdemo.utils.RadioGroupFlow>
 
     <EditText
         android:id="@+id/appid_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rg_role"
+        android:layout_below="@id/rg_room_type"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="15dp"
         android:layout_marginRight="15dp"
