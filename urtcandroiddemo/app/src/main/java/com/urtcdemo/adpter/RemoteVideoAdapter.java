@@ -13,10 +13,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
