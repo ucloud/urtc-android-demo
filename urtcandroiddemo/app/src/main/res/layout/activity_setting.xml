@@ -208,8 +208,52 @@
 
     </com.urtcdemo.utils.RadioGroupFlow>
 
+    <!--<com.urtcdemo.utils.RadioGroupFlow-->
+    <!--android:id="@+id/rg_role"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@id/rg_scribe"-->
+    <!--android:layout_marginLeft="15dp"-->
+    <!--android:layout_marginTop="15dp"-->
+    <!--android:layout_marginRight="15dp"-->
+    <!--android:orientation="horizontal"-->
+    <!--android:paddingStart="0dp"-->
+    <!--android:paddingTop="2dp"-->
+    <!--android:paddingEnd="0dp"-->
+    <!--android:paddingBottom="2dp"-->
+    <!--android:visibility="gone">-->
+
+    <!--<RadioButton-->
+    <!--android:id="@+id/rb_role_pub"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_weight="1"-->
+    <!--android:shadowColor="@color/color_FF007AFF"-->
+    <!--android:text="@string/role_pub"-->
+    <!--android:textColor="@color/textcolor" />-->
+
+    <!--<RadioButton-->
+    <!--android:id="@+id/rb_role_scribe"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_weight="1"-->
+    <!--android:shadowColor="@color/color_FF007AFF"-->
+    <!--android:text="@string/role_scribe"-->
+    <!--android:textColor="@color/textcolor" />-->
+
+    <!--<RadioButton-->
+    <!--android:id="@+id/rb_role_both"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_weight="1"-->
+    <!--android:shadowColor="@color/color_FF007AFF"-->
+    <!--android:text="@string/role_both"-->
+    <!--android:textColor="@color/textcolor" />-->
+
+    <!--</com.urtcdemo.utils.RadioGroupFlow>-->
+
     <com.urtcdemo.utils.RadioGroupFlow
-        android:id="@+id/rg_role"
+        android:id="@+id/rg_white_role"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/rg_scribe"
@@ -220,34 +264,24 @@
         android:paddingStart="0dp"
         android:paddingTop="2dp"
         android:paddingEnd="0dp"
-        android:paddingBottom="2dp"
-        android:visibility="visible">
+        android:paddingBottom="2dp">
 
         <RadioButton
-            android:id="@+id/rb_role_pub"
+            android:id="@+id/rb_role_teacher"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/role_pub"
+            android:text="@string/white_role_teacher"
             android:textColor="@color/textcolor" />
 
         <RadioButton
-            android:id="@+id/rb_role_scribe"
+            android:id="@+id/rb_role_student"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/role_scribe"
-            android:textColor="@color/textcolor" />
-
-        <RadioButton
-            android:id="@+id/rb_role_both"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/role_both"
+            android:text="@string/white_role_student"
             android:textColor="@color/textcolor" />
 
     </com.urtcdemo.utils.RadioGroupFlow>
@@ -256,7 +290,7 @@
         android:id="@+id/rg_room_type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rg_role"
+        android:layout_below="@id/rg_white_role"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="15dp"
         android:layout_marginRight="15dp"
@@ -287,11 +321,21 @@
 
     </com.urtcdemo.utils.RadioGroupFlow>
 
+       <android.support.v7.widget.AppCompatCheckBox
+        android:id="@+id/checkbox_white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rg_room_type"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:text="@string/white_mode"
+        android:textColor="@color/color_FFFFFFFF" />
+
     <EditText
         android:id="@+id/appid_edittext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rg_room_type"
+        android:layout_below="@id/checkbox_white"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="15dp"
         android:layout_marginRight="15dp"

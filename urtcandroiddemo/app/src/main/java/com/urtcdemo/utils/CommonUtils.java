@@ -16,10 +16,18 @@ public class CommonUtils {
     public static final int AUTO_MODE = 0;
     public static final int MANUAL_MODE = 1;
 
+    public static final int TEACHER_ROLE = 0;
+    public static final int STUDENT_ROLE = 1;
+    //这个值和SDK内部的值无关，只和业务有关
+    public static final String BUS_WHITE_MODE = "BUS_WHITE_MODE";
+    public static final String WHITE_ROLE = "WHITE_ROLE";
+    public static final String WHITE_LOG_INFO = "WHITE_LOG_INFO";
+
     public static final String videoprofile = "videoprofile";
     public static final String capture_mode = "capturemode";
     public static final String PUBLISH_MODE = "PUBLISH_MODE";
     public static final String SCRIBE_MODE = "SCRIBE_MODE";
+
     public static final String SDK_STREAM_ROLE = "SDK_STREAM_ROLE";
     public static final String SDK_CLASS_TYPE = "SDK_CLASS_TYPE";
 
@@ -31,4 +39,7 @@ public class CommonUtils {
 
     @IntDef({AUTO_MODE, MANUAL_MODE})
     public @interface  PubScribeMode {}
+
+    @IntDef({TEACHER_ROLE, STUDENT_ROLE})
+    public @interface  WhiteRoleType {}
 }

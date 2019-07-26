@@ -59,6 +59,10 @@
         <activity
             android:name=".activity.SettingActivity"
             android:screenOrientation="portrait"></activity>
+
+        <activity android:name=".activity.WhiteBoardRoomActivity"
+            android:screenOrientation="landscape">
+        </activity>
     </application>
 
 </manifest>

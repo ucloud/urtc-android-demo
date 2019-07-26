@@ -31,12 +31,17 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
     private Context mContext;
     private List<ViewHolder> mCacheHolder;
     private RemoveRemoteStreamReceiver mRemoveRemoteStreamReceiver;
+    private int mVideoSize;
 
 
     public RemoteVideoAdapter(Context context) {
         mContext = context;
         mInflater = ((Activity) context).getLayoutInflater();
         mCacheHolder = new ArrayList<>();
+    }
+
+    public void setVideoSize(int videoSize) {
+        this.mVideoSize = videoSize;
     }
 
     @Override
@@ -77,8 +82,14 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
                 }
                 videoView.setZOrderMediaOverlay(true);
                 videoView.setTag(R.id.index, viewInfo);
-                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT);
+                FrameLayout.LayoutParams layoutParams;
+                if(mVideoSize != 0) {
+                    layoutParams = new FrameLayout.LayoutParams(mVideoSize,
+                            mVideoSize);
+                }else{
+                    layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT);
+                }
                 holderView.addView(videoView, layoutParams);
             } else {
                 FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,

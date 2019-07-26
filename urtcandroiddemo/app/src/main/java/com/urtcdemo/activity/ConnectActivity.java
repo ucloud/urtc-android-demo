@@ -39,33 +39,41 @@ public class ConnectActivity extends AppCompatActivity {
 
     private EditText roomEditText;
     private String mUserId = "";
-    private String mRoomid = "" ;
-    private String mAppid = "" ;
-    private String mRoomToken = "" ;
+    private String mRoomid = "";
+    private String mAppid = "";
+    private String mRoomToken = "";
     private View connectButton;
-    private ImageButton setButton ;
+    private ImageButton setButton;
     private TextView mTextSDKVersion;
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
-    private boolean mStartSuccess=false;
-    private ImageView mAnimal ;
+    private boolean mStartSuccess = false;
+    private ImageView mAnimal;
 
     @Override
     @TargetApi(21)
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK) {
             Toast.makeText(this, "获取桌面采集权限失败",
-                    Toast.LENGTH_LONG).show() ;
+                    Toast.LENGTH_LONG).show();
             return;
         }
         if (requestCode != UCloudRtcSdkEngine.SCREEN_CAPTURE_REQUEST_CODE) {
             Toast.makeText(this, "获取桌面采集权限失败",
-                    Toast.LENGTH_LONG).show() ;
+                    Toast.LENGTH_LONG).show();
             return;
         }
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
         if (!mStartSuccess) {
-            mStartSuccess=true;
-            Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
+            mStartSuccess = true;
+            SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
+                    Context.MODE_PRIVATE);
+            boolean isWhiteMode = preferences.getBoolean(CommonUtils.BUS_WHITE_MODE, false);
+            Intent intent;
+            if (isWhiteMode) {
+                intent = new Intent(ConnectActivity.this, WhiteBoardRoomActivity.class);
+            } else {
+                intent = new Intent(ConnectActivity.this, RoomActivity.class);
+            }
             intent.putExtra("room_id", mRoomid);
             intent.putExtra("user_id", mUserId);
             intent.putExtra("app_id", mAppid);
@@ -75,15 +83,16 @@ public class ConnectActivity extends AppCompatActivity {
                 public void run() {
                     startActivity(intent);
                     finish();
-                    mStartSuccess=false;
+                    mStartSuccess = false;
                 }
-            },500);
+            }, 500);
         }
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserId = "android_"+ UUID.randomUUID().toString().replace("-", "");
+        mUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -91,30 +100,28 @@ public class ConnectActivity extends AppCompatActivity {
         setContentView(R.layout.activity_connect);
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
-        mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID) ;
+        mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID);
         mAnimal = findViewById(R.id.userporta);
         ((AnimationDrawable) mAnimal.getBackground()).start();
         setButton = findViewById(R.id.setting_btn);
         roomEditText = findViewById(R.id.room_edittext);
         roomEditText.requestFocus();
         mTextSDKVersion = findViewById(R.id.tv_sdk_version);
-        mTextSDKVersion.setText(getString(R.string.app_name)+"\n" + UCloudRtcSdkEngine.getSdkVersion());
+        mTextSDKVersion.setText(getString(R.string.app_name) + "\n" + UCloudRtcSdkEngine.getSdkVersion());
         connectButton = findViewById(R.id.connect_button);
         connectButton.setOnClickListener(view -> {
-            mRoomid = roomEditText.getText().toString() ;
+            mRoomid = roomEditText.getText().toString();
             if (mRoomid.isEmpty()) {
-                ToastUtils.shortShow(getApplicationContext(),"房间id 不能为空");
-            }
-            else
-            {
+                ToastUtils.shortShow(getApplicationContext(), "房间id 不能为空");
+            } else {
                 //测试环境下SDK自动生成token
                 if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL) {
-                    mRoomToken = "testoken" ;
-                    Log.d(TAG, " appid "+ mAppid) ;
+                    mRoomToken = "testoken";
+                    Log.d(TAG, " appid " + mAppid);
                     UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
-                }else {
+                } else {
                     //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
-                    ToastUtils.shortShow(this,"正式环境下请获取自己服务器的token");
+                    ToastUtils.shortShow(this, "正式环境下请获取自己服务器的token");
 //                    new Thread(new Runnable() {
 //                        @Override
 //                        public void run() {
@@ -169,7 +176,7 @@ public class ConnectActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        
+
         RelativeLayout root = findViewById(R.id.id_rl_root);
         root.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
@@ -199,7 +206,7 @@ public class ConnectActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        Log.d(TAG, "activity onStop") ;
+        Log.d(TAG, "activity onStop");
         super.onStop();
         ((AnimationDrawable) mAnimal.getBackground()).stop();
     }

@@ -6,10 +6,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
@@ -24,46 +26,39 @@ import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class SettingActivity extends AppCompatActivity {
+
     private TextView mConfigTextView;
     private int mSelectPos = 0;
     private ArrayAdapter<String> mAdapter;
     private VideoProfilePopupWindow mSpinnerPopupWindow;
-
     private RadioGroupFlow mCaptureModeRadioGroup;
     private RadioButton mScreenCapture;
     private RadioButton mCameraCapture;
     private RadioButton mOnlyAudioCapture;
     private RadioButton mScreenAudioCapture;
     private RadioButton mMutiTrackCapture;
-
     private RadioGroupFlow mRGPublish;
     private RadioButton mRBPublishAuto;
     private RadioButton mRBPublishManul;
     private RadioGroupFlow mRGScribe;
     private RadioButton mRBScribeAuto;
     private RadioButton mRBScribeManual;
-
     private RadioGroupFlow mRGRole;
-    private RadioButton mRBRolePublish;
-    private RadioButton mRBRoleScribe;
-    private RadioButton mRBRoleBoth;
-
+    private RadioButton mRBRoleTeacher;
+    private RadioButton mRBRoleStudent;
     private RadioGroupFlow mRGClass;
     private RadioButton mRBRoomSmall;
     private RadioButton mRBRoomLarge;
-
-
     private RadioGroupFlow mEnvGroup;
     private RadioButton mDevenv;
     private RadioButton mTestenv;
-
+    private AppCompatCheckBox mCheckBox;
     private ImageButton mBackButton;
     private Button saveButton;
     private int mCaptureMode;
@@ -71,12 +66,13 @@ public class SettingActivity extends AppCompatActivity {
     private int mPublishMode;
     @CommonUtils.PubScribeMode
     private int mScribeMode;
-    private UCloudRtcSdkStreamRole mRole;
+    @CommonUtils.WhiteRoleType
+    private int mWhiteRole;
     private UCloudRtcSdkRoomType mRoomType;
     private boolean mTestMode;
     private List<String> mDefaultConfiguration = new ArrayList<>();
     private String mAppid;
-
+    private boolean mIsWhiteMode = false;
     private EditText mAppidEditText;
     private EditText mGatewayEditText;
 
@@ -87,7 +83,6 @@ public class SettingActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
-
         mConfigTextView = findViewById(R.id.config_text_view);
         mCaptureModeRadioGroup = findViewById(R.id.capture_mode_button);
         mScreenCapture = findViewById(R.id.screen_capture_button);
@@ -101,16 +96,16 @@ public class SettingActivity extends AppCompatActivity {
         mRGScribe = findViewById(R.id.rg_scribe);
         mRBScribeAuto = findViewById(R.id.rb_scribe_auto);
         mRBScribeManual = findViewById(R.id.rb_scribe_manual);
-        mRGRole = findViewById(R.id.rg_role);
-        mRBRolePublish = findViewById(R.id.rb_role_pub);
-        mRBRoleScribe = findViewById(R.id.rb_role_scribe);
-        mRBRoleBoth = findViewById(R.id.rb_role_both);
+        mRGRole = findViewById(R.id.rg_white_role);
+        mRBRoleTeacher = findViewById(R.id.rb_role_teacher);
+        mRBRoleStudent = findViewById(R.id.rb_role_student);
         mRGClass = findViewById(R.id.rg_room_type);
         mRBRoomSmall = findViewById(R.id.rb_type_small_room);
         mRBRoomLarge = findViewById(R.id.rb_type_large_room);
         mEnvGroup = findViewById(R.id.env_mode);
         mTestenv = findViewById(R.id.test_env);
         mDevenv = findViewById(R.id.dev_env);
+        mCheckBox = findViewById(R.id.checkbox_white);
 
         mAppidEditText = findViewById(R.id.appid_edittext);
         mGatewayEditText = findViewById(R.id.gateway_edittext);
@@ -132,15 +127,15 @@ public class SettingActivity extends AppCompatActivity {
             public void onClick(View v) {
                 SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.app_name),
                         Context.MODE_PRIVATE).edit();
-
                 mAppid = mAppidEditText.getEditableText().toString();
                 editor.putInt(CommonUtils.videoprofile, mSelectPos);
                 editor.putInt(CommonUtils.capture_mode, mCaptureMode);
                 editor.putString(CommonUtils.APPID_KEY, mAppid);
                 editor.putInt(CommonUtils.PUBLISH_MODE, mPublishMode);
                 editor.putInt(CommonUtils.SCRIBE_MODE, mScribeMode);
-                editor.putInt(CommonUtils.SDK_STREAM_ROLE,mRole.ordinal());
+                editor.putInt(CommonUtils.WHITE_ROLE, mWhiteRole);
                 editor.putInt(CommonUtils.SDK_CLASS_TYPE, mRoomType.ordinal());
+                editor.putBoolean(CommonUtils.BUS_WHITE_MODE , mIsWhiteMode);
                 editor.apply();
                 finish();
             }
@@ -202,31 +197,24 @@ public class SettingActivity extends AppCompatActivity {
                 break;
         }
 
-        int roleInt = preferences.getInt(CommonUtils.SDK_STREAM_ROLE, UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH.ordinal());
-        mRole = UCloudRtcSdkStreamRole.valueOf(roleInt);
-        switch (mRole) {
-            case UCLOUD_RTC_SDK_STREAM_ROLE_BOTH:
-                mRBRoleBoth.setChecked(true);
+        mWhiteRole = preferences.getInt(CommonUtils.WHITE_ROLE, CommonUtils.TEACHER_ROLE);
+        switch (mWhiteRole) {
+            case CommonUtils.TEACHER_ROLE:
+                mRBRoleTeacher.setChecked(true);
                 break;
-            case UCLOUD_RTC_SDK_STREAM_ROLE_PUB:
-                mRBRolePublish.setChecked(true);
-                break;
-            case UCLOUD_RTC_SDK_STREAM_ROLE_SUB:
-                mRBRoleScribe.setChecked(true);
+            case CommonUtils.STUDENT_ROLE:
+                mRBRoleStudent.setChecked(true);
                 break;
         }
-
 
         int roomInt = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL.ordinal());
         mRoomType = UCloudRtcSdkRoomType.valueOf(roomInt);
         switch (mRoomType) {
             case UCLOUD_RTC_SDK_ROOM_SMALL:
                 mRBRoomSmall.setChecked(true);
-                mRBRoleBoth.setEnabled(true);
                 break;
             case UCLOUD_RTC_SDK_ROOM_LARGE:
                 mRBRoomLarge.setChecked(true);
-                mRBRoleBoth.setEnabled(false);
                 break;
         }
 
@@ -275,38 +263,27 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
-        mRGRole.setOnCheckedChangeListener((group, checkedId) -> {
-            switch (group.getCheckedRadioButtonId()) {
-                case R.id.rb_role_pub:
-                    mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_PUB;
-                    break;
-                case R.id.rb_role_scribe:
-                    mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_SUB;
-                    break;
-                case R.id.rb_role_both:
-                    if(mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE){
-                        ToastUtils.shortShow(this,"大班课模式不能选择全部");
-                    }else{
-                        mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH;
-                    }
-                    break;
-            }
-        });
-
         mRGClass.setOnCheckedChangeListener((group, checkedId) -> {
             switch (group.getCheckedRadioButtonId()) {
                 case R.id.rb_type_small_room:
                     mRoomType = UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL;
-                    mRBRoleBoth.setEnabled(true);
                     break;
                 case R.id.rb_type_large_room:
                     mRoomType = UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE;
-                    mRBRoleBoth.setEnabled(false);
-                    checkRole();
                     break;
             }
         });
 
+        mRGRole.setOnCheckedChangeListener((group, checkedId) -> {
+            switch (group.getCheckedRadioButtonId()) {
+                case R.id.rb_role_teacher:
+                    mWhiteRole = CommonUtils.TEACHER_ROLE;
+                    break;
+                case R.id.rb_role_student:
+                    mWhiteRole = CommonUtils.STUDENT_ROLE;
+                    break;
+            }
+        });
 
         mRGPublish.setOnCheckedChangeListener((group, checkedId) -> {
             switch (group.getCheckedRadioButtonId()) {
@@ -329,14 +306,32 @@ public class SettingActivity extends AppCompatActivity {
                     break;
             }
         });
-    }
 
-    private void checkRole(){
-        if(mRole == UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH){
-            ToastUtils.shortShow(this,"大班课模式不能选择全部权限,默认重新选择上传权限");
-            SettingActivity.this.mRBRolePublish.setChecked(true);
-            SettingActivity.this.mRBRoleBoth.setChecked(false);
+        mIsWhiteMode = preferences.getBoolean(CommonUtils.BUS_WHITE_MODE,false);
+        mCheckBox.setChecked(mIsWhiteMode);
+        if(mIsWhiteMode){
+            mRBPublishManul.setEnabled(false);
+            mRBScribeManual.setEnabled(false);
+            mRBRoomSmall.setEnabled(false);
         }
+        mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+               mIsWhiteMode = isChecked;
+               if(isChecked){
+                   mRBPublishAuto.setChecked(true);
+                   mRBPublishManul.setEnabled(false);
+                   mRBScribeAuto.setChecked(true);
+                   mRBScribeManual.setEnabled(false);
+                   mRBRoomSmall.setEnabled(false);
+                   ToastUtils.shortShow(SettingActivity.this,"白板模式只支持自动发布和订阅，大班课模式");
+               }else{
+                   mRBPublishManul.setEnabled(true);
+                   mRBScribeManual.setEnabled(true);
+                   mRBRoomSmall.setEnabled(true);
+               }
+            }
+        });
     }
 
     private void showPopupWindow() {
