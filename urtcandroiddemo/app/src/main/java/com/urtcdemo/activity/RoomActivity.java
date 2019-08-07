@@ -226,7 +226,7 @@ public class RoomActivity extends AppCompatActivity {
                 public void run() {
                     if (code == 0) {
                         ToastUtils.shortShow(RoomActivity.this, " 加入房间成功");
-                        mRecordBtn.setVisibility(View.VISIBLE);
+//                        mRecordBtn.setVisibility(View.VISIBLE);
                         startTimeShow();
                     } else {
                         ToastUtils.shortShow(RoomActivity.this, " 加入房间失败 " +
