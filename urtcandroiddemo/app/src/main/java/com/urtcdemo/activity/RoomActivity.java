@@ -22,7 +22,6 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.ucloudrtclib.common.URTCLogUtils;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
@@ -657,7 +656,6 @@ public class RoomActivity extends AppCompatActivity {
     private void onMediaServerDisconnect() {
         localrenderview.release();
         clearGridItem();
-        URTCLogUtils.d(TAG,"destory engine");
         UCloudRtcSdkEngine.destory();
     }
 
