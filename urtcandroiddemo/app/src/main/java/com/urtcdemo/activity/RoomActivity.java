@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -60,6 +59,7 @@ public class RoomActivity extends AppCompatActivity {
     private String mRoomid = "urtc1";
     private String mRoomToken = "test token";
     private String mAppid = "";
+    private boolean mIsRecording = false;
 
     TextView title = null;
     UCloudRtcSdkSurfaceVideoView localrenderview = null;
@@ -78,6 +78,7 @@ public class RoomActivity extends AppCompatActivity {
     ImageButton mMuteMic = null;
     ImageButton mLoudSpkeader = null;
     ImageButton mMuteCam = null;
+    TextView mRecordBtn = null;
     private SteamScribePopupWindow mSpinnerPopupWindowScribe;
     private View mStreamSelect;
     private TextView mTextStream;
@@ -224,6 +225,7 @@ public class RoomActivity extends AppCompatActivity {
                 public void run() {
                     if (code == 0) {
                         ToastUtils.shortShow(RoomActivity.this, " 加入房间成功");
+//                        mRecordBtn.setVisibility(View.VISIBLE);
                         startTimeShow();
                     } else {
                         ToastUtils.shortShow(RoomActivity.this, " 加入房间失败 " +
@@ -280,9 +282,8 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-
                     if (code == 0) {
-                        ToastUtils.shortShow(RoomActivity.this, "发布视频成功");
+//                        ToastUtils.shortShow(RoomActivity.this, "发布视频成功");
                         int mediatype = info.getMediaType().ordinal();
                         if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
                             if (!sdkEngine.isAudioOnlyMode()) {
@@ -618,6 +619,30 @@ public class RoomActivity extends AppCompatActivity {
                 }
             });
         }
+
+        @Override
+        public void onRecordStart(String msg) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ToastUtils.longShow(RoomActivity.this, "onRecordStart: "+ msg);
+                    mIsRecording = true;
+                    mRecordBtn.setText("stop record");
+                }
+            });
+        }
+
+        @Override
+        public void onRecordStop(String msg) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ToastUtils.longShow(RoomActivity.this, "onRecordStart: "+ msg);
+                    mIsRecording = false;
+                    mRecordBtn.setText("start record");
+                }
+            });
+        }
     };
     private int mSelectPos;
 
@@ -659,7 +684,7 @@ public class RoomActivity extends AppCompatActivity {
         mVideoAdapter = new RemoteVideoAdapter(this);
         mVideoAdapter.setRemoveRemoteStreamReceiver(mRemoveRemoteStreamReceiver);
         mRemoteGridView.setAdapter(mVideoAdapter);
-        sdkEngine = UCloudRtcSdkEngine.createEngnine(eventListener);
+        sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
@@ -672,6 +697,18 @@ public class RoomActivity extends AppCompatActivity {
         mStreamSelect = findViewById(R.id.stream_select);
         mTextStream = findViewById(R.id.stream_text_view);
         refreshStreamInfoText();
+        mRecordBtn = findViewById(R.id.opRecord);
+
+        mRecordBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!mIsRecording){
+                    sdkEngine.startRecord(mVideoProfile);
+                }else{
+                    sdkEngine.stopRecord();
+                }
+            }
+        });
         mTextStream.setOnClickListener(new CustomerClickListener() {
             @Override
             protected void onSingleClick() {
