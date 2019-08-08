@@ -623,6 +623,16 @@ public class WhiteBoardRoomActivity extends AppCompatActivity {
                 }
             });
         }
+
+        @Override
+        public void onRecordStart(String msg) {
+
+        }
+
+        @Override
+        public void onRecordStop(String msg) {
+
+        }
     };
     private int mSelectPos;
 
@@ -677,7 +687,7 @@ public class WhiteBoardRoomActivity extends AppCompatActivity {
         mVideoAdapter.setVideoSize(UiHelper.dipToPx(this,115));
         mVideoAdapter.setRemoveRemoteStreamReceiver(mRemoveRemoteStreamReceiver);
         mRemoteGridView.setAdapter(mVideoAdapter);
-        sdkEngine = UCloudRtcSdkEngine.createEngnine(eventListener);
+        sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");

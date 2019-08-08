@@ -618,6 +618,16 @@ public class RoomActivity extends AppCompatActivity {
                 }
             });
         }
+
+        @Override
+        public void onRecordStart(String msg) {
+
+        }
+
+        @Override
+        public void onRecordStop(String msg) {
+
+        }
     };
     private int mSelectPos;
 
@@ -659,7 +669,7 @@ public class RoomActivity extends AppCompatActivity {
         mVideoAdapter = new RemoteVideoAdapter(this);
         mVideoAdapter.setRemoveRemoteStreamReceiver(mRemoveRemoteStreamReceiver);
         mRemoteGridView.setAdapter(mVideoAdapter);
-        sdkEngine = UCloudRtcSdkEngine.createEngnine(eventListener);
+        sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
