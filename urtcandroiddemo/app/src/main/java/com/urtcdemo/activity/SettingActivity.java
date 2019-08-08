@@ -324,11 +324,13 @@ public class SettingActivity extends AppCompatActivity {
                    mRBScribeAuto.setChecked(true);
                    mRBScribeManual.setEnabled(false);
                    mRBRoomSmall.setEnabled(false);
+                   mRBRoomLarge.setChecked(true);
                    ToastUtils.shortShow(SettingActivity.this,"白板模式只支持自动发布和订阅，大班课模式");
                }else{
                    mRBPublishManul.setEnabled(true);
                    mRBScribeManual.setEnabled(true);
                    mRBRoomSmall.setEnabled(true);
+
                }
             }
         });
