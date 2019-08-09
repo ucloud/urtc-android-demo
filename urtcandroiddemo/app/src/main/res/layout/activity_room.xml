@@ -158,9 +158,8 @@
 
                 <ImageButton
                     android:id="@+id/button_call_toggle_cam"
-                    android:background="#0000"
+                    android:background="@drawable/publish_layer"
                     android:src="@mipmap/video_open"
-                    android:scaleType="fitCenter"
                     android:contentDescription="toggle cam"
                     android:layout_marginEnd="8dp"
                     android:layout_width="54dp"
@@ -168,9 +167,8 @@
 
                 <ImageButton
                     android:id="@+id/button_call_switch_camera"
-                    android:background="#0000"
-                    android:scaleType="fitCenter"
-                    android:src="@mipmap/camera_switch_front"
+                    android:background="@drawable/publish_layer"
+                    android:src="@mipmap/switch_camera"
                     android:contentDescription="@string/switch_camera"
                     android:layout_marginEnd="8dp"
                     android:layout_width="54dp"
@@ -178,9 +176,8 @@
 
                 <ImageButton
                     android:id="@+id/button_call_toggle_mic"
-                    android:background="#0000"
+                    android:background="@drawable/publish_layer"
                     android:src="@mipmap/microphone"
-                    android:scaleType="fitCenter"
                     android:contentDescription="@string/toggle_mic"
                     android:layout_marginEnd="8dp"
                     android:layout_width="54dp"
@@ -188,9 +185,8 @@
 
                 <ImageButton
                     android:id="@+id/button_call_loundspeaker"
-                    android:background="#0000"
+                    android:background="@drawable/publish_layer"
                     android:src="@mipmap/loudspeaker"
-                    android:scaleType="fitCenter"
                     android:contentDescription="loud speaker on/off"
                     android:layout_width="54dp"
                     android:layout_height="54dp"/>

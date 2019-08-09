@@ -333,10 +333,11 @@ public class SettingActivity extends AppCompatActivity {
 
     private void checkRole(){
         if(mRole == UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH){
-            ToastUtils.shortShow(this,"大班课模式不能选择全部权限,默认重新选择上传权限");
-            SettingActivity.this.mRBRolePublish.setChecked(true);
-            SettingActivity.this.mRBRoleBoth.setChecked(false);
+            ToastUtils.shortShow(this,"大班课模式不能选择全部权限,默认重新选择下行权限");
         }
+        SettingActivity.this.mRBRolePublish.setChecked(false);
+        SettingActivity.this.mRBRoleScribe.setChecked(true);
+        SettingActivity.this.mRBRoleBoth.setChecked(false);
     }
 
     private void showPopupWindow() {

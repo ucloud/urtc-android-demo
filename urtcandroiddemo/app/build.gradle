@@ -43,7 +43,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.github.markzhai:blockcanary-android:1.5.0'
     testImplementation 'junit:junit:4.12'
-    implementation (name: 'ucloudrtclib_1.2.0_dd1ae99f', ext: 'aar')
+    implementation (name: 'ucloudrtclib_1.2.0_6ebd30cb', ext: 'aar')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

@@ -83,7 +83,7 @@
 
        <ImageButton
            android:id="@+id/button_call_switch_camera"
-           android:background="@mipmap/camera_switch_front"
+           android:background="@mipmap/switch_camera"
            android:contentDescription="@string/switch_camera"
            android:layout_marginEnd="8dp"
            android:layout_width="48dp"
