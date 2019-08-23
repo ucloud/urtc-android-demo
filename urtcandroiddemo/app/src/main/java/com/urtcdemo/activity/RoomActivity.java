@@ -707,7 +707,7 @@ public class RoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(!mIsRecording){
-                    sdkEngine.startRecord(mVideoProfile);
+                    sdkEngine.startRecord(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_RESOLUTION_STANDARD.ordinal());
                 }else{
                     sdkEngine.stopRecord();
                 }
