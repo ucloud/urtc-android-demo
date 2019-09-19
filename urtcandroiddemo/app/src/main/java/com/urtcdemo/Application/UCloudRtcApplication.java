@@ -10,6 +10,7 @@ import android.view.WindowManager;
 
 import com.github.moduth.blockcanary.BlockCanary;
 import com.github.moduth.blockcanary.BlockCanaryContext;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.urtcdemo.BuildConfig;
 import com.urtcdemo.utils.CommonUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
@@ -33,7 +34,7 @@ public class UCloudRtcApplication extends Application {
         windowManager.getDefaultDisplay().getMetrics(outMetrics);
         CommonUtils.mItemWidth = (outMetrics.widthPixels - UiHelper.dipToPx(this,15))/ 3;
         CommonUtils.mItemHeight = CommonUtils.mItemWidth;
-
+        CrashReport.initCrashReport(getApplicationContext(), "9a51ae062a", true);
 //        BlockCanary.install(this, new AppContext()).start();
     }
 

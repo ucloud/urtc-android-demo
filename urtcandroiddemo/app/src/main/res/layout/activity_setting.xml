@@ -14,336 +14,393 @@
         android:background="@color/backgroundColor"
         android:src="@mipmap/back" />
 
-    <RelativeLayout
-        android:id="@+id/config_video_profile"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <ScrollView
         android:layout_below="@+id/back_btn"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
-        android:layout_marginRight="30dp"
-        android:background="@drawable/oval_edit_text_background"
-        android:gravity="center_horizontal"
-        android:paddingStart="15dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="15dp"
-        android:paddingBottom="8dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/config_text_view"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:textColor="@color/textcolor" />
+            android:layout_height="match_parent">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:src="@drawable/arrow_down" />
-    </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/config_video_profile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/oval_edit_text_background"
+                android:gravity="center_horizontal"
+                android:paddingStart="15dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="15dp"
+                android:paddingBottom="8dp">
 
-    <com.urtcdemo.utils.RadioGroupFlow
-        android:id="@+id/capture_mode_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/config_video_profile"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="15dp"
-        android:orientation="horizontal"
-        android:paddingStart="0dp"
-        android:paddingTop="2dp"
-        android:paddingEnd="0dp"
-        android:paddingBottom="2dp">
+                <TextView
+                    android:id="@+id/config_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:textColor="@color/textcolor" />
 
-        <RadioButton
-            android:id="@+id/camera_capture_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/camera_capture"
-            android:textColor="@color/textcolor" />
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/arrow_down" />
+            </RelativeLayout>
 
-        <RadioButton
-            android:id="@+id/audio_capture_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/audio_capture"
-            android:textColor="@color/textcolor" />
+            <com.urtcdemo.utils.RadioGroupFlow
+                android:id="@+id/capture_mode_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/config_video_profile"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:orientation="horizontal"
+                android:paddingStart="0dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="2dp">
 
-        <RadioButton
-            android:id="@+id/screen_capture_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/screen_capture"
-            android:textColor="@color/textcolor" />
+                <RadioButton
+                    android:id="@+id/camera_capture_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/camera_capture"
+                    android:textColor="@color/textcolor" />
 
-        <RadioButton
-            android:id="@+id/screen_audio_track_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/screen_audio_track"
-            android:textColor="@color/textcolor" />
+                <RadioButton
+                    android:id="@+id/audio_capture_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/audio_capture"
+                    android:textColor="@color/textcolor" />
 
-        <RadioButton
-            android:id="@+id/muti_track_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/muti_track"
-            android:textColor="@color/textcolor" />
-    </com.urtcdemo.utils.RadioGroupFlow>
+                <RadioButton
+                    android:id="@+id/screen_capture_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/screen_capture"
+                    android:textColor="@color/textcolor" />
 
-    <com.urtcdemo.utils.RadioGroupFlow
-        android:id="@+id/env_mode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/capture_mode_button"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="15dp"
-        android:orientation="horizontal"
-        android:paddingStart="0dp"
-        android:paddingTop="2dp"
-        android:paddingEnd="0dp"
-        android:paddingBottom="2dp"
-        android:visibility="visible">
+                <RadioButton
+                    android:id="@+id/screen_audio_track_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/screen_audio_track"
+                    android:textColor="@color/textcolor" />
 
-        <RadioButton
-            android:id="@+id/dev_env"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/dev_env"
-            android:textColor="@color/textcolor" />
+                <RadioButton
+                    android:id="@+id/muti_track_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/muti_track"
+                    android:textColor="@color/textcolor" />
+            </com.urtcdemo.utils.RadioGroupFlow>
 
-        <RadioButton
-            android:id="@+id/test_env"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/test_env"
-            android:textColor="@color/textcolor" />
+            <com.urtcdemo.utils.RadioGroupFlow
+                android:id="@+id/env_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/capture_mode_button"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:orientation="horizontal"
+                android:paddingStart="0dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="2dp"
+                android:visibility="visible">
 
-    </com.urtcdemo.utils.RadioGroupFlow>
+                <RadioButton
+                    android:id="@+id/dev_env"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/dev_env"
+                    android:textColor="@color/textcolor" />
 
-    <com.urtcdemo.utils.RadioGroupFlow
-        android:id="@+id/rg_publish"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/env_mode"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="15dp"
-        android:orientation="horizontal"
-        android:paddingStart="0dp"
-        android:paddingTop="2dp"
-        android:paddingEnd="0dp"
-        android:paddingBottom="2dp"
-        android:visibility="visible">
+                <RadioButton
+                    android:id="@+id/test_env"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/test_env"
+                    android:textColor="@color/textcolor" />
 
-        <RadioButton
-            android:id="@+id/rb_pub_auto"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/pub_auto"
-            android:textColor="@color/textcolor" />
+            </com.urtcdemo.utils.RadioGroupFlow>
 
-        <RadioButton
-            android:id="@+id/rb_pub_manual"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/pub_manual"
-            android:textColor="@color/textcolor" />
+            <com.urtcdemo.utils.RadioGroupFlow
+                android:id="@+id/rg_publish"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/env_mode"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:orientation="horizontal"
+                android:paddingStart="0dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="2dp"
+                android:visibility="visible">
 
-    </com.urtcdemo.utils.RadioGroupFlow>
+                <RadioButton
+                    android:id="@+id/rb_pub_auto"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/pub_auto"
+                    android:textColor="@color/textcolor" />
 
-    <com.urtcdemo.utils.RadioGroupFlow
-        android:id="@+id/rg_scribe"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rg_publish"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="15dp"
-        android:orientation="horizontal"
-        android:paddingStart="0dp"
-        android:paddingTop="2dp"
-        android:paddingEnd="0dp"
-        android:paddingBottom="2dp"
-        android:visibility="visible">
+                <RadioButton
+                    android:id="@+id/rb_pub_manual"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/pub_manual"
+                    android:textColor="@color/textcolor" />
 
-        <RadioButton
-            android:id="@+id/rb_scribe_auto"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/scribe_auto"
-            android:textColor="@color/textcolor" />
+            </com.urtcdemo.utils.RadioGroupFlow>
 
-        <RadioButton
-            android:id="@+id/rb_scribe_manual"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/scribe_manual"
-            android:textColor="@color/textcolor" />
+            <com.urtcdemo.utils.RadioGroupFlow
+                android:id="@+id/rg_scribe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rg_publish"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:orientation="horizontal"
+                android:paddingStart="0dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="2dp"
+                android:visibility="visible">
 
-    </com.urtcdemo.utils.RadioGroupFlow>
+                <RadioButton
+                    android:id="@+id/rb_scribe_auto"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/scribe_auto"
+                    android:textColor="@color/textcolor" />
 
-    <com.urtcdemo.utils.RadioGroupFlow
-        android:id="@+id/rg_role"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rg_scribe"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="15dp"
-        android:orientation="horizontal"
-        android:paddingStart="0dp"
-        android:paddingTop="2dp"
-        android:paddingEnd="0dp"
-        android:paddingBottom="2dp"
-        android:visibility="visible">
+                <RadioButton
+                    android:id="@+id/rb_scribe_manual"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/scribe_manual"
+                    android:textColor="@color/textcolor" />
 
-        <RadioButton
-            android:id="@+id/rb_role_pub"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/role_pub"
-            android:textColor="@color/textcolor" />
+            </com.urtcdemo.utils.RadioGroupFlow>
 
-        <RadioButton
-            android:id="@+id/rb_role_scribe"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/role_scribe"
-            android:textColor="@color/textcolor" />
+            <com.urtcdemo.utils.RadioGroupFlow
+                android:id="@+id/rg_role"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rg_scribe"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:orientation="horizontal"
+                android:paddingStart="0dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="2dp"
+                android:visibility="visible">
 
-        <RadioButton
-            android:id="@+id/rb_role_both"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/role_both"
-            android:textColor="@color/textcolor" />
+                <RadioButton
+                    android:id="@+id/rb_role_pub"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/role_pub"
+                    android:textColor="@color/textcolor" />
 
-    </com.urtcdemo.utils.RadioGroupFlow>
+                <RadioButton
+                    android:id="@+id/rb_role_scribe"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/role_scribe"
+                    android:textColor="@color/textcolor" />
 
-    <com.urtcdemo.utils.RadioGroupFlow
-        android:id="@+id/rg_room_type"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rg_role"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="15dp"
-        android:orientation="horizontal"
-        android:paddingStart="0dp"
-        android:paddingTop="2dp"
-        android:paddingEnd="0dp"
-        android:paddingBottom="2dp"
-        android:visibility="visible">
+                <RadioButton
+                    android:id="@+id/rb_role_both"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/role_both"
+                    android:textColor="@color/textcolor" />
 
-        <RadioButton
-            android:id="@+id/rb_type_small_room"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/room_small"
-            android:textColor="@color/textcolor" />
+            </com.urtcdemo.utils.RadioGroupFlow>
 
-        <RadioButton
-            android:id="@+id/rb_type_large_room"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:shadowColor="@color/color_FF007AFF"
-            android:text="@string/room_large"
-            android:textColor="@color/textcolor" />
+            <com.urtcdemo.utils.RadioGroupFlow
+                android:id="@+id/rg_room_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rg_role"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:orientation="horizontal"
+                android:paddingStart="0dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="2dp"
+                android:visibility="visible">
 
-    </com.urtcdemo.utils.RadioGroupFlow>
+                <RadioButton
+                    android:id="@+id/rb_type_small_room"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/room_small"
+                    android:textColor="@color/textcolor" />
 
-    <EditText
-        android:id="@+id/appid_edittext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/rg_room_type"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="15dp"
-        android:background="@drawable/oval_edit_text_background"
-        android:maxLines="1"
-        android:paddingLeft="15dp"
-        android:paddingTop="8dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="8dp"
-        android:text="1"
-        android:textColor="@color/textcolor"
-        android:textColorHint="@color/textcolor"
-        android:textSize="18sp"
-        android:visibility="visible" />
+                <RadioButton
+                    android:id="@+id/rb_type_large_room"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:shadowColor="@color/color_FF007AFF"
+                    android:text="@string/room_large"
+                    android:textColor="@color/textcolor" />
 
-    <EditText
-        android:id="@+id/gateway_edittext"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/appid_edittext"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="15dp"
-        android:background="@drawable/oval_edit_text_background"
-        android:maxLines="1"
-        android:paddingLeft="15dp"
-        android:paddingTop="8dp"
-        android:paddingRight="15dp"
-        android:paddingBottom="8dp"
-        android:text="1"
-        android:textColor="@color/textcolor"
-        android:textColorHint="@color/textcolor"
-        android:textSize="18sp"
-        android:visibility="gone" />
+            </com.urtcdemo.utils.RadioGroupFlow>
 
-    <Button
-        android:id="@+id/save_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/gateway_edittext"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:layout_marginRight="30dp"
-        android:background="@drawable/oval_btn_background"
-        android:gravity="center"
-        android:paddingStart="15dp"
-        android:paddingTop="10dp"
-        android:paddingEnd="15dp"
-        android:paddingBottom="10dp"
-        android:text="保存"
-        android:textColor="@color/textcolor"
-        android:textSize="15sp" />
+            <EditText
+                android:id="@+id/appid_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/rg_room_type"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/oval_edit_text_background"
+                android:maxLines="1"
+                android:paddingLeft="15dp"
+                android:paddingTop="8dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="8dp"
+                android:text="1"
+                android:textColor="@color/textcolor"
+                android:textColorHint="@color/textcolor"
+                android:textSize="18sp"
+                android:visibility="visible" />
 
+            <EditText
+                android:id="@+id/gateway_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/appid_edittext"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/oval_edit_text_background"
+                android:maxLines="1"
+                android:paddingLeft="15dp"
+                android:paddingTop="8dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="8dp"
+                android:text="1"
+                android:textColor="@color/textcolor"
+                android:textColorHint="@color/textcolor"
+                android:textSize="18sp"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/stub_mix"
+                android:layout_marginTop="15dp"
+                android:layout_width="match_parent"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_below="@id/gateway_edittext"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <CheckBox
+                    android:id="@+id/cb_mix_support"
+                    android:layout_width="0dp"
+                    android:layout_weight="1.0"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textcolor"
+                    android:text="@string/mix_support"/>
+
+                <CheckBox
+                    android:id="@+id/cb_loop"
+                    android:layout_width="0dp"
+                    android:layout_weight="1.0"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/textcolor"
+                    android:text="@string/is_loop"/>
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/edit_mix_file_path"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/stub_mix"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/oval_edit_text_background"
+                android:maxLines="1"
+                android:paddingLeft="15dp"
+                android:paddingTop="8dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="8dp"
+                android:hint="@string/mix_file_path"
+                android:textColor="@color/textcolor"
+                android:textSize="18sp"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/save_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/edit_mix_file_path"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="30dp"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/oval_btn_background"
+                android:gravity="center"
+                android:paddingStart="15dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="15dp"
+                android:paddingBottom="10dp"
+                android:text="保存"
+                android:textColor="@color/textcolor"
+                android:textSize="15sp" />
+
+        </RelativeLayout>
+
+    </ScrollView>
 
 </RelativeLayout>

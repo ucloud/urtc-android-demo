@@ -76,6 +76,20 @@
             android:background="@drawable/oval_btn_background"
             android:textColor="@color/textcolor" />
 
+        <Button
+            android:id="@+id/export_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/export_log"
+            android:textSize="18sp"
+            android:paddingLeft="15dp"
+            android:paddingTop="8dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="8dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/oval_btn_background"
+            android:textColor="@color/textcolor" />
+
         <RadioGroup
             android:visibility="gone"
             android:id="@+id/id_radio_group"

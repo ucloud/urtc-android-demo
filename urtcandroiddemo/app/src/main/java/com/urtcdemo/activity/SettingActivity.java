@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
@@ -76,9 +78,14 @@ public class SettingActivity extends AppCompatActivity {
     private boolean mTestMode;
     private List<String> mDefaultConfiguration = new ArrayList<>();
     private String mAppid;
-
     private EditText mAppidEditText;
     private EditText mGatewayEditText;
+    private EditText mEditTextMixFilePath;
+    private CheckBox mCheckBoxMixSupport;
+    private CheckBox mCheckBoxLoop;
+    private boolean mSupportMix;
+    private boolean mIsLoop;
+    private String mMixFilePath;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -114,6 +121,9 @@ public class SettingActivity extends AppCompatActivity {
 
         mAppidEditText = findViewById(R.id.appid_edittext);
         mGatewayEditText = findViewById(R.id.gateway_edittext);
+        mCheckBoxLoop = findViewById(R.id.cb_loop);
+        mCheckBoxMixSupport = findViewById(R.id.cb_mix_support);
+        mEditTextMixFilePath = findViewById(R.id.edit_mix_file_path);
 
         String[] configurations = getResources().getStringArray(R.array.videoResolutions);
         mDefaultConfiguration.addAll(Arrays.asList(configurations));
@@ -141,6 +151,13 @@ public class SettingActivity extends AppCompatActivity {
                 editor.putInt(CommonUtils.SCRIBE_MODE, mScribeMode);
                 editor.putInt(CommonUtils.SDK_STREAM_ROLE,mRole.ordinal());
                 editor.putInt(CommonUtils.SDK_CLASS_TYPE, mRoomType.ordinal());
+                editor.putBoolean(CommonUtils.SDK_SUPPORT_MIX,mSupportMix);
+                UCloudRtcSdkEnv.setMixSupport(mSupportMix);
+                editor.putBoolean(CommonUtils.SDK_IS_LOOP,mIsLoop);
+                UCloudRtcSdkEnv.setLoop(mIsLoop);
+                mMixFilePath = mEditTextMixFilePath.getText().toString();
+                UCloudRtcSdkEnv.setMixFilePath(mMixFilePath);
+                editor.putString(CommonUtils.SDK_MIX_FILE_PATH,mMixFilePath);
                 editor.apply();
                 finish();
             }
@@ -307,7 +324,6 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
-
         mRGPublish.setOnCheckedChangeListener((group, checkedId) -> {
             switch (group.getCheckedRadioButtonId()) {
                 case R.id.rb_pub_auto:
@@ -329,6 +345,28 @@ public class SettingActivity extends AppCompatActivity {
                     break;
             }
         });
+
+        boolean supportMix = preferences.getBoolean(CommonUtils.SDK_SUPPORT_MIX, false);
+        mSupportMix = supportMix;
+        mCheckBoxMixSupport.setChecked(supportMix);
+        mCheckBoxMixSupport.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mSupportMix = isChecked;
+            }
+        });
+
+        boolean isLoop = preferences.getBoolean(CommonUtils.SDK_IS_LOOP, true);
+        mIsLoop = isLoop;
+        mCheckBoxLoop.setChecked(isLoop);
+        mCheckBoxLoop.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mIsLoop = isChecked;
+            }
+        });
+        String mixFilePath = preferences.getString(CommonUtils.SDK_MIX_FILE_PATH,getResources().getString(R.string.mix_file_path));
+        mEditTextMixFilePath.setText(mixFilePath);
     }
 
     private void checkRole(){

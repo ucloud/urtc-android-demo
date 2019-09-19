@@ -6,16 +6,44 @@ android {
         applicationId "com.urtcdemo"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 2
-        versionName '1.2.2'
+        versionCode 3
+        versionName '1.2.3'
         ndk {
-            abiFilters "armeabi-v8a", "armeabi-v7a"
+            // armeabi-v7a
+            abiFilters "arm64-v8a"
         }
     }
+
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+
+    signingConfigs{
+        release {
+            storeFile file("/src/main/urtc.jks")
+            storePassword "123456"
+            keyAlias "urtc"
+            keyPassword "123456"
+        }
+        debug {
+            storeFile file("/src/main/urtc.jks")
+            storePassword "123456"
+            keyAlias "urtc"
+            keyPassword "123456"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.release
         }
     }
 
@@ -43,7 +71,11 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.github.markzhai:blockcanary-android:1.5.0'
     testImplementation 'junit:junit:4.12'
-    implementation (name: 'ucloudrtclib_1.3.4_2186c35e', ext: 'aar')
+//    implementation (name: 'ucloudrtclib_1.3.4_2186c35e', ext: 'aar')
+    implementation project(':urtc-sdk-android')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    //bugly
+    implementation 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
+    implementation 'com.tencent.bugly:nativecrashreport:latest.release' //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0
 }

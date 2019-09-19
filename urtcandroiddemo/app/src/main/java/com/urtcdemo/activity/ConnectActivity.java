@@ -23,6 +23,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ucloudrtclib.common.URTCFileUtil;
+import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.PermissionUtils;
@@ -32,6 +34,12 @@ import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.UUID;
 
 public class ConnectActivity extends AppCompatActivity {
@@ -43,6 +51,7 @@ public class ConnectActivity extends AppCompatActivity {
     private String mAppid = "" ;
     private String mRoomToken = "" ;
     private View connectButton;
+    private View exportButton;
     private ImageButton setButton ;
     private TextView mTextSDKVersion;
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
@@ -92,6 +101,9 @@ public class ConnectActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
         mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID) ;
+        UCloudRtcSdkEnv.setMixSupport(preferences.getBoolean(CommonUtils.SDK_SUPPORT_MIX,false));
+        UCloudRtcSdkEnv.setLoop(preferences.getBoolean(CommonUtils.SDK_IS_LOOP,true));
+        UCloudRtcSdkEnv.setMixFilePath(preferences.getString(CommonUtils.SDK_MIX_FILE_PATH,getResources().getString(R.string.mix_file_path)));
         mAnimal = findViewById(R.id.userporta);
         ((AnimationDrawable) mAnimal.getBackground()).start();
         setButton = findViewById(R.id.setting_btn);
@@ -161,7 +173,31 @@ public class ConnectActivity extends AppCompatActivity {
                 }
             }
         });
+        exportButton = findViewById(R.id.export_button);
+        exportButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
 
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        URTCFileUtil.getInstance().copyFolder("/data/user/0/com.urtcdemo/app_bugly", "/sdcard/urtc/app_bugly"  );
+                        URTCFileUtil.getInstance().copyFolder("/data/tombstones", "/sdcard/urtc/tombstones"  );
+                               Handler handler = new Handler(Looper.getMainLooper());
+                               handler.post(new Runnable() {
+                                   @Override
+                                   public void run() {
+                                       ToastUtils.shortShow(ConnectActivity.this,"拷贝完成");
+                                   }
+                               });
+
+                    }
+                });
+                thread.start();
+
+
+            }
+        });
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -189,6 +225,8 @@ public class ConnectActivity extends AppCompatActivity {
 
         String[] permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         PermissionUtils.needsPermissions(this, permissions);
+        Thread thread = new Thread(new CopyMixFileTask(this));
+        thread.start();
     }
 
     @Override
@@ -202,6 +240,83 @@ public class ConnectActivity extends AppCompatActivity {
         Log.d(TAG, "activity onStop") ;
         super.onStop();
         ((AnimationDrawable) mAnimal.getBackground()).stop();
+    }
+
+    static class CopyMixFileTask implements Runnable{
+
+        WeakReference<AppCompatActivity> context;
+
+        public CopyMixFileTask(AppCompatActivity context) {
+            this.context = new WeakReference<AppCompatActivity>(context);
+        }
+
+        @Override
+        public void run() {
+            if(context != null && context.get()!=null){
+                String storageFileDir = context.get().getResources().getString(R.string.mix_file_dir);
+                String storageFilePath = storageFileDir+File.separator+"dy.mp3";
+                File fileStorage = new File(storageFilePath);
+                boolean needCopy = false;
+                if(!fileStorage.exists()){
+                    needCopy = true;
+                }
+                Handler handler = new Handler(Looper.getMainLooper());
+                if(needCopy){
+                    File file = new File(storageFileDir);
+                    if (!file.exists()) {//如果文件夹不存在，则创建新的文件夹
+                        file.mkdirs();
+                    }
+                    readInputStream(storageFilePath,context.get().getResources().openRawResource(R.raw.dy));
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                                ToastUtils.shortShow(UCloudRtcSdkEnv.getsApplication(),"default mix file copy success");
+                        }
+                    });
+                }else{
+//                    handler.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            ToastUtils.shortShow(UCloudRtcSdkEnv.getsApplication(),"mix file already exist");
+//                        }
+//                    });
+                }
+                context.clear();
+                context = null;
+            }
+        }
+
+        /**
+         * 读取输入流中的数据写入输出流
+         *
+         * @param storagePath 目标文件路径
+         * @param inputStream 输入流
+         */
+        public void readInputStream(String storagePath, InputStream inputStream) {
+            File file = new File(storagePath);
+            try {
+                if (!file.exists()) {
+                    // 1.建立通道对象
+                    FileOutputStream fos = new FileOutputStream(file);
+                    // 2.定义存储空间
+                    byte[] buffer = new byte[1024];
+                    // 3.开始读文件
+                    int length = 0;
+                    while ((length = inputStream.read(buffer)) != -1) {// 循环从输入流读取buffer字节
+                        // 将Buffer中的数据写到outputStream对象中
+                        fos.write(buffer, 0, length);
+                    }
+                    fos.flush();// 刷新缓冲区
+                    // 4.关闭流
+                    fos.close();
+                    inputStream.close();
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
