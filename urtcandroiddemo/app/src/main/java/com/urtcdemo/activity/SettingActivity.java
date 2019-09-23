@@ -18,6 +18,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.ucloudrtclib.netengine.URTCWSDefine;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
@@ -367,6 +368,23 @@ public class SettingActivity extends AppCompatActivity {
         });
         String mixFilePath = preferences.getString(CommonUtils.SDK_MIX_FILE_PATH,getResources().getString(R.string.mix_file_path));
         mEditTextMixFilePath.setText(mixFilePath);
+
+        //test log pre
+//        TextView textView = findViewById(R.id.btn_log_pre);
+//        textView.setText(URTCWSDefine.logPre?"pre":"online");
+//        textView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(URTCWSDefine.logPre){
+//                    URTCWSDefine.logPre = false;
+//                }else{
+//                    URTCWSDefine.logPre = true;
+//                }
+//                textView.setText(URTCWSDefine.logPre?"pre":"online");
+//                URTCWSDefine.statsReportUrl = URTCWSDefine.logPre ? "https://logpre.urtc.com.cn:443/api/rtcClinetLog" : "https://log.urtc.com.cn:443/api/rtcClinetLog";
+//                URTCWSDefine.joinLeaveReportUrl = URTCWSDefine.logPre ? "https://logpre.urtc.com.cn:443/api/rtcJoinLeaveClientLog" : "https://log.urtc.com.cn:443/api/rtcJoinLeaveClientLog";
+//            }
+//        });
     }
 
     private void checkRole(){

@@ -380,12 +380,23 @@
                 android:textColor="@color/textcolor"
                 android:textSize="18sp"
                 android:visibility="visible" />
+            
+            <TextView
+                android:id="@+id/btn_log_pre"
+                android:background="@color/color_FFFFFFFF"
+                android:layout_below="@id/edit_mix_file_path"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="15dp"
+                android:text="pre"
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/save_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/edit_mix_file_path"
+                android:layout_below="@id/btn_log_pre"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="30dp"
                 android:layout_marginRight="30dp"
@@ -399,6 +410,8 @@
                 android:textColor="@color/textcolor"
                 android:textSize="15sp" />
 
+        
+        
         </RelativeLayout>
 
     </ScrollView>
