@@ -22,7 +22,6 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.ucloudrtclib.common.URTCLogUtils;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
@@ -652,7 +651,7 @@ public class RoomActivity extends AppCompatActivity {
         @Override
         public void onAudioDeviceChanged(UCloudRtcSdkAudioDevice device) {
             defaultAudioDevice = device;
-            URTCLogUtils.d(TAG,"URTCAudioManager: room change device to "+ defaultAudioDevice);
+//            URTCLogUtils.d(TAG,"URTCAudioManager: room change device to "+ defaultAudioDevice);
             if (defaultAudioDevice == UCloudRtcSdkAudioDevice.UCLOUD_RTC_SDK_AUDIODEVICE_SPEAKER) {
                 mLoudSpkeader.setImageResource(R.mipmap.loudspeaker);
                 mSpeakerOn = true;
@@ -887,7 +886,7 @@ public class RoomActivity extends AppCompatActivity {
         }
 
         defaultAudioDevice = sdkEngine.getDefaultAudioDevice();
-        URTCLogUtils.d(TAG,"URTCAudioManager audio device room with: "+defaultAudioDevice);
+//        URTCLogUtils.d(TAG,"URTCAudioManager audio device room with: "+defaultAudioDevice);
         if (defaultAudioDevice == UCloudRtcSdkAudioDevice.UCLOUD_RTC_SDK_AUDIODEVICE_SPEAKER) {
             mLoudSpkeader.setImageResource(R.mipmap.loudspeaker);
             mSpeakerOn = true;

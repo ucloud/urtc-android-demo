@@ -18,7 +18,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.ucloudrtclib.netengine.URTCWSDefine;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
