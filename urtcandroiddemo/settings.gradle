@@ -1,1 +1,1 @@
-include ':app', ':ucloud_business','urtc-sdk-android'
+include ':app','urtc-sdk-android','ucloud_business_sdk'
