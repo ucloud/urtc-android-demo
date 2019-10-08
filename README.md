@@ -1,5 +1,5 @@
 # 1 描述
-URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK，支持android4.4及以上系统，提供了音视频通话基础功能，提供灵活的接口，支持高度定制以及二次开发。
+URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK，支持android5.1及以上系统，提供了音视频通话基础功能，提供灵活的接口，支持高度定制以及二次开发。
 
 # 2 功能列表
 
