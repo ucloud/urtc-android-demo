@@ -18,6 +18,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
@@ -370,18 +371,17 @@ public class SettingActivity extends AppCompatActivity {
 
         //test log pre
 //        TextView textView = findViewById(R.id.btn_log_pre);
-//        textView.setText(URTCWSDefine.logPre?"pre":"online");
+//        textView.setText(URTCLogReportManager.logPre?"pre":"online");
 //        textView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                if(URTCWSDefine.logPre){
-//                    URTCWSDefine.logPre = false;
+//                if(URTCLogReportManager.logPre){
+//                    URTCLogReportManager.logPre = false;
 //                }else{
-//                    URTCWSDefine.logPre = true;
+//                    URTCLogReportManager.logPre = true;
 //                }
-//                textView.setText(URTCWSDefine.logPre?"pre":"online");
-//                URTCWSDefine.statsReportUrl = URTCWSDefine.logPre ? "https://logpre.urtc.com.cn:443/api/rtcClinetLog" : "https://log.urtc.com.cn:443/api/rtcClinetLog";
-//                URTCWSDefine.joinLeaveReportUrl = URTCWSDefine.logPre ? "https://logpre.urtc.com.cn:443/api/rtcJoinLeaveClientLog" : "https://log.urtc.com.cn:443/api/rtcJoinLeaveClientLog";
+//                URTCLogReportManager.refreshUrl();
+//                textView.setText(URTCLogReportManager.logPre?"pre":"online");
 //            }
 //        });
     }

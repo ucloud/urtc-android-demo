@@ -23,7 +23,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.PermissionUtils;
@@ -104,6 +103,7 @@ public class ConnectActivity extends AppCompatActivity {
         UCloudRtcSdkEnv.setMixSupport(preferences.getBoolean(CommonUtils.SDK_SUPPORT_MIX,false));
         UCloudRtcSdkEnv.setLoop(preferences.getBoolean(CommonUtils.SDK_IS_LOOP,true));
         UCloudRtcSdkEnv.setMixFilePath(preferences.getString(CommonUtils.SDK_MIX_FILE_PATH,getResources().getString(R.string.mix_file_path)));
+        UCloudRtcSdkEnv.setLogReport(true);
         mAnimal = findViewById(R.id.userporta);
         ((AnimationDrawable) mAnimal.getBackground()).start();
         setButton = findViewById(R.id.setting_btn);
@@ -270,14 +270,14 @@ public class ConnectActivity extends AppCompatActivity {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                                ToastUtils.shortShow(UCloudRtcSdkEnv.getsApplication(),"default mix file copy success");
+                                ToastUtils.shortShow(UCloudRtcSdkEnv.getApplication(),"default mix file copy success");
                         }
                     });
                 }else{
 //                    handler.post(new Runnable() {
 //                        @Override
 //                        public void run() {
-//                            ToastUtils.shortShow(UCloudRtcSdkEnv.getsApplication(),"mix file already exist");
+//                            ToastUtils.shortShow(UCloudRtcSdkEnv.getApplication(),"mix file already exist");
 //                        }
 //                    });
                 }

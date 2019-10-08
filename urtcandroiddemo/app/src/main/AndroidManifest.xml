@@ -31,7 +31,6 @@
         android:usesCleartextTraffic="true"
         android:debuggable="true">
 
-
         <activity
             android:name=".activity.ConnectActivity"
             android:label="@string/app_name"
@@ -56,12 +55,20 @@
                     android:scheme="http" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activity.RoomActivity"
             android:screenOrientation="portrait"></activity>
+
         <activity
             android:name=".activity.SettingActivity"
             android:screenOrientation="portrait"></activity>
+
+        <service
+            android:name="com.ucloudrtclib.monitor.MonitorService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote"></service>
     </application>
 
 </manifest>

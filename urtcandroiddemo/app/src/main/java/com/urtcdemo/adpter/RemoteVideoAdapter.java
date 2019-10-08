@@ -193,6 +193,10 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
         return medialist.size();
     }
 
+    public HashMap<String, URTCVideoViewInfo> getStreamViews() {
+        return mStreamViews;
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(View itemView) {
             super(itemView);

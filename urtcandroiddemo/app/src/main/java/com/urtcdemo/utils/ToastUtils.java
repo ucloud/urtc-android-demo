@@ -7,10 +7,10 @@ import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 
 public class ToastUtils {
     public static void shortShow(Context context, String msg) {
-        Toast.makeText(UCloudRtcSdkEnv.getsApplication().getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(UCloudRtcSdkEnv.getApplication().getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
     public static void longShow(Context context, String msg) {
-        Toast.makeText(UCloudRtcSdkEnv.getsApplication().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+        Toast.makeText(UCloudRtcSdkEnv.getApplication().getApplicationContext(), msg, Toast.LENGTH_LONG).show();
     }
 }
