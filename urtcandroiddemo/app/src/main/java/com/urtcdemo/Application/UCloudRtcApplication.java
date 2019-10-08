@@ -26,6 +26,7 @@ public class UCloudRtcApplication extends Application {
         super.onCreate();
         sContext = this;
         UCloudRtcSdkEnv.initEnv(getApplicationContext(), this);
+        UCloudRtcSdkEnv.setWriteToLogCat(false);
         UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo) ;
         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
         UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.SEC_KEY);

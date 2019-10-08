@@ -71,22 +71,7 @@ public class ConnectActivity extends AppCompatActivity {
             return;
         }
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
-        if (!mStartSuccess) {
-            mStartSuccess=true;
-            Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
-            intent.putExtra("room_id", mRoomid);
-            intent.putExtra("user_id", mUserId);
-            intent.putExtra("app_id", mAppid);
-            intent.putExtra("token", mRoomToken);
-            mMainHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startActivity(intent);
-                    finish();
-                    mStartSuccess=false;
-                }
-            },500);
-        }
+        startRoomActivity();
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,7 +108,11 @@ public class ConnectActivity extends AppCompatActivity {
                 if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL) {
                     mRoomToken = "testoken" ;
                     Log.d(TAG, " appid "+ mAppid) ;
-                    UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
+                    }else{
+                        startRoomActivity();
+                    }
                 }else {
                     //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
                     ToastUtils.shortShow(this,"正式环境下请获取自己服务器的token");
@@ -227,6 +216,25 @@ public class ConnectActivity extends AppCompatActivity {
         PermissionUtils.needsPermissions(this, permissions);
         Thread thread = new Thread(new CopyMixFileTask(this));
         thread.start();
+    }
+
+    private void startRoomActivity(){
+        if (!mStartSuccess) {
+            mStartSuccess=true;
+            Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
+            intent.putExtra("room_id", mRoomid);
+            intent.putExtra("user_id", mUserId);
+            intent.putExtra("app_id", mAppid);
+            intent.putExtra("token", mRoomToken);
+            mMainHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(intent);
+                    finish();
+                    mStartSuccess=false;
+                }
+            },500);
+        }
     }
 
     @Override
