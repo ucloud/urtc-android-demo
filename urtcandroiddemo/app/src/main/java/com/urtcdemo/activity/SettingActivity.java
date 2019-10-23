@@ -20,7 +20,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 
-import com.ucloudrtclib.monitor.URTCLogReportManager;
+//import com.ucloudrtclib.monitor.URTCLogReportManager;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.R;
@@ -386,20 +386,20 @@ public class SettingActivity extends AppCompatActivity {
         mEditTextMixFilePath.setText(mixFilePath);
 
         //test log pre
-        TextView textView = findViewById(R.id.btn_log_pre);
-        textView.setText(URTCLogReportManager.logPre ? "pre" : "online");
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (URTCLogReportManager.logPre) {
-                    URTCLogReportManager.logPre = false;
-                } else {
-                    URTCLogReportManager.logPre = true;
-                }
-                URTCLogReportManager.refreshUrl();
-                textView.setText(URTCLogReportManager.logPre ? "pre" : "online");
-            }
-        });
+//        TextView textView = findViewById(R.id.btn_log_pre);
+//        textView.setText(URTCLogReportManager.logPre ? "pre" : "online");
+//        textView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (URTCLogReportManager.logPre) {
+//                    URTCLogReportManager.logPre = false;
+//                } else {
+//                    URTCLogReportManager.logPre = true;
+//                }
+//                URTCLogReportManager.refreshUrl();
+//                textView.setText(URTCLogReportManager.logPre ? "pre" : "online");
+//            }
+//        });
         if(!TextUtils.isEmpty(UCloudRtcApplication.getUserId())){
             mUserIdEditText.setText(UCloudRtcApplication.getUserId());
         }
