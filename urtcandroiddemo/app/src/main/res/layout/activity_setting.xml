@@ -316,10 +316,28 @@
                 android:visibility="visible" />
 
             <EditText
-                android:id="@+id/gateway_edittext"
+                android:id="@+id/userid_edittext"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/appid_edittext"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/oval_edit_text_background"
+                android:maxLines="1"
+                android:paddingLeft="15dp"
+                android:paddingTop="8dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="8dp"
+                android:hint="android_user0"
+                android:textColor="@color/textcolor"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/gateway_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/userid_edittext"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginRight="15dp"

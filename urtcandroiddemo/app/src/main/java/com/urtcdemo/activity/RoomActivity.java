@@ -16,7 +16,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.Chronometer;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -81,6 +83,7 @@ public class RoomActivity extends AppCompatActivity {
     ImageButton mLoudSpkeader = null;
     ImageButton mMuteCam = null;
     TextView mRecordBtn = null;
+    CheckBox  mCheckBoxMirror = null;
     private SteamScribePopupWindow mSpinnerPopupWindowScribe;
     private View mStreamSelect;
     private TextView mTextStream;
@@ -718,15 +721,17 @@ public class RoomActivity extends AppCompatActivity {
         mTextStream = findViewById(R.id.stream_text_view);
         refreshStreamInfoText();
         mRecordBtn = findViewById(R.id.opRecord);
+        mCheckBoxMirror = findViewById(R.id.cb_mirror);
 
-        mRecordBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mIsRecording) {
-                    sdkEngine.startRecord(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_RESOLUTION_STANDARD.ordinal());
-                } else {
-                    sdkEngine.stopRecord();
-                }
+        mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
+        mCheckBoxMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            UCloudRtcSdkEnv.setFrontCameraMirror(isChecked);
+        });
+        mRecordBtn.setOnClickListener(v -> {
+            if (!mIsRecording) {
+                sdkEngine.startRecord(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_RESOLUTION_STANDARD.ordinal());
+            } else {
+                sdkEngine.stopRecord();
             }
         });
         mTextStream.setOnClickListener(new CustomerClickListener() {
@@ -829,7 +834,7 @@ public class RoomActivity extends AppCompatActivity {
 
         mMuteCam.setOnClickListener(v -> onToggleCamera());
 
-        title = findViewById(R.id.titlebar);
+        title = findViewById(R.id.text_room);
         title.setText("roomid: " + mRoomid);
         //title.setText("roomid: "+mRoomid+"\nuid: "+ mUserid);
 

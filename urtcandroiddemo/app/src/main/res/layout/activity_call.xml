@@ -9,7 +9,7 @@
                 tools:ignore="MergeRootFrame">
 
     <RelativeLayout
-        android:id="@+id/titlebar"
+        android:id="@+id/text_room"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/color_FF121832"
@@ -42,7 +42,7 @@
         android:layout_above="@id/connect_button"
         android:layout_height="match_parent"
         android:background="@color/color_666666"
-        android:layout_below="@+id/titlebar">
+        android:layout_below="@+id/text_room">
 
         <FrameLayout
             android:layout_width="match_parent"

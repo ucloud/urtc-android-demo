@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.PermissionUtils;
@@ -76,7 +77,7 @@ public class ConnectActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserId = "android_"+ UUID.randomUUID().toString().replace("-", "");
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -223,6 +224,8 @@ public class ConnectActivity extends AppCompatActivity {
             mStartSuccess=true;
             Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
             intent.putExtra("room_id", mRoomid);
+            String autoGenUserId = "android_"+ UUID.randomUUID().toString().replace("-", "");
+            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId():autoGenUserId;
             intent.putExtra("user_id", mUserId);
             intent.putExtra("app_id", mAppid);
             intent.putExtra("token", mRoomToken);

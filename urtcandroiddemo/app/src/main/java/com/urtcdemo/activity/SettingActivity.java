@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -19,7 +20,9 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 
+import com.ucloudrtclib.monitor.URTCLogReportManager;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
+import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.RadioGroupFlow;
@@ -32,6 +35,9 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class SettingActivity extends AppCompatActivity {
     private TextView mConfigTextView;
@@ -80,6 +86,7 @@ public class SettingActivity extends AppCompatActivity {
     private List<String> mDefaultConfiguration = new ArrayList<>();
     private String mAppid;
     private EditText mAppidEditText;
+    private EditText mUserIdEditText;
     private EditText mGatewayEditText;
     private EditText mEditTextMixFilePath;
     private CheckBox mCheckBoxMixSupport;
@@ -121,6 +128,7 @@ public class SettingActivity extends AppCompatActivity {
         mDevenv = findViewById(R.id.dev_env);
 
         mAppidEditText = findViewById(R.id.appid_edittext);
+        mUserIdEditText = findViewById(R.id.userid_edittext);
         mGatewayEditText = findViewById(R.id.gateway_edittext);
         mCheckBoxLoop = findViewById(R.id.cb_loop);
         mCheckBoxMixSupport = findViewById(R.id.cb_mix_support);
@@ -145,24 +153,32 @@ public class SettingActivity extends AppCompatActivity {
                         Context.MODE_PRIVATE).edit();
 
                 mAppid = mAppidEditText.getEditableText().toString();
+                String userId = stringFilter(mUserIdEditText.getEditableText().toString());
+                if(!TextUtils.isEmpty(userId)){
+                    if(!userId.startsWith("android_")){
+                        userId = "android_" + userId;
+                    }
+                    UCloudRtcApplication.setUserId(userId);
+                }
                 editor.putInt(CommonUtils.videoprofile, mSelectPos);
                 editor.putInt(CommonUtils.capture_mode, mCaptureMode);
                 editor.putString(CommonUtils.APPID_KEY, mAppid);
                 editor.putInt(CommonUtils.PUBLISH_MODE, mPublishMode);
                 editor.putInt(CommonUtils.SCRIBE_MODE, mScribeMode);
-                editor.putInt(CommonUtils.SDK_STREAM_ROLE,mRole.ordinal());
+                editor.putInt(CommonUtils.SDK_STREAM_ROLE, mRole.ordinal());
                 editor.putInt(CommonUtils.SDK_CLASS_TYPE, mRoomType.ordinal());
-                editor.putBoolean(CommonUtils.SDK_SUPPORT_MIX,mSupportMix);
+                editor.putBoolean(CommonUtils.SDK_SUPPORT_MIX, mSupportMix);
                 UCloudRtcSdkEnv.setMixSupport(mSupportMix);
-                editor.putBoolean(CommonUtils.SDK_IS_LOOP,mIsLoop);
+                editor.putBoolean(CommonUtils.SDK_IS_LOOP, mIsLoop);
                 UCloudRtcSdkEnv.setLoop(mIsLoop);
                 mMixFilePath = mEditTextMixFilePath.getText().toString();
                 UCloudRtcSdkEnv.setMixFilePath(mMixFilePath);
-                editor.putString(CommonUtils.SDK_MIX_FILE_PATH,mMixFilePath);
+                editor.putString(CommonUtils.SDK_MIX_FILE_PATH, mMixFilePath);
                 editor.apply();
                 finish();
             }
         });
+
 
         mConfigTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -302,9 +318,9 @@ public class SettingActivity extends AppCompatActivity {
                     mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_SUB;
                     break;
                 case R.id.rb_role_both:
-                    if(mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE){
-                        ToastUtils.shortShow(this,"大班课模式不能选择全部");
-                    }else{
+                    if (mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE) {
+                        ToastUtils.shortShow(this, "大班课模式不能选择全部");
+                    } else {
                         mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH;
                     }
                     break;
@@ -366,29 +382,42 @@ public class SettingActivity extends AppCompatActivity {
                 mIsLoop = isChecked;
             }
         });
-        String mixFilePath = preferences.getString(CommonUtils.SDK_MIX_FILE_PATH,getResources().getString(R.string.mix_file_path));
+        String mixFilePath = preferences.getString(CommonUtils.SDK_MIX_FILE_PATH, getResources().getString(R.string.mix_file_path));
         mEditTextMixFilePath.setText(mixFilePath);
 
         //test log pre
-//        TextView textView = findViewById(R.id.btn_log_pre);
-//        textView.setText(URTCLogReportManager.logPre?"pre":"online");
-//        textView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(URTCLogReportManager.logPre){
-//                    URTCLogReportManager.logPre = false;
-//                }else{
-//                    URTCLogReportManager.logPre = true;
-//                }
-//                URTCLogReportManager.refreshUrl();
-//                textView.setText(URTCLogReportManager.logPre?"pre":"online");
-//            }
-//        });
+        TextView textView = findViewById(R.id.btn_log_pre);
+        textView.setText(URTCLogReportManager.logPre ? "pre" : "online");
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (URTCLogReportManager.logPre) {
+                    URTCLogReportManager.logPre = false;
+                } else {
+                    URTCLogReportManager.logPre = true;
+                }
+                URTCLogReportManager.refreshUrl();
+                textView.setText(URTCLogReportManager.logPre ? "pre" : "online");
+            }
+        });
+        if(!TextUtils.isEmpty(UCloudRtcApplication.getUserId())){
+            mUserIdEditText.setText(UCloudRtcApplication.getUserId());
+        }
     }
 
-    private void checkRole(){
-        if(mRole == UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH){
-            ToastUtils.shortShow(this,"大班课模式不能选择全部权限,默认重新选择下行权限");
+    public static String stringFilter(String str) throws PatternSyntaxException {
+        // 只允许字母和数字
+        // String   regEx  =  "[^a-zA-Z0-9]";
+        // 清除掉所有特殊字符
+        String regEx = "[`~!@#$%^&*()+=|{}':;',//[//].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(str);
+        return m.replaceAll("").trim();
+    }
+
+    private void checkRole() {
+        if (mRole == UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH) {
+            ToastUtils.shortShow(this, "大班课模式不能选择全部权限,默认重新选择下行权限");
         }
         SettingActivity.this.mRBRolePublish.setChecked(false);
         SettingActivity.this.mRBRoleScribe.setChecked(true);

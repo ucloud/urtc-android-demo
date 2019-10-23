@@ -1,9 +1,11 @@
 package com.urtcdemo.Application;
 
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
@@ -20,20 +22,31 @@ import com.urtcdemo.utils.UiHelper;
 
 public class UCloudRtcApplication extends Application {
 
+    private static final String TAG = "UCloudRtcApplication";
     private static Context sContext;
+    private static String sUserId;
+
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d(TAG, "onCreate: " + this);
+        if (TextUtils.equals(getCurrentProcessName(this), getPackageName())) {
+//            Log.d(TAG, "init: ");
+            init();//判断成功后才执行初始化代码
+        }
+    }
+
+    private void init(){
         sContext = this;
         UCloudRtcSdkEnv.initEnv(getApplicationContext(), this);
-        UCloudRtcSdkEnv.setWriteToLogCat(false);
-        UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo) ;
+        UCloudRtcSdkEnv.setWriteToLogCat(true);
+        UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo);
         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
         UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.SEC_KEY);
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics outMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(outMetrics);
-        CommonUtils.mItemWidth = (outMetrics.widthPixels - UiHelper.dipToPx(this,15))/ 3;
+        CommonUtils.mItemWidth = (outMetrics.widthPixels - UiHelper.dipToPx(this, 15)) / 3;
         CommonUtils.mItemHeight = CommonUtils.mItemWidth;
         CrashReport.initCrashReport(getApplicationContext(), "9a51ae062a", true);
 //        BlockCanary.install(this, new AppContext()).start();
@@ -72,9 +85,32 @@ public class UCloudRtcApplication extends Application {
         }
     }
 
-    private static Context getAppContext() {
+    public static Context getAppContext() {
         return sContext;
     }
 
+    public static UCloudRtcApplication getInstance() {
+        return (UCloudRtcApplication) sContext;
+    }
 
+    public static String getUserId() {
+        return sUserId;
+    }
+
+    public static void setUserId(String userId) {
+        sUserId = userId;
+    }
+
+    private String getCurrentProcessName(Context context) {
+        int pid = android.os.Process.myPid();
+        ActivityManager mActivityManager = (ActivityManager) context
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningAppProcessInfo appProcess : mActivityManager
+                .getRunningAppProcesses()) {
+            if (appProcess.pid == pid) {
+                return appProcess.processName;
+            }
+        }
+        return null;
+    }
 }

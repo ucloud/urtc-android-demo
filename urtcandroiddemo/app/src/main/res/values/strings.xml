@@ -251,6 +251,7 @@
     <string name="stats_data_tip"><data><![CDATA[码率: %1$d kbs\n帧率: %2$d fps\n视频大小: %3$d x %4$d\n延时: %5$d ms\n丢包率: %6$d\ncpuAverage: %7$d\ncpuCurrent: %8$d\nfreqScaleAver: %9$d]]></data></string>
 
     <string name="mix_support">是否支持混合</string>
+    <string name="mirror">镜像</string>
     <string name="is_loop">是否循环混合</string>
     <string name="mix_file_path">/sdcard/urtc/dy.mp3</string>
     <string name="mix_file_dir">/sdcard/urtc/</string>

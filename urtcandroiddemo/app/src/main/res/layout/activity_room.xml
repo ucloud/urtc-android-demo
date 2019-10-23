@@ -67,10 +67,10 @@
 
                     <TextView
                         android:layout_marginLeft="20dp"
-                        android:id="@+id/titlebar"
+                        android:id="@+id/text_room"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=""
+                        android:text="11"
                         android:textColor="@color/colorWhite"></TextView>
 
                     <TextView
@@ -84,6 +84,15 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:textColor="@color/colorWhite"></TextView>
+
+                    <CheckBox
+                        android:id="@+id/cb_mirror"
+                        android:layout_width="0dp"
+                        android:layout_weight="1.0"
+                        android:layout_marginLeft="20dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/textcolor"
+                        android:text="@string/mirror"/>
 
                 </LinearLayout>
 
