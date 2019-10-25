@@ -45,6 +45,6 @@
 * sdk 修复切换App 过一阵显示黑屏
 * app 配合sdk 修改黑屏，修改录屏兼容性
 
-## 1.5.1 版本 19-10-25 sdk dc5b6ccc 1.5.5 / app 1.5.1 
+## 1.5.5 版本 19-10-25 sdk dc5b6ccc 1.5.5  
 * sdk 修改录像功能，更改sdk文档
 * sdk 增加日志上报中pull的streamid 和 userid
