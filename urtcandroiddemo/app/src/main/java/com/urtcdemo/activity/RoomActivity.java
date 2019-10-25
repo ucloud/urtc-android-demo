@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -62,7 +61,10 @@ public class RoomActivity extends AppCompatActivity {
     private String mRoomid = "urtc1";
     private String mRoomToken = "test token";
     private String mAppid = "";
+    private String mBucket = "urtc-test";
+    private String mRegion = "cn-bj";
     private boolean mIsRecording = false;
+    private boolean mAtomOpStart = false;
     private boolean mIsPublished = false;
 
     TextView title = null;
@@ -631,25 +633,35 @@ public class RoomActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onRecordStart(String msg) {
+        public void onRecordStart(int code,String fileName) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ToastUtils.longShow(RoomActivity.this, "onRecordStart: " + msg);
-                    mIsRecording = true;
-                    mRecordBtn.setText("stop record");
+                    if(code == NET_ERR_CODE_OK.ordinal()){
+                        String videoPath = "http://"+ mBucket + "."+ mRegion +".ufileos.com/" + fileName;
+                        Log.d(TAG,videoPath);
+                        ToastUtils.longShow(RoomActivity.this, "观看地址: " +videoPath );
+                        mIsRecording = true;
+                        mRecordBtn.setText("stop record");
+                        if(mAtomOpStart)
+                            mAtomOpStart = false;
+                    }else{
+                        ToastUtils.longShow(RoomActivity.this, "录制开始失败: 原因：" +code );
+                    }
                 }
             });
         }
 
         @Override
-        public void onRecordStop(String msg) {
+        public void onRecordStop(int code) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ToastUtils.longShow(RoomActivity.this, "onRecordStart: " + msg);
-                    mIsRecording = false;
-                    mRecordBtn.setText("start record");
+                    ToastUtils.longShow(RoomActivity.this, "录制结束: " + (code == NET_ERR_CODE_OK.ordinal()?"成功":"失败"));
+                    if(mIsRecording){
+                        mIsRecording = false;
+                        mRecordBtn.setText("start record");
+                    }
                 }
             });
         }
@@ -729,9 +741,12 @@ public class RoomActivity extends AppCompatActivity {
         });
         mRecordBtn.setOnClickListener(v -> {
             if (!mIsRecording) {
-                sdkEngine.startRecord(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_RESOLUTION_STANDARD.ordinal());
-            } else {
+                mAtomOpStart = true;
+                sdkEngine.startRecord(3,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal(),mRegion,mBucket,UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_RESOLUTION_STANDARD.ordinal());
+            } else if(!mAtomOpStart){
+                mAtomOpStart = true;
                 sdkEngine.stopRecord();
+
             }
         });
         mTextStream.setOnClickListener(new CustomerClickListener() {

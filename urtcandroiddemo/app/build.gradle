@@ -6,9 +6,10 @@ android {
         applicationId "com.urtcdemo"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 8
-        versionName '1.5.0'
+        versionCode 9
+        versionName '1.5.1'
         ndk {
+//            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a"
             abiFilters "armeabi-v7a"
         }
     }
@@ -69,7 +70,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.github.markzhai:blockcanary-android:1.5.0'
     testImplementation 'junit:junit:4.12'
-    implementation (name: 'ucloudrtclib_1.5.1_2b202e9b', ext: 'aar')
+    implementation (name: 'ucloudrtclib_1.5.5_dc5b6ccc', ext: 'aar')
 //    implementation project(path: ':ucloud_business_sdk')
 //    implementation project(':urtc-sdk-android')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
