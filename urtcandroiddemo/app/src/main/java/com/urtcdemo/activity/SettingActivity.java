@@ -157,7 +157,7 @@ public class SettingActivity extends AppCompatActivity {
                 String userId = stringFilter(mUserIdEditText.getEditableText().toString());
                 if(!TextUtils.isEmpty(userId)){
                     if(!userId.startsWith("android_")){
-//                        userId = "android_" + userId;
+                        userId = "android_" + userId;
                     }
                     UCloudRtcApplication.setUserId(userId);
                 }
