@@ -39,8 +39,9 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
+import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
-import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCDataPusher;
+import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCDataProvider;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
 import com.urtcdemo.utils.CommonUtils;
@@ -112,6 +113,7 @@ public class RoomActivity extends AppCompatActivity {
     private int mBitmapHeight;
     private UCloudRtcSdkSurfaceVideoView mMuteView = null;
     Chronometer timeshow;
+    private int mPictureFlag = 0;
 
     private View.OnClickListener mSwapRemoteLocalListener = new View.OnClickListener() {
         @Override
@@ -948,58 +950,40 @@ public class RoomActivity extends AppCompatActivity {
         info.setRoomId(mRoomid);
         info.setUId(mUserid);
         Log.d(TAG, " roomtoken = " + mRoomToken);
-        UCloudRtcSdkEngine.onRGBCaptureResult(new UcloudRTCDataPusher() {
-            @Override
-            public ByteBuffer getSource() {
-                return getRGBBuffer();
-            }
+        UCloudRtcSdkEnv.setRGBCaptureMode(UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
+        UCloudRtcSdkEnv.setRGBCaptureMode(UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_RGB);
+        UCloudRtcSdkEngine.onRGBCaptureResult(new UcloudRTCDataProvider() {
 
             @Override
-            public ByteBuffer getDst() {
-                return getYuvBuffer();
-            }
+            public ByteBuffer provideRGBData(List<Integer> params) {
+                Bitmap bitmap = null;
+                if(mPictureFlag < 25){
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inPreferredConfig = Bitmap.Config.RGB_565;
+                    bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.timg,options);
+                    params.add(UcloudRTCDataProvider.RGB565_TO_I420);
+                }
+                else{
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                    bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.timg2,options);
+                    params.add(UcloudRTCDataProvider.RGBA_TO_I420);
+                }
 
-            @Override
-            public int getSrcWidth() {
-                return mBitmapWidth;
-            }
+                if(++mPictureFlag >50)
+                mPictureFlag = 0;
 
-            @Override
-            public int getSrcHeight() {
-                return mBitmapHeight;
-            }
-
-            @Override
-            public int getDstWidth() {
-                return mBitmapWidth;
-            }
-
-            @Override
-            public int getDstHeight() {
-                return mBitmapHeight;
-            }
-
-            @Override
-            public int getType() {
-                return UcloudRTCDataPusher.RGBA_TO_I420;
+                params.add(bitmap.getWidth());
+                params.add(bitmap.getHeight());
+                ByteBuffer buffer = sdkEngine.getNativeOpInterface().
+                        createNativeByteBuffer(bitmap.getWidth()*bitmap.getHeight()*4);
+                bitmap.copyPixelsToBuffer(buffer);
+                return buffer;
             }
         });
         sdkEngine.joinChannel(info);
     }
 
-    private ByteBuffer getRGBBuffer(){
-        Bitmap bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.timg);
-        mBitmapWidth=bitmap.getWidth();
-        mBitmapHeight=bitmap.getHeight();
-        ByteBuffer buffer= JniCommon.nativeAllocateByteBuffer(bitmap.getWidth()*bitmap.getHeight()*4);
-        bitmap.copyPixelsToBuffer(buffer);
-        return buffer;
-    }
-
-    private ByteBuffer getYuvBuffer(){
-        ByteBuffer buffer= JniCommon.nativeAllocateByteBuffer(mBitmapWidth*mBitmapHeight*3/2);
-        return buffer;
-    }
 
 
     @Override
