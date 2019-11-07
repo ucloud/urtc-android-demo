@@ -950,8 +950,12 @@ public class RoomActivity extends AppCompatActivity {
         info.setRoomId(mRoomid);
         info.setUId(mUserid);
         Log.d(TAG, " roomtoken = " + mRoomToken);
-        UCloudRtcSdkEnv.setRGBCaptureMode(UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
-        UCloudRtcSdkEnv.setRGBCaptureMode(UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_RGB);
+        //普通摄像头捕获方式
+//        UCloudRtcSdkEnv.setRGBCaptureMode(
+//                UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
+        //rgb数据捕获
+        UCloudRtcSdkEnv.setRGBCaptureMode(
+                UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_RGB);
         UCloudRtcSdkEngine.onRGBCaptureResult(new UcloudRTCDataProvider() {
 
             @Override
