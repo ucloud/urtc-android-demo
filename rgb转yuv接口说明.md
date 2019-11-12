@@ -17,41 +17,92 @@ public interface UcloudRTCDataProvider {
 
 
 使用范例，RoomActivity
-
 ```
- 		//普通摄像头捕获方式,不支持切换
+//设置捕获模式
 //        UCloudRtcSdkEnv.setRGBCaptureMode(
 //                UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
         //rgb数据捕获
         UCloudRtcSdkEnv.setRGBCaptureMode(
                 UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_RGB);
-        UCloudRtcSdkEngine.onRGBCaptureResult(new UcloudRTCDataProvider() {
 
+//生产者消费者队列
+private Queue<RGBSourceData> mQueue = new LinkedList();
+
+//生产者往队列中push数据
+TimerTask timerTask = new TimerTask() {
             @Override
-            public ByteBuffer provideRGBData(List<Integer> params) {
-                Bitmap bitmap = null;
-                if(mPictureFlag < 25){
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inPreferredConfig = Bitmap.Config.RGB_565;
-                    bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.timg,options);
-                    params.add(UcloudRTCDataProvider.RGB565_TO_I420);
-                }
-                else{
-                    BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                    bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.timg2,options);
-                    params.add(UcloudRTCDataProvider.RGBA_TO_I420);
-                }
+            public void run() {
+                    synchronized (mUCloudRTCDataProvider){
+                        RGBSourceData sourceData;
+                        Bitmap bitmap = null;
+                        int type;
+                        if(mPictureFlag < 25){
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.inPreferredConfig = Bitmap.Config.RGB_565;
+                            bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.timg,options);
+                            type = UcloudRTCDataProvider.RGB565_TO_I420;
+                        }
+                        else{
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                            bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.timg2,options);
+                            type = UcloudRTCDataProvider.RGBA_TO_I420;
+                        }
 
-                if(++mPictureFlag >50)
-                mPictureFlag = 0;
+                        if(++mPictureFlag >50)
+                            mPictureFlag = 0;
+                        sourceData = new RGBSourceData(bitmap,bitmap.getWidth(),bitmap.getHeight(),type);
+                        mQueue.add(sourceData);
+                    }
 
-                params.add(bitmap.getWidth());
-                params.add(bitmap.getHeight());
-                ByteBuffer buffer = sdkEngine.getNativeOpInterface().
-                        createNativeByteBuffer(bitmap.getWidth()*bitmap.getHeight()*4);
-                bitmap.copyPixelsToBuffer(buffer);
-                return buffer;
             }
-        });
+        };
+        if(UCloudRtcSdkEnv.getCaptureMode() == UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_RGB){
+            mTimer.schedule(timerTask,0,40);
+            UCloudRtcSdkEngine.onRGBCaptureResult(mUCloudRTCDataProvider);
+        }
+
+```
+
+
+
+```
+ 		//sdk作为消费者消费数据
+     private UcloudRTCDataProvider mUCloudRTCDataProvider = new UcloudRTCDataProvider() {
+        private ByteBuffer cacheBuffer;
+        private RGBSourceData rgbSourceData;
+
+        @Override
+        public ByteBuffer provideRGBData(List<Integer> params) {
+            rgbSourceData = mQueue.poll();
+            if(rgbSourceData == null){
+                return null;
+            }else{
+                params.add(rgbSourceData.getType());
+                params.add(rgbSourceData.getWidth());
+                params.add(rgbSourceData.getHeight());
+                if(cacheBuffer == null){
+                    cacheBuffer = sdkEngine.getNativeOpInterface().
+                            createNativeByteBuffer(4096*2160*4);
+                }else{
+                    cacheBuffer.clear();
+                }
+                cacheBuffer.limit(rgbSourceData.getWidth()*rgbSourceData.getHeight()*4);
+//                ByteBuffer buffer = sdkEngine.getNativeOpInterface().
+//                        createNativeByteBuffer(bitmap.getWidth()*bitmap.getHeight()*4);
+                rgbSourceData.getSrcData().copyPixelsToBuffer(cacheBuffer);
+                rgbSourceData.getSrcData().recycle();
+                return cacheBuffer;
+            }
+        }
+        //释放数据
+        public void releaseBuffer(){
+            if(rgbSourceData != null && !rgbSourceData.getSrcData().isRecycled()){
+                rgbSourceData.getSrcData().recycle();
+            }
+            if(cacheBuffer != null){
+                sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cacheBuffer);
+            }
+        }
+    };
 ```
