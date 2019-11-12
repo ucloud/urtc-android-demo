@@ -42,6 +42,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
 import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCDataProvider;
+import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCDataReceiver;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
 import com.urtcdemo.utils.CommonUtils;
@@ -53,6 +54,10 @@ import com.urtcdemo.view.URTCVideoViewInfo;
 
 import org.webrtc.JniCommon;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -109,8 +114,6 @@ public class RoomActivity extends AppCompatActivity {
     private UCloudRtcSdkStreamInfo mLocalStreamInfo;
     private boolean mRemoteVideoMute;
     private boolean mRemoteAudioMute;
-    private int mBitmapWidth;
-    private int mBitmapHeight;
     private UCloudRtcSdkSurfaceVideoView mMuteView = null;
     Chronometer timeshow;
     private int mPictureFlag = 0;
@@ -432,6 +435,29 @@ public class RoomActivity extends AppCompatActivity {
                             videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
                             videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
                             videoView.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+                            videoView.setFrameCallBack(new UcloudRTCDataReceiver() {
+                                private int limit = 0;
+                                @Override
+                                public void onRecevieRGBAData(ByteBuffer rgbBuffer, int width, int height) {
+                                    final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
+                                    bitmap.copyPixelsFromBuffer(rgbBuffer);
+                                    String name = "/mnt/sdcard/yuvtorgba"+ limit+".jpg";
+                                    if (limit++ < 5) {
+                                        File file = new File(name);
+                                        try {
+                                            FileOutputStream out = new FileOutputStream(file);
+                                            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
+                                                out.flush();
+                                                out.close();
+                                            }
+                                        } catch (FileNotFoundException e) {
+                                            e.printStackTrace();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                            });
                             vinfo.setmRenderview(videoView);
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
