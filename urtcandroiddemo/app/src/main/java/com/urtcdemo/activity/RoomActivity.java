@@ -518,44 +518,44 @@ public class RoomActivity extends AppCompatActivity {
                         Log.d(TAG, " subscribe info: " + info.getUId() + " hasvideo " + info.isHasVideo());
                         if (info.isHasVideo()) {
                              //for callback
-                            UCloudRtcSdkSurfaceVideoView videoViewCallBack = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
-                            videoViewCallBack.setFrameCallBack(new UcloudRTCDataReceiver() {
-                                private int limit = 0;
-                                private ByteBuffer cache;
-                                @Override
-                                public void onRecevieRGBAData(ByteBuffer rgbBuffer, int width, int height) {
-                                    final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
-                                    bitmap.copyPixelsFromBuffer(rgbBuffer);
-                                    String name = "/mnt/sdcard/yuvrgba"+ limit+".jpg";
-                                    if (limit++ < 5) {
-                                        File file = new File(name);
-                                        try {
-                                            FileOutputStream out = new FileOutputStream(file);
-                                            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
-                                                out.flush();
-                                                out.close();
-                                            }
-                                        } catch (FileNotFoundException e) {
-                                            e.printStackTrace();
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public ByteBuffer getCacheBuffer() {
-                                    if(cache == null){
-                                        //根据需求来，设置最大的可能用到的buffersize，后续回调会复用这块内存
-                                        int size = 4096*2160*4;
-                                        cache = ByteBuffer.allocateDirect(size);
-                                    }
-                                    cache.clear();
-                                    return cache;
-                                }
-                            });
-                            videoViewCallBack.init(false);
-                            sdkEngine.startRemoteView(info, videoViewCallBack);
+//                            UCloudRtcSdkSurfaceVideoView videoViewCallBack = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
+//                            videoViewCallBack.setFrameCallBack(new UcloudRTCDataReceiver() {
+//                                private int limit = 0;
+//                                private ByteBuffer cache;
+//                                @Override
+//                                public void onRecevieRGBAData(ByteBuffer rgbBuffer, int width, int height) {
+//                                    final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
+//                                    bitmap.copyPixelsFromBuffer(rgbBuffer);
+//                                    String name = "/mnt/sdcard/yuvrgba"+ limit+".jpg";
+//                                    if (limit++ < 5) {
+//                                        File file = new File(name);
+//                                        try {
+//                                            FileOutputStream out = new FileOutputStream(file);
+//                                            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
+//                                                out.flush();
+//                                                out.close();
+//                                            }
+//                                        } catch (FileNotFoundException e) {
+//                                            e.printStackTrace();
+//                                        } catch (IOException e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public ByteBuffer getCacheBuffer() {
+//                                    if(cache == null){
+//                                        //根据需求来，设置最大的可能用到的buffersize，后续回调会复用这块内存
+//                                        int size = 4096*2160*4;
+//                                        cache = ByteBuffer.allocateDirect(size);
+//                                    }
+//                                    cache.clear();
+//                                    return cache;
+//                                }
+//                            });
+//                            videoViewCallBack.init(false);
+//                            sdkEngine.startRemoteView(info, videoViewCallBack);
 
                             videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
                             videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
@@ -570,13 +570,13 @@ public class RoomActivity extends AppCompatActivity {
                         vinfo.setmEanbleVideo(info.isHasVideo());
                         String mkey = info.getUId() + info.getMediaType().toString();
                         vinfo.setKey(mkey);
-//                        if (mVideoAdapter != null) {
-//                            mVideoAdapter.addStreamView(mkey, vinfo, info);
-//                        }
-//                        if (vinfo != null && videoView != null) {
-//                            sdkEngine.startRemoteView(info, videoView);
-//                            videoView.refreshRemoteOp(View.VISIBLE);
-//                        }
+                        if (mVideoAdapter != null) {
+                            mVideoAdapter.addStreamView(mkey, vinfo, info);
+                        }
+                        if (vinfo != null && videoView != null) {
+                            sdkEngine.startRemoteView(info, videoView);
+                            videoView.refreshRemoteOp(View.VISIBLE);
+                        }
                         //如果订阅成功就删除待订阅列表中的数据
                         mSpinnerPopupWindowScribe.removeStreamInfoByUid(info.getUId());
                         refreshStreamInfoText();
