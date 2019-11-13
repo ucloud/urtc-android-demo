@@ -2,15 +2,22 @@ rgb 转yuv 数据接口 ，外部实现即可。参数list数组按序放入转�
 
 ```
 public interface UcloudRTCDataProvider {
-    int RGBA_TO_I420 = 16781376;
-    int ABGR_TO_I420 = 16781377;
-    int BGRA_TO_I420 = 16781378;
-    int ARGB_TO_I420 = 16781379;
-    int RGB24_TO_I420 = 16781364;
-    int RGB565_TO_I420 = 16781349;
+
+    //0-3 表示转换类型
+    //4-7 表示rgba_stride的宽度的倍数
+    //8-11 表示yuv_stride宽度移位数
+    //12-15 表示uv左移位数
+    public static final int RGBA_TO_I420 = 0x01001040;
+    public static final int ABGR_TO_I420 = 0x01001041;
+    public static final int BGRA_TO_I420 = 0x01001042;
+    public static final int ARGB_TO_I420 = 0x01001043;
+    public static final int RGB24_TO_I420 = 0x01001034;
+    public static final int RGB565_TO_I420 = 0x01001025;
+
+    ByteBuffer provideRGBData(List<Integer> params);
     
-    //
-    ByteBuffer provideRGBData(List<Integer> var1);
+    //释放相关内存
+    void releaseBuffer();
 }
 ```
 
