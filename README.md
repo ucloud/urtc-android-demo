@@ -1,5 +1,5 @@
 # 1 描述
-URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK，支持android5.1及以上系统，提供了音视频通话基础功能，提供灵活的接口，支持高度定制以及二次开发。
+URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK，支持android4.4及以上系统，提供了音视频通话基础功能，提供灵活的接口，支持高度定制以及二次开发。
 
 # 2 功能列表
 
@@ -32,6 +32,7 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
 * 手势
 * 虚拟形象
 * 变声
+* 自定义的外部输入和输出扩展接口
 
 ## 2.3 文档地址
 * https://docs.ucloud.cn/video/urtc/index.html 
@@ -96,7 +97,7 @@ public class UCloudRtcApplication extends Application {
         CommonUtils.mItemHeight = CommonUtils.mItemWidth;
     }
 }
-~~~ 
+~~~
 ### 5.1.2 继承实现UCloudRtcSdkEventListener 实现事件处理
 ~~~
 UCloudRtcSdkEventListener eventListener = new UCloudRtcSdkEventListener() {
@@ -222,10 +223,12 @@ void onRecordStart(int code,String fileName);
 ~~~
 sdkEngine.stopRecord();
 ~~~
-## 5.6 离开房间
+## 5.7 外部扩展输入与输出
+sdk支持rgba系列数据（rgba，abgr，rgb565，）以及yuv420p的外部自定义输入，能够产出拉流的rgba,abgr的数据供使用者自行扩展使用，具体使用方式请参考demo内部的rgb转yuv接口使用说明.md 和 yuv转rgb接口使用说明.md
+## 5.8 离开房间
 ~~~
 sdkEngine.leaveChannel() ;
 ~~~
 
-## 5.7 编译运行
+## 5.9 编译运行
 
