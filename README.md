@@ -207,7 +207,21 @@ public void onUnSubscribeResult(int code, String msg, UCloudRtcSdkStreamInfo inf
 //接口
 public int setStreamRole(UCloudRtcSdkStreamRole role)
 ~~~
+## 5.6 录像
+### 5.6.1 录像开始
+录像目前只支持摄像头录制，不支持桌面录制，region和bucket这两个参数需要上ucloud控制台申请自己的录像存储空间，测试demo
+可以使用demo已经申请好的，服务器会通过UCloudRtcSdkEventListener 的onRecordStart()接口作为回调返回录像开始结果。
+~~~
+sdkEngine.startRecord(3,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal(),"region","bucket",UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_RESOLUTION_STANDARD.ordinal()); 
+//UCloudRtcSdkEventListener
+void onRecordStart(int code,String fileName);
+~~~
 
+### 5.6.2录像结束
+服务器会通过UCloudRtcSdkEventListener 的onRecordStop()接口作为回调返回录像结束结果。
+~~~
+sdkEngine.stopRecord();
+~~~
 ## 5.6 离开房间
 ~~~
 sdkEngine.leaveChannel() ;
