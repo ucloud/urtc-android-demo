@@ -33,7 +33,7 @@ public interface UcloudRTCDataProvider {
 设置外部采集模式参数
 
 ```
- //设置sdk 外部扩展采集的帧率
+ //设置sdk 外部扩展模式及其采集的帧率，同时sdk内部会自动调整初始码率和最小码率为1500kbps
  sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_EXTEND.extendParams(30,2080,720));
 
 //设置捕获模式，二选一
