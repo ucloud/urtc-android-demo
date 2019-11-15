@@ -1096,10 +1096,10 @@ public class RoomActivity extends AppCompatActivity {
         info.setRoomId(mRoomid);
         info.setUId(mUserid);
         Log.d(TAG, " roomtoken = " + mRoomToken);
-        //普通摄像头捕获方式
+        //普通摄像头捕获方式，与扩展模式二选一
         UCloudRtcSdkEnv.setCaptureMode(
                 UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
-        //rgb数据捕获
+        //rgb数据捕获，与普通捕获模式二选一
 //        UCloudRtcSdkEnv.setCaptureMode(
 //                UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND);
         Runnable imgTask = new Runnable() {
