@@ -119,6 +119,8 @@ public class RoomActivity extends AppCompatActivity {
     Chronometer timeshow;
     private int mPictureFlag = 0;
     private ArrayBlockingQueue<RGBSourceData> mQueue = new ArrayBlockingQueue(2);
+    // 定义一个nv21 的
+     private ArrayBlockingQueue<NVSourceData> mQueueNV = new ArrayBlockingQueue(2);
     private Thread mCreateImgThread;
     private boolean startCreateImg = true;
     private AtomicInteger memoryCount = new AtomicInteger(0);
@@ -165,15 +167,57 @@ public class RoomActivity extends AppCompatActivity {
         }
     }
 
+    class NVSourceData{
+        ByteBuffer srcData;
+        int width;
+        int height;
+        int type;
+
+        public NVSourceData(ByteBuffer srcData, int width, int height,int type) {
+            this.srcData = srcData;
+            this.width = width;
+            this.height = height;
+            this.type = type;
+        }
+
+        public ByteBuffer getSrcData() {
+            return srcData;
+        }
+
+        public void setSrcData(ByteBuffer srcData) {
+            this.srcData = srcData;
+        }
+
+        public int getWidth() {
+            return width;
+        }
+
+        public void setWidth(int width) {
+            this.width = width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public void setHeight(int height) {
+            this.height = height;
+        }
+
+        public int getType() {
+            return type;
+        }
+    }
+
     private UcloudRTCDataProvider mUCloudRTCDataProvider = new UcloudRTCDataProvider() {
         private ByteBuffer cacheBuffer;
         private RGBSourceData rgbSourceData;
+        private NVSourceData nvSourceData;
 
         @Override
         public ByteBuffer provideRGBData(List<Integer> params) {
             rgbSourceData = mQueue.poll();
             if(rgbSourceData == null){
-//                mUCloudRTCDataProvider.notify();
                 return null;
             }else{
                 params.add(rgbSourceData.getType());
@@ -190,6 +234,24 @@ public class RoomActivity extends AppCompatActivity {
                 recycleBitmap(rgbSourceData.getSrcData());
                 return cacheBuffer;
             }
+
+            //NV系列 数据处理
+//            nvSourceData = mQueueNV.poll();
+//            if(nvSourceData == null){
+//                return null;
+//            }else{
+//                params.add(nvSourceData.getType());
+//                params.add(nvSourceData.getWidth());
+//                params.add(nvSourceData.getHeight());
+//                if(cacheBuffer == null){
+//                    cacheBuffer = sdkEngine.getNativeOpInterface().
+//                            createNativeByteBuffer(4096*2160*4);
+//                }else{
+//                    cacheBuffer.clear();
+//                }
+//                cacheBuffer.put(nvSourceData.getSrcData());
+//                return cacheBuffer;
+//            }
         }
 
         public void releaseBuffer(){
@@ -845,7 +907,7 @@ public class RoomActivity extends AppCompatActivity {
     private void onMediaServerDisconnect() {
         localrenderview.release();
         clearGridItem();
-        UCloudRtcSdkEngine.destory();
+//        UCloudRtcSdkEngine.destory();
     }
 
     @Override
@@ -1107,11 +1169,6 @@ public class RoomActivity extends AppCompatActivity {
             public void run() {
                     while(startCreateImg){
                         try{
-//                        synchronized (mUCloudRTCDataProvider){
-//                            if(mQueue.size() != 0){
-//                                mUCloudRTCDataProvider.wait();
-//                            }
-//                            if(mQueue.size() == 0){
                             RGBSourceData sourceData;
                             Bitmap bitmap = null;
                             int type;
@@ -1132,6 +1189,7 @@ public class RoomActivity extends AppCompatActivity {
                                 mPictureFlag = 0;
                             if(bitmap != null){
                                 sourceData = new RGBSourceData(bitmap,bitmap.getWidth(),bitmap.getHeight(),type);
+                                //add rgbdata
                                 mQueue.put(sourceData);
                                 Log.d(TAG, "create bitmap: " + bitmap + "count :" + memoryCount.incrementAndGet());
                             }
@@ -1141,6 +1199,15 @@ public class RoomActivity extends AppCompatActivity {
                         }catch (Exception e){
                             e.printStackTrace();
                         }
+
+                        //可以添加nv21 的数据,请根据实际情况拿到bytebuffer的数据,图像宽高
+//                        try {
+//                            ByteBuffer byteBuffer = null;
+//                            NVSourceData nvSourceData = new NVSourceData(byteBuffer,1280,720,UcloudRTCDataProvider.NV21);
+//                            mQueueNV.put(nvSourceData);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
                     }
                     //这里在回收一遍 防止队列不阻塞了在destroy以后又产生了bitmap没回收
                     while(mQueue.size() != 0 ){
