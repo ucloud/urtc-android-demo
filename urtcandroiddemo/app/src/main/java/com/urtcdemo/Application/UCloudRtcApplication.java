@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import com.github.moduth.blockcanary.BlockCanary;
 import com.github.moduth.blockcanary.BlockCanaryContext;
 import com.tencent.bugly.crashreport.CrashReport;
+//import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkPushEncode;
 import com.urtcdemo.BuildConfig;
 import com.urtcdemo.utils.CommonUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
@@ -43,6 +44,8 @@ public class UCloudRtcApplication extends Application {
         UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo);
         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
         UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.SEC_KEY);
+        //默认vp8编码，可以改成h264
+//        UCloudRtcSdkEnv.setEncodeMode(UcloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics outMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(outMetrics);

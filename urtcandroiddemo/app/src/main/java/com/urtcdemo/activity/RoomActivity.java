@@ -40,6 +40,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
 import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkCaptureMode;
+import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCDataProvider;
 import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCDataReceiver;
@@ -51,7 +52,6 @@ import com.urtcdemo.utils.UiHelper;
 import com.urtcdemo.view.CustomerClickListener;
 import com.urtcdemo.view.SteamScribePopupWindow;
 import com.urtcdemo.view.URTCVideoViewInfo;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -68,7 +68,7 @@ import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC
 
 
 public class RoomActivity extends AppCompatActivity {
-    private static final String TAG = "memory";
+    private static final String TAG = "RoomActivity";
 
     private String mUserid = "test001";
     private String mRoomid = "urtc1";
@@ -118,6 +118,7 @@ public class RoomActivity extends AppCompatActivity {
     private UCloudRtcSdkSurfaceVideoView mMuteView = null;
     Chronometer timeshow;
     private int mPictureFlag = 0;
+    private boolean mPFlag = false;
     private ArrayBlockingQueue<RGBSourceData> mQueue = new ArrayBlockingQueue(2);
     // 定义一个nv21 的
      private ArrayBlockingQueue<NVSourceData> mQueueNV = new ArrayBlockingQueue(2);
@@ -225,13 +226,17 @@ public class RoomActivity extends AppCompatActivity {
                 params.add(rgbSourceData.getHeight());
                 if(cacheBuffer == null){
                     cacheBuffer = sdkEngine.getNativeOpInterface().
-                            createNativeByteBuffer(4096*2160*4);
+                            createNativeByteBuffer(2560*720*4);
                 }else{
                     cacheBuffer.clear();
                 }
                 cacheBuffer.limit(rgbSourceData.getWidth()*rgbSourceData.getHeight()*4);
                 rgbSourceData.getSrcData().copyPixelsToBuffer(cacheBuffer);
                 recycleBitmap(rgbSourceData.getSrcData());
+                rgbSourceData.srcData = null;
+                rgbSourceData = null;
+                Log.d("YUVCapture", "provideRGBData finish" + Thread.currentThread());
+                cacheBuffer.position(0);
                 return cacheBuffer;
             }
 
@@ -257,6 +262,8 @@ public class RoomActivity extends AppCompatActivity {
         public void releaseBuffer(){
             if(rgbSourceData != null && !rgbSourceData.getSrcData().isRecycled()){
                 rgbSourceData.getSrcData().recycle();
+                rgbSourceData.srcData = null;
+                rgbSourceData = null;
             }
             if(cacheBuffer != null){
                 sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cacheBuffer);
@@ -873,7 +880,7 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ToastUtils.longShow(RoomActivity.this, "录制结束: " + (code == NET_ERR_CODE_OK.ordinal()?"成功":"失败"));
+                    ToastUtils.longShow(RoomActivity.this, "录制结束: " + (code == NET_ERR_CODE_OK.ordinal()?"成功":"失败: "+ code));
                     if(mIsRecording){
                         mIsRecording = false;
                         mRecordBtn.setText("start record");
@@ -958,7 +965,18 @@ public class RoomActivity extends AppCompatActivity {
         mRecordBtn.setOnClickListener(v -> {
             if (!mIsRecording) {
                 mAtomOpStart = true;
-                sdkEngine.startRecord(3,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal(),mRegion,mBucket,UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_RESOLUTION_STANDARD.ordinal());
+
+                UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+                        .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
+                        .mediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                        .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
+                        .Average(UcloudRtcSdkRecordProfile.RECORD_EVEN)
+                        .WaterType(UcloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
+                        .WaterPosition(UcloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
+                        .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
+                        .Template(1)
+                        .build();
+                sdkEngine.startRecord(recordProfile);
             } else if(!mAtomOpStart){
                 mAtomOpStart = true;
                 sdkEngine.stopRecord();
@@ -1172,26 +1190,26 @@ public class RoomActivity extends AppCompatActivity {
                             RGBSourceData sourceData;
                             Bitmap bitmap = null;
                             int type;
-                            if(mPictureFlag < 25){
-                                BitmapFactory.Options options = new BitmapFactory.Options();
-                                options.inPreferredConfig = Bitmap.Config.RGB_565;
-                                bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.timg2,options);
-                                type = UcloudRTCDataProvider.RGB565_TO_I420;
-                            }
-                            else{
+                            if(mPFlag){
                                 BitmapFactory.Options options = new BitmapFactory.Options();
                                 options.inPreferredConfig = Bitmap.Config.ARGB_8888;
                                 bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.img3,options);
                                 type = UcloudRTCDataProvider.RGBA_TO_I420;
                             }
-
-                            if(++mPictureFlag >50)
-                                mPictureFlag = 0;
+                            else{
+                                BitmapFactory.Options options = new BitmapFactory.Options();
+                                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                                bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.img4,options);
+                                type = UcloudRTCDataProvider.RGBA_TO_I420;
+                            }
+                            mPFlag = !mPFlag;
+//                            if(++mPictureFlag >50)
+//                                mPictureFlag = 0;
                             if(bitmap != null){
                                 sourceData = new RGBSourceData(bitmap,bitmap.getWidth(),bitmap.getHeight(),type);
                                 //add rgbdata
                                 mQueue.put(sourceData);
-                                Log.d(TAG, "create bitmap: " + bitmap + "count :" + memoryCount.incrementAndGet());
+//                                Log.d(TAG, "create bitmap: " + bitmap + "count :" + memoryCount.incrementAndGet());
                             }
 //                            }
 //                        }
@@ -1214,6 +1232,8 @@ public class RoomActivity extends AppCompatActivity {
                         RGBSourceData rgbSourceData = mQueue.poll();
                         if(rgbSourceData != null){
                             recycleBitmap(rgbSourceData.getSrcData());
+                            rgbSourceData.srcData = null;
+                            rgbSourceData = null;
                         }
                     }
             }
@@ -1232,7 +1252,7 @@ public class RoomActivity extends AppCompatActivity {
     private void recycleBitmap(Bitmap bitmap){
         if(bitmap != null && !bitmap.isRecycled()){
             bitmap.recycle();
-            Log.d(TAG, "recycleBitmap: " + bitmap + "count: "+ (memoryCount.decrementAndGet()));
+//            Log.d(TAG, "recycleBitmap: " + bitmap + "count: "+ (memoryCount.decrementAndGet()));
         }
     }
 
@@ -1371,7 +1391,10 @@ public class RoomActivity extends AppCompatActivity {
                 RGBSourceData rgbSourceData = mQueue.poll();
                 if(rgbSourceData != null){
                     recycleBitmap(rgbSourceData.getSrcData());
+                    rgbSourceData.srcData = null;
+                    rgbSourceData = null;
                 }
+
             }
         }
         UCloudRtcSdkEngine.destory();
