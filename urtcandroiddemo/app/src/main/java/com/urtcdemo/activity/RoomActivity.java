@@ -40,10 +40,12 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
 import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkCaptureMode;
+//import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
 import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCDataProvider;
 import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCDataReceiver;
+//import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
 import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
@@ -60,6 +62,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -124,6 +128,7 @@ public class RoomActivity extends AppCompatActivity {
     // 定义一个nv21 的
      private ArrayBlockingQueue<NVSourceData> mQueueNV = new ArrayBlockingQueue(2);
     private Thread mCreateImgThread;
+    private Timer mTimerCreateImg = new Timer("createPicture");
     private boolean startCreateImg = true;
     private AtomicInteger memoryCount = new AtomicInteger(0);
 
@@ -220,8 +225,10 @@ public class RoomActivity extends AppCompatActivity {
         public ByteBuffer provideRGBData(List<Integer> params) {
             rgbSourceData = mQueue.poll();
             if(rgbSourceData == null){
+                Log.d(TAG, "provideRGBData: " + null);
                 return null;
             }else{
+                Log.d(TAG, "provideRGBData: ! = null");
                 params.add(rgbSourceData.getType());
                 params.add(rgbSourceData.getWidth());
                 params.add(rgbSourceData.getHeight());
@@ -275,6 +282,7 @@ public class RoomActivity extends AppCompatActivity {
     private UcloudRTCDataReceiver mUcloudRTCDataReceiver = new UcloudRTCDataReceiver() {
         private int limit = 0;
         private ByteBuffer cache;
+
         @Override
         public void onReceiveRGBAData(ByteBuffer rgbBuffer, int width, int height) {
             final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
@@ -659,9 +667,9 @@ public class RoomActivity extends AppCompatActivity {
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
                             //设置交换
-                          videoView.setOnClickListener(mSwapRemoteLocalListener);
+//                          videoView.setOnClickListener(mSwapRemoteLocalListener);
                             //远端截图
-//                            videoView.setOnClickListener(mScreenShotOnClickListener);
+                            videoView.setOnClickListener(mScreenShotOnClickListener);
                         }
                         vinfo.setmUid(info.getUId());
                         vinfo.setmMediatype(info.getMediaType());
@@ -976,27 +984,26 @@ public class RoomActivity extends AppCompatActivity {
         mCheckBoxMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
             UCloudRtcSdkEnv.setFrontCameraMirror(isChecked);
         });
-//        mRecordBtn.setOnClickListener(v -> {
-//            if (!mIsRecording) {
-//                mAtomOpStart = true;
-//
-//                UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-//                        .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
-//                        .mediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-//                        .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
-//                        .Average(UcloudRtcSdkRecordProfile.RECORD_EVEN)
-//                        .WaterType(UcloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
-//                        .WaterPosition(UcloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
-//                        .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
-//                        .Template(1)
-//                        .build();
-//                sdkEngine.startRecord(recordProfile);
-//            } else if(!mAtomOpStart){
-//                mAtomOpStart = true;
-//                sdkEngine.stopRecord();
-//
-//            }
-//        });
+        mRecordBtn.setOnClickListener(v -> {
+            if (!mIsRecording) {
+                mAtomOpStart = true;
+                UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+                        .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
+                        .mediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                        .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
+                        .Average(UcloudRtcSdkRecordProfile.RECORD_UNEVEN)
+                        .WaterType(UcloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
+                        .WaterPosition(UcloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
+                        .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
+                        .Template(UcloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
+                        .build();
+                sdkEngine.startRecord(recordProfile);
+            } else if(!mAtomOpStart){
+                mAtomOpStart = true;
+                sdkEngine.stopRecord();
+
+            }
+        });
         mTextStream.setOnClickListener(new CustomerClickListener() {
             @Override
             protected void onSingleClick() {
@@ -1180,8 +1187,9 @@ public class RoomActivity extends AppCompatActivity {
             mStreamSelect.setVisibility(View.VISIBLE);
         }
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
-        //设置sdk 外部扩展模式及其采集的帧率，同时sdk内部会自动调整初始码率和最小码率为1500kbps
-//        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_EXTEND.extendParams(30,2080,720));
+        //设置sdk 外部扩展模式及其采集的帧率，同时sdk内部会自动调整初始码率和最小码率
+        //扩展模式只支持720p的分辨率及以下，若要自定义更高分辨率，请联系Ucloud商务定制，否则sdk会抛出异常，终止运行。
+//        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_EXTEND.extendParams(30,640,480));
         sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfile));
         initButtonSize();
         UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo();
@@ -1196,6 +1204,43 @@ public class RoomActivity extends AppCompatActivity {
         //rgb数据捕获，与普通捕获模式二选一
 //        UCloudRtcSdkEnv.setCaptureMode(
 //                UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND);
+//        TimerTask timerTask = new TimerTask() {
+//            @Override
+//            public void run() {
+//                try{
+//                    RGBSourceData sourceData;
+//                    Bitmap bitmap = null;
+//                    int type;
+//                    if(mPFlag){
+//                        BitmapFactory.Options options = new BitmapFactory.Options();
+//                        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+//                        bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.img1_640,options);
+//                        type = UcloudRTCDataProvider.RGBA_TO_I420;
+//                    }
+//                    else{
+//                        BitmapFactory.Options options = new BitmapFactory.Options();
+//                        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+//                        bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.img_640,options);
+//                        type = UcloudRTCDataProvider.RGBA_TO_I420;
+//                    }
+//                    mPFlag = !mPFlag;
+////                            if(++mPictureFlag >50)
+////                                mPictureFlag = 0;
+//                    if(bitmap != null){
+//                        sourceData = new RGBSourceData(bitmap,bitmap.getWidth(),bitmap.getHeight(),type);
+//                        //add rgbdata
+//                        mQueue.put(sourceData);
+////                                Log.d(TAG, "create bitmap: " + bitmap + "count :" + memoryCount.incrementAndGet());
+//                    }
+////                            }
+////                        }
+//
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//            }
+//        };
+
         Runnable imgTask = new Runnable() {
             @Override
             public void run() {
@@ -1207,13 +1252,13 @@ public class RoomActivity extends AppCompatActivity {
                             if(mPFlag){
                                 BitmapFactory.Options options = new BitmapFactory.Options();
                                 options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                                bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.img3,options);
+                                bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.img1_640,options);
                                 type = UcloudRTCDataProvider.RGBA_TO_I420;
                             }
                             else{
                                 BitmapFactory.Options options = new BitmapFactory.Options();
                                 options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                                bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.img4,options);
+                                bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.timg2,options);
                                 type = UcloudRTCDataProvider.RGBA_TO_I420;
                             }
                             mPFlag = !mPFlag;
@@ -1228,6 +1273,7 @@ public class RoomActivity extends AppCompatActivity {
 //                            }
 //                        }
 
+                             Thread.sleep((int)(Math.random()*20));
                         }catch (Exception e){
                             e.printStackTrace();
                         }
@@ -1256,8 +1302,11 @@ public class RoomActivity extends AppCompatActivity {
         if(UCloudRtcSdkEnv.getCaptureMode() == UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND &&
                 (mRole == UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH ||
                         mRole == UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_PUB)){
+
             mCreateImgThread = new Thread(imgTask);
+            mCreateImgThread.setName("create picture");
             mCreateImgThread.start();
+//            mTimerCreateImg.scheduleAtFixedRate(timerTask,0,10);
             UCloudRtcSdkEngine.onRGBCaptureResult(mUCloudRTCDataProvider);
         }
         sdkEngine.joinChannel(info);
@@ -1269,8 +1318,6 @@ public class RoomActivity extends AppCompatActivity {
 //            Log.d(TAG, "recycleBitmap: " + bitmap + "count: "+ (memoryCount.decrementAndGet()));
         }
     }
-
-
 
     private void addScreenShotCallBack(UCloudRtcSdkSurfaceVideoView view){
         view.setScreenShotBack(new UcloudRTCSceenShot() {
@@ -1291,7 +1338,8 @@ public class RoomActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Log.d(TAG, "local screen shoot : " + name);
+                Log.d(TAG, "screen shoot : " + name);
+                ToastUtils.shortShow(RoomActivity.this,"screen shoot : " + name);
             }
         });
     }
