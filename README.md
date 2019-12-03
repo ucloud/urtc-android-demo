@@ -211,6 +211,9 @@ public int setStreamRole(UCloudRtcSdkStreamRole role)
 ## 5.6 录像
 ### 5.6.1 录像开始
 录像目前只支持摄像头录制，不支持桌面录制，region和bucket这两个参数默认用了ucloud自己的region和bucket，如果用自己的需要上ucloud控制台申请自己的录像存储空间，服务器会通过UCloudRtcSdkEventListener 的onRecordStart()接口作为回调返回录像开始结果。
+
+具体录像的参数说明可以参照sdk文档以及https://github.com/UCloudDocs/urtc/blob/master/cloudRecord/RecordLaylout.md
+
 ~~~
 UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
                         .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
