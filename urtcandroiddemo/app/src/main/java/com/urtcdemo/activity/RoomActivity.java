@@ -63,7 +63,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -131,6 +130,7 @@ public class RoomActivity extends AppCompatActivity {
     private Timer mTimerCreateImg = new Timer("createPicture");
     private boolean startCreateImg = true;
     private AtomicInteger memoryCount = new AtomicInteger(0);
+    private List<String> userIds = new ArrayList<>();
 
     class RGBSourceData{
         Bitmap srcData;
@@ -490,10 +490,10 @@ public class RoomActivity extends AppCompatActivity {
                 public void run() {
                     ToastUtils.shortShow(RoomActivity.this, " 离开房间 " +
                             code + " errmsg " + msg);
-                    Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
+//                    Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
                     onMediaServerDisconnect();
-                    startActivity(intent);
-                    finish();
+//                    startActivity(intent);
+//                    finish();
                 }
             });
         }
@@ -503,6 +503,7 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(TAG, "rejoining room");
                     ToastUtils.shortShow(RoomActivity.this, " 服务器重连中…… ");
                     stopTimeShow();
                 }
@@ -586,7 +587,9 @@ public class RoomActivity extends AppCompatActivity {
 
         @Override
         public void onRemoteUserJoin(String uid) {
+
             runOnUiThread(new Runnable() {
+
                 @Override
                 public void run() {
                     ToastUtils.shortShow(RoomActivity.this, " 用户 "
@@ -613,12 +616,17 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (sdkEngine.isAutoSubscribe()) {
-                        sdkEngine.subscribe(info);
-                    } else {
+                    //特殊情况下，譬如客户端在断网情况下离开房间，服务端可能还持有流，并没有超时，客户端就会收到自己的userid,
+                    // 如果客户端是固定userid就可以过滤掉，如果不是，等待服务端超时也会删除流
+                    Log.d(TAG, "onRemotePublish: " + info.getUId() + " me : " + mUserid);
+                    if(!mUserid.equals(info.getUId())){
                         mSteamList.add(info);
-                        mSpinnerPopupWindowScribe.notifyUpdate();
-                        refreshStreamInfoText();
+                        if (sdkEngine.isAutoSubscribe()) {
+                            sdkEngine.subscribe(info);
+                        } else {
+                            mSpinnerPopupWindowScribe.notifyUpdate();
+                            refreshStreamInfoText();
+                        }
                     }
                 }
             });
@@ -674,6 +682,7 @@ public class RoomActivity extends AppCompatActivity {
                         vinfo.setmUid(info.getUId());
                         vinfo.setmMediatype(info.getMediaType());
                         vinfo.setmEanbleVideo(info.isHasVideo());
+                        vinfo.setEnableAudio(info.isHasAudio());
                         String mkey = info.getUId() + info.getMediaType().toString();
                         vinfo.setKey(mkey);
                         //默认输出，和外部输出代码二选一
@@ -987,9 +996,10 @@ public class RoomActivity extends AppCompatActivity {
         mRecordBtn.setOnClickListener(v -> {
             if (!mIsRecording) {
                 mAtomOpStart = true;
+//                如果主窗口是当前用户
                 UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
                         .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
-                        .mediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                        .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                         .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
                         .Average(UcloudRtcSdkRecordProfile.RECORD_UNEVEN)
                         .WaterType(UcloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
@@ -998,10 +1008,25 @@ public class RoomActivity extends AppCompatActivity {
                         .Template(UcloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
                         .build();
                 sdkEngine.startRecord(recordProfile);
+                //如果主窗口不是当前推流用户，而是被订阅的用户
+//                UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo = mVideoAdapter.getStreamInfo(0);
+//                if(uCloudRtcSdkStreamInfo != null){
+//                    UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+//                            .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
+//                            .mainViewUserId(uCloudRtcSdkStreamInfo.getUId())
+//                            .mainViewMediaType(uCloudRtcSdkStreamInfo.getMediaType().ordinal())
+//                            .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
+//                            .Average(UcloudRtcSdkRecordProfile.RECORD_UNEVEN)
+//                            .WaterType(UcloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
+//                            .WaterPosition(UcloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
+//                            .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
+//                            .Template(UcloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
+//                            .build();
+//                    sdkEngine.startRecord(recordProfile);
+//                }
             } else if(!mAtomOpStart){
                 mAtomOpStart = true;
                 sdkEngine.stopRecord();
-
             }
         });
         mTextStream.setOnClickListener(new CustomerClickListener() {
@@ -1500,12 +1525,12 @@ public class RoomActivity extends AppCompatActivity {
 
     private void callHangUp() {
         int ret = sdkEngine.leaveChannel().ordinal();
-        if (ret != NET_ERR_CODE_OK.ordinal()) {
+//        if (ret != NET_ERR_CODE_OK.ordinal()) {
             Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
             onMediaServerDisconnect();
             startActivity(intent);
             finish();
-        }
+//        }
     }
 
     boolean mSwitchCam = false;

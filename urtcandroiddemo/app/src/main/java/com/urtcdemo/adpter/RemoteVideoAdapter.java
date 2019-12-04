@@ -141,6 +141,18 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
         notifyDataSetChanged();
     }
 
+    public UCloudRtcSdkStreamInfo getStreamInfo(int position){
+        UCloudRtcSdkStreamInfo streamInfo = null;
+        if(medialist.size() > position && mStreamViews.size() > position){
+            streamInfo = new UCloudRtcSdkStreamInfo();
+            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getmMediatype());
+            streamInfo.setHasAudio(mStreamViews.get(medialist.get(position)).isEnableAudio());
+            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).ismEanbleVideo());
+            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getmUid());
+        }
+        return streamInfo;
+    }
+
     public void removeStreamView(String mkey) {
         if (mStreamViews.containsKey(mkey)) {
             Log.d(TAG, " removeStreamView key: " + mkey);
