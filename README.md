@@ -1,5 +1,5 @@
 # 1 描述
-URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK，支持android4.4及以上系统，提供了音视频通话基础功能，提供灵活的接口，支持高度定制以及二次开发。
+URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK，支持android5.0及以上系统，提供了音视频通话基础功能，提供灵活的接口，支持高度定制以及二次开发。
 
 # 2 功能列表
 
@@ -210,10 +210,41 @@ public int setStreamRole(UCloudRtcSdkStreamRole role)
 ~~~
 ## 5.6 录像
 ### 5.6.1 录像开始
-录像目前只支持摄像头录制，不支持桌面录制，region和bucket这两个参数需要上ucloud控制台申请自己的录像存储空间，测试demo
-可以使用demo已经申请好的，服务器会通过UCloudRtcSdkEventListener 的onRecordStart()接口作为回调返回录像开始结果。
+录像目前只支持摄像头录制，不支持桌面录制，region和bucket这两个参数默认用了ucloud自己的region和bucket，如果用自己的需要上ucloud控制台申请自己的录像存储空间，服务器会通过UCloudRtcSdkEventListener 的onRecordStart()接口作为回调返回录像开始结果。
+
+需要特别注意的是，录像可以指定主界面是哪个用户，当非均衡模式的情况下，主界面是哪个用户，哪个用户就占据大窗口。同时，这里的用户可以是当前App中推流的用户，也可以是当前App中被订阅的用户，这个参数只要靠mainviewuid去实现，如果是上述第一种情况，可以不指定，sdk自动获取，如果是第二种，就需要App SDK使用者拿到当前订阅的用户id，用这个id去设置录像的mainviewuid
+
+更多的录像的参数说明可以参照sdk文档以及https://github.com/UCloudDocs/urtc/blob/master/cloudRecord/RecordLaylout.md
+
 ~~~
-sdkEngine.startRecord(3,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal(),"region","bucket",UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_RESOLUTION_STANDARD.ordinal()); 
+//                如果主窗口是当前用户
+UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+                        .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
+                        .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                        .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
+                        .Average(UcloudRtcSdkRecordProfile.RECORD_UNEVEN)
+                        .WaterType(UcloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
+                        .WaterPosition(UcloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
+                        .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
+                        .Template(UcloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
+                        .build();
+                sdkEngine.startRecord(recordProfile);
+                //如果主窗口不是当前推流用户，而是被订阅的用户
+//                UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo = mVideoAdapter.getStreamInfo(0);
+//                if(uCloudRtcSdkStreamInfo != null){
+//                    UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+//                            .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
+//                            .mainViewUserId(uCloudRtcSdkStreamInfo.getUId())
+//                            .mainViewMediaType(uCloudRtcSdkStreamInfo.getMediaType().ordinal())
+//                            .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
+//                            .Average(UcloudRtcSdkRecordProfile.RECORD_UNEVEN)
+//                            .WaterType(UcloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
+//                            .WaterPosition(UcloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
+//                            .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
+//                            .Template(UcloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
+//                            .build();
+//                    sdkEngine.startRecord(recordProfile);
+//                }
 //UCloudRtcSdkEventListener
 void onRecordStart(int code,String fileName);
 ~~~
