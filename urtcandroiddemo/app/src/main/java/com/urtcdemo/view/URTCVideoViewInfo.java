@@ -7,6 +7,7 @@ public class URTCVideoViewInfo {
     private UCloudRtcSdkSurfaceVideoView mRenderview ;
     private String mUid ;
     private boolean mEanbleVideo ;
+    private boolean mEnableAudio;
     private UCloudRtcSdkMediaType mMediatype ;
     private String key;
 
@@ -23,6 +24,14 @@ public class URTCVideoViewInfo {
 
     public void setmRenderview(UCloudRtcSdkSurfaceVideoView mRenderview) {
         this.mRenderview = mRenderview;
+    }
+
+    public boolean isEnableAudio() {
+        return mEnableAudio;
+    }
+
+    public void setEnableAudio(boolean enableAudio) {
+        mEnableAudio = enableAudio;
     }
 
     public boolean ismEanbleVideo() {
