@@ -6,7 +6,7 @@ android {
         applicationId "com.urtcdemo"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 14
+        versionCode 15
         versionName '1.6.2'
         ndk {
             abiFilters  "armeabi-v7a", "arm64-v8a"
@@ -71,7 +71,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     implementation (name: 'ucloudrtclib_1.6.2_ee9bbf43', ext: 'aar')
-    implementation (name: 'ucloudimlib_1.0_5bd1dd67', ext: 'aar')
+    implementation (name: 'ucloudimlib_1.0_e053d8bc', ext: 'aar')
+    implementation (name: 'ucloud_base_1.0_6279f2ae', ext: 'aar')
 //    implementation project(path: ':ucloud_business_sdk')
 //    implementation project(':urtc-sdk-android')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

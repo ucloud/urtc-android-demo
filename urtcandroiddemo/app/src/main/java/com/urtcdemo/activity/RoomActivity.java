@@ -139,7 +139,7 @@ public class RoomActivity extends AppCompatActivity {
     private boolean startCreateImg = true;
     private AtomicInteger memoryCount = new AtomicInteger(0);
     private List<String> userIds = new ArrayList<>();
-    private boolean reqLeaveIMQuit = false;
+    private boolean receiveLeaveIMQuit = false;
     private boolean receiveRTCQuit = false;
 
     class RGBSourceData{
@@ -501,7 +501,7 @@ public class RoomActivity extends AppCompatActivity {
         @Override
         public void onLeaveRoomResult(int code, String msg, String roomid) {
             Log.d(TAG, "onIMLeaveRoomResult: " + code + " msg: "+ msg + " roomid: "+ roomid);
-            reqLeaveIMQuit = true;
+            receiveLeaveIMQuit = true;
             leaveRoom();
         }
 
@@ -527,7 +527,7 @@ public class RoomActivity extends AppCompatActivity {
     };
 
     private void leaveRoom(){
-        if(receiveRTCQuit){
+        if(receiveRTCQuit && receiveLeaveIMQuit){
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1057,7 +1057,7 @@ public class RoomActivity extends AppCompatActivity {
         mVideoAdapter.setRemoveRemoteStreamReceiver(mRemoveRemoteStreamReceiver);
         mRemoteGridView.setAdapter(mVideoAdapter);
         sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
-//        imEngine = UcloudIMSdkEngine.createEngine(mIMSdkEventListener);
+        imEngine = UcloudIMSdkEngine.createEngine(mIMSdkEventListener);
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
@@ -1438,7 +1438,7 @@ public class RoomActivity extends AppCompatActivity {
         imSdkAuthInfo.setRoomId(mRoomid);
         imSdkAuthInfo.setUId(mUserid);
 //        imSdkAuthInfo.setIMRole(UCloudIMRole.UCLOUD_IM_ROLE_TEACHER);
-//        imEngine.joinChannel(imSdkAuthInfo);
+        imEngine.joinChannel(imSdkAuthInfo);
     }
 
     private void recycleBitmap(Bitmap bitmap){
@@ -1615,7 +1615,7 @@ public class RoomActivity extends AppCompatActivity {
             }
         }
         UCloudRtcSdkEngine.destory();
-//        UcloudIMSdkEngine.destory();
+        UcloudIMSdkEngine.destory();
         System.gc();
     }
 
@@ -1629,7 +1629,7 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void callHangUp() {
-//        imEngine.leaveChannel();
+        imEngine.leaveChannel();
         int ret = sdkEngine.leaveChannel().ordinal();
         if (ret != NET_ERR_CODE_OK.ordinal()) {
         Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
