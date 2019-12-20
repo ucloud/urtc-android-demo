@@ -632,19 +632,19 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
-                        if (localrenderview != null) {
-                            localrenderview.refresh();
-                        }
-                    } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
-                        if (mCaptureMode == CommonUtils.screen_capture_mode) {
+                    if (code == 0) {
+                        mIsPublished = false;
+                        if (info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
                             if (localrenderview != null) {
                                 localrenderview.refresh();
                             }
+                        } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
+                            if (mCaptureMode == CommonUtils.screen_capture_mode) {
+                                if (localrenderview != null) {
+                                    localrenderview.refresh();
+                                }
+                            }
                         }
-                    }
-
-                    if (code == 0) {
                         ToastUtils.shortShow(RoomActivity.this, "取消发布视频成功");
                     } else {
                         ToastUtils.shortShow(RoomActivity.this, "取消发布视频失败 "
@@ -1077,6 +1077,12 @@ public class RoomActivity extends AppCompatActivity {
                         .Template(UcloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
                         .build();
                 sdkEngine.startRecord(recordProfile);
+//                UcloudRtcSdkRecordProfile recordAudioProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+//                        .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_AUDIO)
+//                        .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+//                        .build();
+//                sdkEngine.startRecord(recordAudioProfile);
+
                 //如果主窗口不是当前推流用户，而是被订阅的用户
 //                UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo = mVideoAdapter.getStreamInfo(0);
 //                if(uCloudRtcSdkStreamInfo != null){
@@ -1198,7 +1204,7 @@ public class RoomActivity extends AppCompatActivity {
                     ToastUtils.shortShow(RoomActivity.this, "发布");
                 }
             } else {
-                ToastUtils.shortShow(RoomActivity.this, "已经发布");
+                sdkEngine.unPublish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
             }
         });
         mHangup.setOnClickListener(v -> callHangUp());
