@@ -25,9 +25,8 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.ucloud.business.im.UcloudIMSdkEngine;
-import com.ucloud.business.im.UcloudIMSdkEventListener;
-import com.ucloud.business.im.sdkengine.define.UCloudIMErrorCode;
+import com.ucloud.business.im.sdkengine.UcloudIMSdkEngine;
+import com.ucloud.business.im.sdkengine.UcloudIMSdkEventListener;
 import com.ucloud.business.im.sdkengine.define.UCloudIMSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
@@ -134,12 +133,14 @@ public class RoomActivity extends AppCompatActivity {
     private boolean mPFlag = false;
     private ArrayBlockingQueue<RGBSourceData> mQueue = new ArrayBlockingQueue(2);
     // 定义一个nv21 的
-     private ArrayBlockingQueue<NVSourceData> mQueueNV = new ArrayBlockingQueue(2);
+    private ArrayBlockingQueue<NVSourceData> mQueueNV = new ArrayBlockingQueue(2);
     private Thread mCreateImgThread;
     private Timer mTimerCreateImg = new Timer("createPicture");
     private boolean startCreateImg = true;
     private AtomicInteger memoryCount = new AtomicInteger(0);
     private List<String> userIds = new ArrayList<>();
+    private boolean reqLeaveIMQuit = false;
+    private boolean receiveRTCQuit = false;
 
     class RGBSourceData{
         Bitmap srcData;
@@ -333,7 +334,7 @@ public class RoomActivity extends AppCompatActivity {
         @Override
         public void releaseBuffer() {
             if(cache != null)
-            sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cache);
+                sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cache);
             cache = null;
         }
     };
@@ -404,7 +405,7 @@ public class RoomActivity extends AppCompatActivity {
     private View.OnClickListener mScreenShotOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-             addScreenShotCallBack((UCloudRtcSdkSurfaceVideoView)v);
+            addScreenShotCallBack((UCloudRtcSdkSurfaceVideoView)v);
         }
     };
 
@@ -458,12 +459,13 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     UcloudIMSdkEventListener mIMSdkEventListener = new UcloudIMSdkEventListener(){
+
         @Override
         public void onSendCustomerMsg(String msg) {
-            Log.d(TAG, "onIMSendCustomerMsg: "  + " msg: "+ msg);
+            Log.d(TAG, "onIMSendCustomerMsg : "+ msg);
             try {
                 JSONObject jsonObject = new JSONObject(msg);
-                JSONObject data = jsonObject.getJSONObject("msg");
+                String content  = jsonObject.getString("msg");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -471,19 +473,24 @@ public class RoomActivity extends AppCompatActivity {
 
         @Override
         public void onReceiveCustomMsg(String msg) {
-            Log.d(TAG, "onReceiveCustomMsg: "  + " msg: "+ msg);
+            Log.d(TAG, "onReceiveCustomMsg: "  + msg);
             JSONObject jsonObject = null;
             try {
                 jsonObject = new JSONObject(msg);
                 JSONObject data = jsonObject.getJSONObject("msg");
                 String content = data.getString("content");
                 Log.d(TAG, "onReceiveCustomMsg: "  + " content: "+ content.toString());
-                JSONObject contentJson = new JSONObject(content);
-                Log.d(TAG, "onReceiveCustomMsg: "  + " contentJson: "+ contentJson.getString("title"));
+//                JSONObject contentJson = new JSONObject(content);
+//                Log.d(TAG, "onReceiveCustomMsg: "  + " contentJson: "+ contentJson.getString("title"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
+        }
+
+        @Override
+        public void onReceiveMsg(String msg) {
+            Log.d(TAG, "onReceiveMsg common msg: "+ msg);
         }
 
         @Override
@@ -494,6 +501,8 @@ public class RoomActivity extends AppCompatActivity {
         @Override
         public void onLeaveRoomResult(int code, String msg, String roomid) {
             Log.d(TAG, "onIMLeaveRoomResult: " + code + " msg: "+ msg + " roomid: "+ roomid);
+            reqLeaveIMQuit = true;
+            leaveRoom();
         }
 
         @Override
@@ -516,6 +525,21 @@ public class RoomActivity extends AppCompatActivity {
             Log.d(TAG, "onIMonServerConnect: ");
         }
     };
+
+    private void leaveRoom(){
+        if(receiveRTCQuit){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, " execute leaveroom ");
+                    Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
+                    onMediaServerDisconnect();
+                    startActivity(intent);
+                    finish();
+                }
+            });
+        }
+    }
 
     UCloudRtcSdkEventListener eventListener = new UCloudRtcSdkEventListener() {
         @Override
@@ -554,17 +578,9 @@ public class RoomActivity extends AppCompatActivity {
 
         @Override
         public void onLeaveRoomResult(int code, String msg, String roomid) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ToastUtils.shortShow(RoomActivity.this, " 离开房间 " +
-                            code + " errmsg " + msg);
-//                    Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
-                    onMediaServerDisconnect();
-//                    startActivity(intent);
-//                    finish();
-                }
-            });
+            Log.d(TAG, "onRTCLeaveRoomResult: " + code + " msg: "+ msg + " roomid: "+ roomid);
+            receiveRTCQuit = true;
+            leaveRoom();
         }
 
         @Override
@@ -632,19 +648,19 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (code == 0) {
-                        mIsPublished = false;
-                        if (info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
+                    if (info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
+                        if (localrenderview != null) {
+                            localrenderview.refresh();
+                        }
+                    } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
+                        if (mCaptureMode == CommonUtils.screen_capture_mode) {
                             if (localrenderview != null) {
                                 localrenderview.refresh();
                             }
-                        } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
-                            if (mCaptureMode == CommonUtils.screen_capture_mode) {
-                                if (localrenderview != null) {
-                                    localrenderview.refresh();
-                                }
-                            }
                         }
+                    }
+
+                    if (code == 0) {
                         ToastUtils.shortShow(RoomActivity.this, "取消发布视频成功");
                     } else {
                         ToastUtils.shortShow(RoomActivity.this, "取消发布视频失败 "
@@ -730,7 +746,7 @@ public class RoomActivity extends AppCompatActivity {
 
                         Log.d(TAG, " subscribe info: " + info.getUId() + " hasvideo " + info.isHasVideo());
                         if (info.isHasVideo()) {
-                             //外部扩展输出，和默认输出二选一
+                            //外部扩展输出，和默认输出二选一
 //                            UCloudRtcSdkSurfaceVideoView videoViewCallBack = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
 //                            videoViewCallBack.setFrameCallBack(mUcloudRTCDataReceiver);
 //                            videoViewCallBack.init(false);
@@ -1041,7 +1057,7 @@ public class RoomActivity extends AppCompatActivity {
         mVideoAdapter.setRemoveRemoteStreamReceiver(mRemoveRemoteStreamReceiver);
         mRemoteGridView.setAdapter(mVideoAdapter);
         sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
-        imEngine = UcloudIMSdkEngine.createEngine(mIMSdkEventListener);
+//        imEngine = UcloudIMSdkEngine.createEngine(mIMSdkEventListener);
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
@@ -1077,12 +1093,6 @@ public class RoomActivity extends AppCompatActivity {
                         .Template(UcloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
                         .build();
                 sdkEngine.startRecord(recordProfile);
-//                UcloudRtcSdkRecordProfile recordAudioProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-//                        .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_AUDIO)
-//                        .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-//                        .build();
-//                sdkEngine.startRecord(recordAudioProfile);
-
                 //如果主窗口不是当前推流用户，而是被订阅的用户
 //                UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo = mVideoAdapter.getStreamInfo(0);
 //                if(uCloudRtcSdkStreamInfo != null){
@@ -1110,7 +1120,7 @@ public class RoomActivity extends AppCompatActivity {
 
                 try {
                     JSONObject content = new JSONObject();
-                    content.put("title","haha");
+                    content.put("title","test customer");
                     imEngine.pushCustomerMessage("test",content.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -1204,7 +1214,7 @@ public class RoomActivity extends AppCompatActivity {
                     ToastUtils.shortShow(RoomActivity.this, "发布");
                 }
             } else {
-                sdkEngine.unPublish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+                ToastUtils.shortShow(RoomActivity.this, "已经发布");
             }
         });
         mHangup.setOnClickListener(v -> callHangUp());
@@ -1357,41 +1367,41 @@ public class RoomActivity extends AppCompatActivity {
         Runnable imgTask = new Runnable() {
             @Override
             public void run() {
-                    while(startCreateImg){
-                        try{
-                            RGBSourceData sourceData;
-                            Bitmap bitmap = null;
-                            int type;
-                            if(mPFlag){
-                                BitmapFactory.Options options = new BitmapFactory.Options();
-                                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                                bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.img1_640,options);
-                                type = UcloudRTCDataProvider.RGBA_TO_I420;
-                            }
-                            else{
-                                BitmapFactory.Options options = new BitmapFactory.Options();
-                                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                                bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.timg2,options);
-                                type = UcloudRTCDataProvider.RGBA_TO_I420;
-                            }
-                            mPFlag = !mPFlag;
+                while(startCreateImg){
+                    try{
+                        RGBSourceData sourceData;
+                        Bitmap bitmap = null;
+                        int type;
+                        if(mPFlag){
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                            bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.img1_640,options);
+                            type = UcloudRTCDataProvider.RGBA_TO_I420;
+                        }
+                        else{
+                            BitmapFactory.Options options = new BitmapFactory.Options();
+                            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                            bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.timg2,options);
+                            type = UcloudRTCDataProvider.RGBA_TO_I420;
+                        }
+                        mPFlag = !mPFlag;
 //                            if(++mPictureFlag >50)
 //                                mPictureFlag = 0;
-                            if(bitmap != null){
-                                sourceData = new RGBSourceData(bitmap,bitmap.getWidth(),bitmap.getHeight(),type);
-                                //add rgbdata
-                                mQueue.put(sourceData);
+                        if(bitmap != null){
+                            sourceData = new RGBSourceData(bitmap,bitmap.getWidth(),bitmap.getHeight(),type);
+                            //add rgbdata
+                            mQueue.put(sourceData);
 //                                Log.d(TAG, "create bitmap: " + bitmap + "count :" + memoryCount.incrementAndGet());
-                            }
+                        }
 //                            }
 //                        }
 
-                             Thread.sleep((int)(Math.random()*20));
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
+                        Thread.sleep((int)(Math.random()*20));
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
 
-                        //可以添加nv21 的数据,请根据实际情况拿到bytebuffer的数据,图像宽高
+                    //可以添加nv21 的数据,请根据实际情况拿到bytebuffer的数据,图像宽高
 //                        try {
 //                            ByteBuffer byteBuffer = null;
 //                            NVSourceData nvSourceData = new NVSourceData(byteBuffer,1280,720,UcloudRTCDataProvider.NV21);
@@ -1399,16 +1409,16 @@ public class RoomActivity extends AppCompatActivity {
 //                        } catch (InterruptedException e) {
 //                            e.printStackTrace();
 //                        }
+                }
+                //这里在回收一遍 防止队列不阻塞了在destroy以后又产生了bitmap没回收
+                while(mQueue.size() != 0 ){
+                    RGBSourceData rgbSourceData = mQueue.poll();
+                    if(rgbSourceData != null){
+                        recycleBitmap(rgbSourceData.getSrcData());
+                        rgbSourceData.srcData = null;
+                        rgbSourceData = null;
                     }
-                    //这里在回收一遍 防止队列不阻塞了在destroy以后又产生了bitmap没回收
-                    while(mQueue.size() != 0 ){
-                        RGBSourceData rgbSourceData = mQueue.poll();
-                        if(rgbSourceData != null){
-                            recycleBitmap(rgbSourceData.getSrcData());
-                            rgbSourceData.srcData = null;
-                            rgbSourceData = null;
-                        }
-                    }
+                }
             }
         };
 
@@ -1427,7 +1437,8 @@ public class RoomActivity extends AppCompatActivity {
         imSdkAuthInfo.setAppId(mAppid);
         imSdkAuthInfo.setRoomId(mRoomid);
         imSdkAuthInfo.setUId(mUserid);
-        imEngine.joinChannel(imSdkAuthInfo);
+//        imSdkAuthInfo.setIMRole(UCloudIMRole.UCLOUD_IM_ROLE_TEACHER);
+//        imEngine.joinChannel(imSdkAuthInfo);
     }
 
     private void recycleBitmap(Bitmap bitmap){
@@ -1604,7 +1615,7 @@ public class RoomActivity extends AppCompatActivity {
             }
         }
         UCloudRtcSdkEngine.destory();
-        UcloudIMSdkEngine.destory();
+//        UcloudIMSdkEngine.destory();
         System.gc();
     }
 
@@ -1618,13 +1629,14 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     private void callHangUp() {
+//        imEngine.leaveChannel();
         int ret = sdkEngine.leaveChannel().ordinal();
-//        if (ret != NET_ERR_CODE_OK.ordinal()) {
-            Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
-            onMediaServerDisconnect();
-            startActivity(intent);
-            finish();
-//        }
+        if (ret != NET_ERR_CODE_OK.ordinal()) {
+        Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
+        onMediaServerDisconnect();
+        startActivity(intent);
+        finish();
+        }
     }
 
     boolean mSwitchCam = false;
@@ -1728,3 +1740,4 @@ public class RoomActivity extends AppCompatActivity {
     }
 
 }
+

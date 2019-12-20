@@ -71,6 +71,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     implementation (name: 'ucloudrtclib_1.6.2_ee9bbf43', ext: 'aar')
+    implementation (name: 'ucloudimlib_1.0_5bd1dd67', ext: 'aar')
 //    implementation project(path: ':ucloud_business_sdk')
 //    implementation project(':urtc-sdk-android')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
