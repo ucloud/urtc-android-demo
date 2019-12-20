@@ -1008,6 +1008,12 @@ public class RoomActivity extends AppCompatActivity {
                         .Template(UcloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
                         .build();
                 sdkEngine.startRecord(recordProfile);
+//                UcloudRtcSdkRecordProfile recordAudioProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+//                        .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_AUDIO)
+//                        .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+//                        .build();
+//                sdkEngine.startRecord(recordAudioProfile);
+
                 //如果主窗口不是当前推流用户，而是被订阅的用户
 //                UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo = mVideoAdapter.getStreamInfo(0);
 //                if(uCloudRtcSdkStreamInfo != null){
