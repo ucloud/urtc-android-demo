@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -55,6 +56,14 @@ import com.urtcdemo.utils.UiHelper;
 import com.urtcdemo.view.CustomerClickListener;
 import com.urtcdemo.view.SteamScribePopupWindow;
 import com.urtcdemo.view.URTCVideoViewInfo;
+
+import org.webrtc.ucloud.record.DeviceUtils;
+import org.webrtc.ucloud.record.FileUtils;
+import org.webrtc.ucloud.record.MediaRecorderBase;
+import org.webrtc.ucloud.record.MediaRecorderNative;
+import org.webrtc.ucloud.record.URTCRecordManager;
+import org.webrtc.ucloud.record.model.MediaObject;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -133,6 +142,15 @@ public class RoomActivity extends AppCompatActivity {
     private boolean startCreateImg = true;
     private AtomicInteger memoryCount = new AtomicInteger(0);
     private List<String> userIds = new ArrayList<>();
+    private boolean mLocalRecordStart = false;
+    /**
+     * SDK视频录制对象
+     */
+    private MediaRecorderBase mMediaRecorder;
+    /**
+     * 视频信息
+     */
+    private MediaObject mMediaObject;
 
     enum BtnOp{
         OP_LOCAL_RECORD,
@@ -1017,10 +1035,10 @@ public class RoomActivity extends AppCompatActivity {
         //user can chose the suitable type
 //        mOpBtn.setTag(OP_SEND_MSG);
 //        mOpBtn.setText("sendmsg");
-//        mOpBtn.setTag(OP_LOCAL_RECORD);
-//        mOpBtn.setText("lrecord");
-        mOpBtn.setTag(OP_REMOTE_RECORD);
-        mOpBtn.setText("record");
+        mOpBtn.setTag(OP_LOCAL_RECORD);
+        mOpBtn.setText("lrecord");
+//        mOpBtn.setTag(OP_REMOTE_RECORD);
+//        mOpBtn.setText("record");
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -1033,7 +1051,15 @@ public class RoomActivity extends AppCompatActivity {
                      sdkEngine.messageNotify("hi");
                      break;
                 case OP_LOCAL_RECORD:
-
+                    if(!mLocalRecordStart){
+                        Log.d(TAG, " start local record: ");
+                        mMediaRecorder.startRecord();
+                        mLocalRecordStart = true;
+                    }else{
+                        Log.d(TAG, " stop local record: ");
+                        mMediaRecorder.stopRecord();
+                        mLocalRecordStart = false;
+                    }
                     break;
                 case OP_REMOTE_RECORD:
                     if (!mIsRecording) {
@@ -1386,6 +1412,8 @@ public class RoomActivity extends AppCompatActivity {
             UCloudRtcSdkEngine.onRGBCaptureResult(mUCloudRTCDataProvider);
         }
         sdkEngine.joinChannel(info);
+        initSmallVideo();
+        initMediaRecorder();
     }
 
     private void recycleBitmap(Bitmap bitmap){
@@ -1684,4 +1712,75 @@ public class RoomActivity extends AppCompatActivity {
         timeshow.stop();
     }
 
+    //初始化视频
+    public static void initSmallVideo() {
+        // 设置拍摄视频缓存路径
+        File dcim = Environment
+                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        if (DeviceUtils.isZte()) {
+            if (dcim.exists()) {
+                URTCRecordManager.setVideoCachePath(dcim + "/urtc/");
+            } else {
+                URTCRecordManager.setVideoCachePath(dcim.getPath().replace("/sdcard/",
+                        "/sdcard-ext/")
+                        + "/urtc/");
+            }
+        } else {
+            URTCRecordManager.setVideoCachePath(dcim + "/urtc/");
+        }
+        // 初始化拍摄
+        URTCRecordManager.initialize(false, null);
+    }
+    /**
+     * 初始化拍摄SDK
+     */
+    private void initMediaRecorder () {
+        mMediaRecorder = new MediaRecorderNative();
+        mMediaRecorder.setOnErrorListener(new MediaRecorderBase.OnErrorListener() {
+            @Override
+            public void onVideoError(int what, int extra) {
+
+            }
+
+            @Override
+            public void onAudioError(int what, String message) {
+
+            }
+        });
+        mMediaRecorder.setOnEncodeListener(new MediaRecorderBase.OnEncodeListener() {
+            @Override
+            public void onEncodeStart() {
+
+            }
+
+            @Override
+            public void onEncodeProgress(int progress) {
+
+            }
+
+            @Override
+            public void onEncodeComplete() {
+
+            }
+
+            @Override
+            public void onEncodeError() {
+
+            }
+        });
+        mMediaRecorder.setOnPreparedListener(new MediaRecorderBase.OnPreparedListener() {
+            @Override
+            public void onPrepared() {
+
+            }
+        });
+
+        File f = new File(URTCRecordManager.getVideoCachePath());
+        if (!FileUtils.checkFile(f)) {
+            f.mkdirs();
+        }
+        String key = String.valueOf(System.currentTimeMillis());
+        mMediaObject = mMediaRecorder.setOutputDirectory(key,
+                URTCRecordManager.getVideoCachePath() + key);
+    }
 }

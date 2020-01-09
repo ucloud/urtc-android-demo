@@ -13,12 +13,15 @@ import android.view.WindowManager;
 import com.github.moduth.blockcanary.BlockCanaryContext;
 import com.tencent.bugly.crashreport.CrashReport;
 //import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkPushEncode;
+import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkPushEncode;
 import com.urtcdemo.BuildConfig;
 import com.urtcdemo.utils.CommonUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkLogLevel;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
 import com.urtcdemo.utils.UiHelper;
+
+import org.webrtc.ucloud.UcloudRtcExDevice2YUVCapturer;
 
 public class UCloudRtcApplication extends Application {
 
@@ -40,6 +43,8 @@ public class UCloudRtcApplication extends Application {
         sContext = this;
         UCloudRtcSdkEnv.initEnv(getApplicationContext(), this);
         UCloudRtcSdkEnv.setWriteToLogCat(true);
+        UCloudRtcSdkEnv.setLogReport(false);
+        UCloudRtcSdkEnv.setEncodeMode(UcloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);
         UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo);
         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
         UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.SEC_KEY);
