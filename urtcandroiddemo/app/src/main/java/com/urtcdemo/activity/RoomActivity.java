@@ -69,6 +69,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
+import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_LOCAL_RECORD;
+import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_REMOTE_RECORD;
+import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_SEND_MSG;
 
 
 public class RoomActivity extends AppCompatActivity {
@@ -93,7 +96,6 @@ public class RoomActivity extends AppCompatActivity {
     private GridLayoutManager gridLayoutManager;
     private RemoteVideoAdapter mVideoAdapter;
     RecyclerView mRemoteGridView = null;
-
     UCloudRtcSdkEngine sdkEngine = null;
     ImageButton mPublish = null;
     ImageButton mHangup = null;
@@ -101,7 +103,7 @@ public class RoomActivity extends AppCompatActivity {
     ImageButton mMuteMic = null;
     ImageButton mLoudSpkeader = null;
     ImageButton mMuteCam = null;
-    TextView mRecordBtn = null;
+    TextView mOpBtn = null;
     CheckBox  mCheckBoxMirror = null;
     private SteamScribePopupWindow mSpinnerPopupWindowScribe;
     private View mStreamSelect;
@@ -132,6 +134,11 @@ public class RoomActivity extends AppCompatActivity {
     private AtomicInteger memoryCount = new AtomicInteger(0);
     private List<String> userIds = new ArrayList<>();
 
+    enum BtnOp{
+        OP_LOCAL_RECORD,
+        OP_REMOTE_RECORD,
+        OP_SEND_MSG
+    }
     class RGBSourceData{
         Bitmap srcData;
         int width;
@@ -468,7 +475,7 @@ public class RoomActivity extends AppCompatActivity {
                 public void run() {
                     if (code == 0) {
                         ToastUtils.shortShow(RoomActivity.this, " 加入房间成功");
-//                        mRecordBtn.setVisibility(View.VISIBLE);
+//                        mOpBtn.setVisibility(View.VISIBLE);
                         startTimeShow();
                     } else {
                         ToastUtils.shortShow(RoomActivity.this, " 加入房间失败 " +
@@ -896,7 +903,7 @@ public class RoomActivity extends AppCompatActivity {
                         Log.d(TAG,videoPath);
                         ToastUtils.longShow(RoomActivity.this, "观看地址: " +videoPath );
                         mIsRecording = true;
-                        mRecordBtn.setText("stop record");
+                        mOpBtn.setText("stop record");
                         if(mAtomOpStart)
                             mAtomOpStart = false;
                     }else{
@@ -914,8 +921,28 @@ public class RoomActivity extends AppCompatActivity {
                     ToastUtils.longShow(RoomActivity.this, "录制结束: " + (code == NET_ERR_CODE_OK.ordinal()?"成功":"失败: "+ code));
                     if(mIsRecording){
                         mIsRecording = false;
-                        mRecordBtn.setText("start record");
+                        mOpBtn.setText("start record");
                     }
+                }
+            });
+        }
+
+        @Override
+        public void onMsgNotify(int code, String msg) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onMsgNotify: code: " + code + "msg: " + msg);
+                }
+            });
+        }
+
+        @Override
+        public void onServerBroadCastMsg(String uid, String msg) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onServerBroadCastMsg: uid: " + uid + "msg: " + msg);
                 }
             });
         }
@@ -986,16 +1013,31 @@ public class RoomActivity extends AppCompatActivity {
         mStreamSelect = findViewById(R.id.stream_select);
         mTextStream = findViewById(R.id.stream_text_view);
         refreshStreamInfoText();
-        mRecordBtn = findViewById(R.id.opRecord);
+        mOpBtn = findViewById(R.id.opBtn);
+        //user can chose the suitable type
+//        mOpBtn.setTag(OP_SEND_MSG);
+//        mOpBtn.setText("sendmsg");
+//        mOpBtn.setTag(OP_LOCAL_RECORD);
+//        mOpBtn.setText("lrecord");
+        mOpBtn.setTag(OP_REMOTE_RECORD);
+        mOpBtn.setText("record");
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
-
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
             UCloudRtcSdkEnv.setFrontCameraMirror(isChecked);
         });
-        mRecordBtn.setOnClickListener(v -> {
-            if (!mIsRecording) {
-                mAtomOpStart = true;
+        mOpBtn.setOnClickListener(v -> {
+            BtnOp btnOp = (BtnOp)mOpBtn.getTag();
+            switch (btnOp){
+                case OP_SEND_MSG:
+                     sdkEngine.messageNotify("hi");
+                     break;
+                case OP_LOCAL_RECORD:
+
+                    break;
+                case OP_REMOTE_RECORD:
+                    if (!mIsRecording) {
+                        mAtomOpStart = true;
 //                如果主窗口是当前用户
                 UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
                         .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
@@ -1014,7 +1056,7 @@ public class RoomActivity extends AppCompatActivity {
 //                        .build();
 //                sdkEngine.startRecord(recordAudioProfile);
 
-                //如果主窗口不是当前推流用户，而是被订阅的用户
+                        //如果主窗口不是当前推流用户，而是被订阅的用户
 //                UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo = mVideoAdapter.getStreamInfo(0);
 //                if(uCloudRtcSdkStreamInfo != null){
 //                    UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
@@ -1030,10 +1072,13 @@ public class RoomActivity extends AppCompatActivity {
 //                            .build();
 //                    sdkEngine.startRecord(recordProfile);
 //                }
-            } else if(!mAtomOpStart){
-                mAtomOpStart = true;
-                sdkEngine.stopRecord();
+                    } else if(!mAtomOpStart){
+                        mAtomOpStart = true;
+                        sdkEngine.stopRecord();
+                    }
+                    break;
             }
+
         });
         mTextStream.setOnClickListener(new CustomerClickListener() {
             @Override

@@ -75,7 +75,7 @@
 
                     <TextView
                         android:layout_marginLeft="20dp"
-                        android:id="@+id/opRecord"
+                        android:id="@+id/opBtn"
                         android:background="@drawable/oval_start_record_background"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
