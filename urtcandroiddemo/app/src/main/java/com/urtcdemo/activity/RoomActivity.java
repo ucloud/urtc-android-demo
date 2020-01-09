@@ -43,6 +43,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
 import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkCaptureMode;
 //import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
 import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
+import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCDataProvider;
 import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCDataReceiver;
@@ -57,10 +58,7 @@ import com.urtcdemo.view.CustomerClickListener;
 import com.urtcdemo.view.SteamScribePopupWindow;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
-import org.webrtc.ucloud.record.DeviceUtils;
-import org.webrtc.ucloud.record.FileUtils;
 import org.webrtc.ucloud.record.MediaRecorderBase;
-import org.webrtc.ucloud.record.MediaRecorderNative;
 import org.webrtc.ucloud.record.URTCRecordManager;
 import org.webrtc.ucloud.record.model.MediaObject;
 
@@ -79,8 +77,6 @@ import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CO
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
 import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_LOCAL_RECORD;
-import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_REMOTE_RECORD;
-import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_SEND_MSG;
 
 
 public class RoomActivity extends AppCompatActivity {
@@ -472,6 +468,18 @@ public class RoomActivity extends AppCompatActivity {
             mTextStream.setText(String.format("当前有%d路流可以订阅", mSteamList.size()));
         }
     }
+
+    UCloudRtcRecordListener mLocalRecordListener = new UCloudRtcRecordListener() {
+        @Override
+        public void onLocalRecordStart(String path, int code) {
+            Log.d(TAG, "onLocalRecordStart: " + path + "code: "+ code);
+        }
+
+        @Override
+        public void onLocalRecordStop(String path, long fileLength, int code) {
+            Log.d(TAG, "onLocalRecordStop: " + path + "fileLength: "+ fileLength + "code: "+ code);
+        }
+    };
 
     UCloudRtcSdkEventListener eventListener = new UCloudRtcSdkEventListener() {
         @Override
@@ -1053,11 +1061,11 @@ public class RoomActivity extends AppCompatActivity {
                 case OP_LOCAL_RECORD:
                     if(!mLocalRecordStart){
                         Log.d(TAG, " start local record: ");
-                        mMediaRecorder.startRecord();
+                        URTCRecordManager.getInstance().startRecord(System.currentTimeMillis()+"",mLocalRecordListener);
                         mLocalRecordStart = true;
                     }else{
                         Log.d(TAG, " stop local record: ");
-                        mMediaRecorder.stopRecord();
+                        URTCRecordManager.getInstance().stopRecord();
                         mLocalRecordStart = false;
                     }
                     break;
@@ -1412,8 +1420,7 @@ public class RoomActivity extends AppCompatActivity {
             UCloudRtcSdkEngine.onRGBCaptureResult(mUCloudRTCDataProvider);
         }
         sdkEngine.joinChannel(info);
-        initSmallVideo();
-        initMediaRecorder();
+        initRecordManager();
     }
 
     private void recycleBitmap(Bitmap bitmap){
@@ -1713,74 +1720,11 @@ public class RoomActivity extends AppCompatActivity {
     }
 
     //初始化视频
-    public static void initSmallVideo() {
+    public static void initRecordManager() {
         // 设置拍摄视频缓存路径
-        File dcim = Environment
-                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        if (DeviceUtils.isZte()) {
-            if (dcim.exists()) {
-                URTCRecordManager.setVideoCachePath(dcim + "/urtc/");
-            } else {
-                URTCRecordManager.setVideoCachePath(dcim.getPath().replace("/sdcard/",
-                        "/sdcard-ext/")
-                        + "/urtc/");
-            }
-        } else {
-            URTCRecordManager.setVideoCachePath(dcim + "/urtc/");
-        }
-        // 初始化拍摄
-        URTCRecordManager.initialize(false, null);
-    }
-    /**
-     * 初始化拍摄SDK
-     */
-    private void initMediaRecorder () {
-        mMediaRecorder = new MediaRecorderNative();
-        mMediaRecorder.setOnErrorListener(new MediaRecorderBase.OnErrorListener() {
-            @Override
-            public void onVideoError(int what, int extra) {
-
-            }
-
-            @Override
-            public void onAudioError(int what, String message) {
-
-            }
-        });
-        mMediaRecorder.setOnEncodeListener(new MediaRecorderBase.OnEncodeListener() {
-            @Override
-            public void onEncodeStart() {
-
-            }
-
-            @Override
-            public void onEncodeProgress(int progress) {
-
-            }
-
-            @Override
-            public void onEncodeComplete() {
-
-            }
-
-            @Override
-            public void onEncodeError() {
-
-            }
-        });
-        mMediaRecorder.setOnPreparedListener(new MediaRecorderBase.OnPreparedListener() {
-            @Override
-            public void onPrepared() {
-
-            }
-        });
-
-        File f = new File(URTCRecordManager.getVideoCachePath());
-        if (!FileUtils.checkFile(f)) {
-            f.mkdirs();
-        }
-        String key = String.valueOf(System.currentTimeMillis());
-        mMediaObject = mMediaRecorder.setOutputDirectory(key,
-                URTCRecordManager.getVideoCachePath() + key);
+//        File dcim = Environment
+//                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        URTCRecordManager.init(false,"", "mnt/sdcard/urtc/mp4");
+        Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
     }
 }
