@@ -41,7 +41,7 @@ public class UCloudRtcApplication extends Application {
 
     private void init(){
         sContext = this;
-        UCloudRtcSdkEnv.initEnv(getApplicationContext(), this);
+        UCloudRtcSdkEnv.initEnv(getApplicationContext());
         UCloudRtcSdkEnv.setWriteToLogCat(true);
         UCloudRtcSdkEnv.setLogReport(false);
         UCloudRtcSdkEnv.setEncodeMode(UcloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);

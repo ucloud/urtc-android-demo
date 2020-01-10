@@ -281,7 +281,9 @@ public class ConnectActivity extends AppCompatActivity {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                                ToastUtils.shortShow(UCloudRtcSdkEnv.getApplication(),"default mix file copy success");
+                                if(UCloudRtcSdkEnv.getApplication() != null){
+                                    ToastUtils.shortShow(UCloudRtcSdkEnv.getApplication(),"default mix file copy success");
+                                }
                         }
                     });
                 }else{
