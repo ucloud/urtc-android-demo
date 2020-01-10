@@ -77,6 +77,7 @@ import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CO
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
 import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_LOCAL_RECORD;
+import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_SEND_MSG;
 
 
 public class RoomActivity extends AppCompatActivity {
