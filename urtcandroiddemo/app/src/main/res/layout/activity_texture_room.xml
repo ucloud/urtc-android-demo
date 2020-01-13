@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
+    tools:ignore="MergeRootFrame">
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+           <TextureView
+                android:id="@+id/local_texture_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+            <ProgressBar
+                android:id="@+id/processlocal"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="5dp"
+                android:layout_width="5dp"
+                android:layout_height="match_parent"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/processbar_style_v" />
+        </FrameLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/remoteGridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="bottom" />
+
+        <FrameLayout
+            android:id="@+id/call_fragment_container"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_marginLeft="20dp"
+                        android:id="@+id/text_room"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="11"
+                        android:textColor="@color/colorWhite"></TextView>
+
+                    <TextView
+                        android:layout_marginLeft="20dp"
+                        android:id="@+id/opBtn"
+                        android:background="@drawable/oval_start_record_background"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="start"
+                        android:gravity="center"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:textColor="@color/colorWhite"></TextView>
+
+                    <CheckBox
+                        android:id="@+id/cb_mirror"
+                        android:layout_width="0dp"
+                        android:layout_weight="1.0"
+                        android:layout_marginLeft="20dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/textcolor"
+                        android:text="@string/mirror"/>
+
+                </LinearLayout>
+
+                <Chronometer
+                    android:id="@+id/timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:format="%s"
+                    android:textColor="@color/colorWhite"
+                    android:layout_gravity="center_horizontal" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/stream_select"
+                android:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/back_btn"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/oval_edit_text_background"
+                android:gravity="center_horizontal"
+                android:paddingStart="15dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="15dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:id="@+id/stream_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:textColor="@color/textcolor" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/arrow_down" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:visibility="visible"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_marginTop="5dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageButton
+                    android:id="@+id/button_call_pub"
+                    android:background="@drawable/publish_layer"
+                    android:src="@drawable/publish"
+                    android:contentDescription="@string/disconnect_call"
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"
+                    android:visibility="visible"/>
+
+                <ImageButton
+                    android:id="@+id/button_call_disconnect"
+                    android:background="@mipmap/close_phone"
+                    android:contentDescription="@string/disconnect_call"
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"/>
+
+                <ImageButton
+                    android:id="@+id/button_call_toggle_cam"
+                    android:background="@drawable/publish_layer"
+                    android:src="@mipmap/video_open"
+                    android:contentDescription="toggle cam"
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"/>
+
+                <ImageButton
+                    android:id="@+id/button_call_switch_camera"
+                    android:background="@drawable/publish_layer"
+                    android:src="@mipmap/switch_camera"
+                    android:contentDescription="@string/switch_camera"
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"/>
+
+                <ImageButton
+                    android:id="@+id/button_call_toggle_mic"
+                    android:background="@drawable/publish_layer"
+                    android:src="@mipmap/microphone"
+                    android:contentDescription="@string/toggle_mic"
+                    android:layout_marginEnd="8dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"/>
+
+                <ImageButton
+                    android:id="@+id/button_call_loundspeaker"
+                    android:background="@drawable/publish_layer"
+                    android:src="@mipmap/loudspeaker"
+                    android:contentDescription="loud speaker on/off"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+</RelativeLayout>
