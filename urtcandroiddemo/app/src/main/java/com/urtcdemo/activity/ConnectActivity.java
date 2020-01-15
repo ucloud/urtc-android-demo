@@ -72,7 +72,8 @@ public class ConnectActivity extends AppCompatActivity {
             return;
         }
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
-        startRoomActivity();
+//        startRoomActivity();
+        startRoomTextureActivity();
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -113,6 +114,7 @@ public class ConnectActivity extends AppCompatActivity {
                         UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
                     }else{
                         startRoomActivity();
+//                        startRoomTextureActivity();
                     }
                 }else {
                     //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
@@ -223,6 +225,27 @@ public class ConnectActivity extends AppCompatActivity {
         if (!mStartSuccess) {
             mStartSuccess=true;
             Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
+            intent.putExtra("room_id", mRoomid);
+            String autoGenUserId = "android_"+ UUID.randomUUID().toString().replace("-", "");
+            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId():autoGenUserId;
+            intent.putExtra("user_id", mUserId);
+            intent.putExtra("app_id", mAppid);
+            intent.putExtra("token", mRoomToken);
+            mMainHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(intent);
+                    finish();
+                    mStartSuccess=false;
+                }
+            },500);
+        }
+    }
+
+    private void startRoomTextureActivity(){
+        if (!mStartSuccess) {
+            mStartSuccess=true;
+            Intent intent = new Intent(ConnectActivity.this, RoomTextureActivity.class);
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_"+ UUID.randomUUID().toString().replace("-", "");
             mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId():autoGenUserId;

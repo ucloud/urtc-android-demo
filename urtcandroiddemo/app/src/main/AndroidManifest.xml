@@ -61,6 +61,11 @@
             android:screenOrientation="portrait"></activity>
 
         <activity
+            android:name=".activity.RoomTextureActivity"
+            android:screenOrientation="landscape"
+            android:hardwareAccelerated="true"></activity>
+
+        <activity
             android:name=".activity.SettingActivity"
             android:screenOrientation="portrait"></activity>
 

@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -44,8 +45,6 @@ import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
-import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCDataProvider;
-import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCDataReceiver;
 import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
@@ -68,19 +67,15 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
 import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_LOCAL_RECORD;
 
-//import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
-//import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
 
 
-public class RoomTextureActivity extends AppCompatActivity {
+public class RoomTextureActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener {
     private static final String TAG = "RoomActivity";
 
     private String mUserid = "test001";
@@ -143,6 +138,26 @@ public class RoomTextureActivity extends AppCompatActivity {
      * 视频信息
      */
     private MediaObject mMediaObject;
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        Log.d(TAG, "onSurfaceTextureAvailable: ");
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        return false;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+
+    }
 
     enum BtnOp{
         OP_LOCAL_RECORD,
@@ -289,14 +304,14 @@ public class RoomTextureActivity extends AppCompatActivity {
                         int mediatype = info.getMediaType().ordinal();
                         if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
                             if (!sdkEngine.isAudioOnlyMode()) {
-                                localrenderview.setBackgroundColor(Color.TRANSPARENT);
-//                                sdkEngine.startPreview(info.getMediaType(),
-//                                        localrenderview);
+//                                localrenderview.setBackgroundColor(Color.TRANSPARENT);
+                                sdkEngine.startPreview(info.getMediaType(),
+                                        localrenderview);
                                 mLocalStreamInfo = info;
                                 localrenderview.setTag(mLocalStreamInfo);
 //                                localrenderview.refreshRemoteOp(View.INVISIBLE);
                                 //和交换大小功能触发重叠，App使用者可以另行定义触发
-                                localrenderview.setOnClickListener(mScreenShotOnClickListener);
+//                                localrenderview.setOnClickListener(mScreenShotOnClickListener);
                             }
 
                         } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN.ordinal()) {
@@ -415,7 +430,7 @@ public class RoomTextureActivity extends AppCompatActivity {
                     if (code == 0) {
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo(null);
                         UCloudRtcSdkSurfaceVideoView videoView = null;
-
+                        TextureView textureView = null;
                         Log.d(TAG, " subscribe info: " + info.getUId() + " hasvideo " + info.isHasVideo());
                         if (info.isHasVideo()) {
                              //外部扩展输出，和默认输出二选一
@@ -424,16 +439,23 @@ public class RoomTextureActivity extends AppCompatActivity {
 //                            videoViewCallBack.init(false);
 //                            sdkEngine.startRemoteView(info, videoViewCallBack);
 
-                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
-                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
-                            videoView.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
-                            vinfo.setmRenderview(videoView);
-                            videoView.setTag(info);
-                            videoView.setId(R.id.video_view);
+//                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
+//                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
+//                            videoView.init(false);
+//                            videoView.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+//                            vinfo.setmRenderview(videoView);
+//                            videoView.setTag(info);
+//                            videoView.setId(R.id.video_view);
                             //设置交换
 //                          videoView.setOnClickListener(mSwapRemoteLocalListener);
                             //远端截图
-                            videoView.setOnClickListener(mScreenShotOnClickListener);
+//                            videoView.setOnClickListener(mScreenShotOnClickListener);
+
+                            //textureview
+                            textureView = new TextureView(getApplicationContext());
+                            vinfo.setmRenderview(textureView);
+                            textureView.setTag(info);
+                            textureView.setId(R.id.video_view);
                         }
                         vinfo.setmUid(info.getUId());
                         vinfo.setmMediatype(info.getMediaType());
@@ -445,9 +467,12 @@ public class RoomTextureActivity extends AppCompatActivity {
                         if (mVideoAdapter != null) {
                             mVideoAdapter.addStreamView(mkey, vinfo, info);
                         }
-                        if (vinfo != null && videoView != null) {
-                            sdkEngine.startRemoteView(info, videoView);
-                            videoView.refreshRemoteOp(View.VISIBLE);
+//                        if (vinfo != null && videoView != null) {
+//                            sdkEngine.startRemoteView(info, videoView);
+//                            videoView.refreshRemoteOp(View.VISIBLE);
+//                        }
+                        if (vinfo != null && textureView != null) {
+                            sdkEngine.startRemoteView(info, textureView);
                         }
                         //如果订阅成功就删除待订阅列表中的数据
                         mSpinnerPopupWindowScribe.removeStreamInfoByUid(info.getUId());
@@ -733,7 +758,7 @@ public class RoomTextureActivity extends AppCompatActivity {
         }
         getWindow().getDecorView().setSystemUiVisibility(getSystemUiVisibility());
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(R.layout.activity_room);
+        setContentView(R.layout.activity_texture_room);
         timeshow = findViewById(R.id.timer);
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
@@ -941,6 +966,7 @@ public class RoomTextureActivity extends AppCompatActivity {
         //title.setText("roomid: "+mRoomid+"\nuid: "+ mUserid);
 
         localrenderview = findViewById(R.id.local_texture_view);
+//        localrenderview.setSurfaceTextureListener(this);
         localprocess = findViewById(R.id.processlocal);
         isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture();
         Log.d(TAG, " mCaptureMode " + mCaptureMode);
@@ -1008,6 +1034,8 @@ public class RoomTextureActivity extends AppCompatActivity {
         sdkEngine.setClassType(mClass);
         mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
         sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
+//        mPublishMode = 1;
+//        sdkEngine.setAutoPublish(false);
         mScribeMode = preferences.getInt(CommonUtils.SCRIBE_MODE, CommonUtils.AUTO_MODE);
         if (mScribeMode == CommonUtils.AUTO_MODE) {
             mStreamSelect.setVisibility(View.GONE);
@@ -1071,7 +1099,7 @@ public class RoomTextureActivity extends AppCompatActivity {
         Log.d(TAG, "on Stop");
         for (String key : mVideoAdapter.getStreamViews().keySet()) {
             URTCVideoViewInfo info = mVideoAdapter.getStreamViews().get(key);
-            UCloudRtcSdkSurfaceVideoView videoView = info.getmRenderview();
+            View videoView = info.getmRenderview();
             UCloudRtcSdkStreamInfo videoViewStreamInfo = (UCloudRtcSdkStreamInfo) videoView.getTag();
             if (videoView != null && videoViewStreamInfo != null) {
                 sdkEngine.stopRemoteView(videoViewStreamInfo);
@@ -1113,7 +1141,8 @@ public class RoomTextureActivity extends AppCompatActivity {
     }
 
     private void initButtonSize() {
-        int screenWidth = UiHelper.getScreenPixWidth(this);
+//        int screenWidth = UiHelper.getScreenPixWidth(this);
+        int screenWidth = UiHelper.dipToPx(this,500);
         int leftRightMargin = UiHelper.dipToPx(this, 30 * 2);
         int gap = UiHelper.dipToPx(this, 8);
         int buttonSize;

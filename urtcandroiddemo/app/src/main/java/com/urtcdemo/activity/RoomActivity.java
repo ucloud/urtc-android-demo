@@ -572,7 +572,7 @@ public class RoomActivity extends AppCompatActivity {
                                         localrenderview);
                                 mLocalStreamInfo = info;
                                 localrenderview.setTag(mLocalStreamInfo);
-                                localrenderview.refreshRemoteOp(View.INVISIBLE);
+//                                localrenderview.refreshRemoteOp(View.INVISIBLE);
                                 //和交换大小功能触发重叠，App使用者可以另行定义触发
                                 localrenderview.setOnClickListener(mScreenShotOnClickListener);
                             }
@@ -1220,7 +1220,8 @@ public class RoomActivity extends AppCompatActivity {
         //title.setText("roomid: "+mRoomid+"\nuid: "+ mUserid);
 
         localrenderview = findViewById(R.id.localview);
-        localrenderview.init(true, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
+//        localrenderview.init(true, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
+        localrenderview.init(false);
         localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
         localrenderview.setZOrderMediaOverlay(false);
         localrenderview.setMirror(false);
@@ -1290,7 +1291,9 @@ public class RoomActivity extends AppCompatActivity {
         mClass = UCloudRtcSdkRoomType.valueOf(classType);
         sdkEngine.setClassType(mClass);
         mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
-        sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
+//        sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
+        mPublishMode = 1;
+        sdkEngine.setAutoPublish(false);
         mScribeMode = preferences.getInt(CommonUtils.SCRIBE_MODE, CommonUtils.AUTO_MODE);
         if (mScribeMode == CommonUtils.AUTO_MODE) {
             mStreamSelect.setVisibility(View.GONE);
@@ -1468,7 +1471,7 @@ public class RoomActivity extends AppCompatActivity {
         boolean hasSwap = false;
         for (String key : mVideoAdapter.getStreamViews().keySet()) {
             URTCVideoViewInfo info = mVideoAdapter.getStreamViews().get(key);
-            UCloudRtcSdkSurfaceVideoView videoView = info.getmRenderview();
+            View videoView = info.getmRenderview();
             UCloudRtcSdkStreamInfo videoViewStreamInfo = (UCloudRtcSdkStreamInfo) videoView.getTag();
             UCloudRtcSdkStreamInfo videoViewSwapStreamInfo = (UCloudRtcSdkStreamInfo) videoView.getTag(R.id.swap_info);
             if (videoView != null && videoViewStreamInfo != null) {
@@ -1495,7 +1498,7 @@ public class RoomActivity extends AppCompatActivity {
         Log.d(TAG, "on Stop");
         for (String key : mVideoAdapter.getStreamViews().keySet()) {
             URTCVideoViewInfo info = mVideoAdapter.getStreamViews().get(key);
-            UCloudRtcSdkSurfaceVideoView videoView = info.getmRenderview();
+            View videoView = info.getmRenderview();
             UCloudRtcSdkStreamInfo videoViewStreamInfo = (UCloudRtcSdkStreamInfo) videoView.getTag();
             if (videoView != null && videoViewStreamInfo != null) {
                 sdkEngine.stopRemoteView(videoViewStreamInfo);

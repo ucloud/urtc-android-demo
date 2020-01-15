@@ -1,10 +1,12 @@
 package com.urtcdemo.view;
 
+import android.view.View;
+
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 
 public class URTCVideoViewInfo {
-    private UCloudRtcSdkSurfaceVideoView mRenderview ;
+    private View mRenderview ;
     private String mUid ;
     private boolean mEanbleVideo ;
     private boolean mEnableAudio;
@@ -18,11 +20,11 @@ public class URTCVideoViewInfo {
         mMediatype = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
     }
 
-    public UCloudRtcSdkSurfaceVideoView getmRenderview() {
+    public View getmRenderview() {
         return mRenderview;
     }
 
-    public void setmRenderview(UCloudRtcSdkSurfaceVideoView mRenderview) {
+    public void setmRenderview(View mRenderview) {
         this.mRenderview = mRenderview;
     }
 
@@ -68,8 +70,10 @@ public class URTCVideoViewInfo {
 
     public void release() {
         if (mRenderview != null) {
-            mRenderview.refresh();
-            mRenderview.release();
+            if(mRenderview instanceof UCloudRtcSdkSurfaceVideoView){
+                ((UCloudRtcSdkSurfaceVideoView)mRenderview).refresh();
+                ((UCloudRtcSdkSurfaceVideoView)mRenderview).release();
+            }
             mRenderview = null ;
         }
     }

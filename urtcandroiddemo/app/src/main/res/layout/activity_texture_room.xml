@@ -17,7 +17,7 @@
             android:layout_height="match_parent">
            <TextureView
                 android:id="@+id/local_texture_view"
-                android:layout_width="match_parent"
+                android:layout_width="500dp"
                 android:layout_height="match_parent" />
             <ProgressBar
                 android:id="@+id/processlocal"

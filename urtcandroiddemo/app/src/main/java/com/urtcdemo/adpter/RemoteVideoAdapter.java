@@ -69,13 +69,14 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
             return;
         }
         if (holderView.getChildCount() == 0) {
-            UCloudRtcSdkSurfaceVideoView videoView = viewInfo.getmRenderview();
+            View videoView = viewInfo.getmRenderview();
             if (videoView != null) {
                 ViewParent parent = videoView.getParent();
                 if (parent != null) {
                     ((FrameLayout) parent).removeView(videoView);
                 }
-                videoView.setZOrderMediaOverlay(true);
+                if(videoView instanceof UCloudRtcSdkSurfaceVideoView)
+                    ((UCloudRtcSdkSurfaceVideoView)videoView).setZOrderMediaOverlay(true);
                 videoView.setTag(R.id.index, viewInfo);
                 FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT);
