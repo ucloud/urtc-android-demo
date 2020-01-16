@@ -655,7 +655,7 @@ public class RoomActivity extends AppCompatActivity {
                     Log.d(TAG, "onRemotePublish: " + info.getUId() + " me : " + mUserid);
                     if(!mUserid.equals(info.getUId())){
                         mSteamList.add(info);
-                        if (sdkEngine.isAutoSubscribe()) {
+                        if (!sdkEngine.isAutoSubscribe()) {
                             sdkEngine.subscribe(info);
                         } else {
                             mSpinnerPopupWindowScribe.notifyUpdate();
@@ -709,9 +709,9 @@ public class RoomActivity extends AppCompatActivity {
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
                             //设置交换
-//                          videoView.setOnClickListener(mSwapRemoteLocalListener);
+                            videoView.setOnClickListener(mSwapRemoteLocalListener);
                             //远端截图
-                            videoView.setOnClickListener(mScreenShotOnClickListener);
+//                            videoView.setOnClickListener(mScreenShotOnClickListener);
                         }
                         vinfo.setmUid(info.getUId());
                         vinfo.setmMediatype(info.getMediaType());
