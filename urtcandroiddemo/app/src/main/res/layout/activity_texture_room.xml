@@ -40,6 +40,12 @@
             android:layout_marginBottom="10dp"
             android:layout_gravity="bottom" />
 
+        <TextureView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:id="@+id/test_textureview"
+            android:layout_gravity="right|center_vertical" />
+
         <FrameLayout
             android:id="@+id/call_fragment_container"
             android:visibility="gone"

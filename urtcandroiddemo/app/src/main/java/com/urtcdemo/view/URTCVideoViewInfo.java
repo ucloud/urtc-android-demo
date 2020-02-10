@@ -3,6 +3,7 @@ package com.urtcdemo.view;
 import android.view.View;
 
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 
 public class URTCVideoViewInfo {
@@ -12,6 +13,7 @@ public class URTCVideoViewInfo {
     private boolean mEnableAudio;
     private UCloudRtcSdkMediaType mMediatype ;
     private String key;
+    private UCloudRtcSdkStreamInfo mStreamInfo;
 
     public URTCVideoViewInfo(UCloudRtcSdkSurfaceVideoView view) {
         mRenderview = view ;
@@ -66,6 +68,14 @@ public class URTCVideoViewInfo {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public void setStreamInfo(UCloudRtcSdkStreamInfo streamInfo) {
+        mStreamInfo = streamInfo;
+    }
+
+    public UCloudRtcSdkStreamInfo getStreamInfo() {
+        return mStreamInfo;
     }
 
     public void release() {

@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,7 +32,6 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStats;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
@@ -45,9 +42,10 @@ import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
-import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
+import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCFirstFrameRendered;
+import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCScreenShot;
 import com.urtcdemo.R;
-import com.urtcdemo.adpter.RemoteVideoAdapter;
+import com.urtcdemo.adpter.RemoteHasViewVideoAdapter;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.UiHelper;
@@ -76,7 +74,7 @@ import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_LOCAL_RECORD;
 
 
 public class RoomTextureActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener {
-    private static final String TAG = "RoomActivity";
+    private static final String TAG = "RoomTextureActivity";
 
     private String mUserid = "test001";
     private String mRoomid = "urtc1";
@@ -96,7 +94,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
     final int COL_SIZE_P = 3;
     final int COL_SIZE_L = 6;
     private GridLayoutManager gridLayoutManager;
-    private RemoteVideoAdapter mVideoAdapter;
+    private RemoteHasViewVideoAdapter mVideoAdapter;
     RecyclerView mRemoteGridView = null;
     UCloudRtcSdkEngine sdkEngine = null;
     ImageButton mPublish = null;
@@ -131,8 +129,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
     private boolean startCreateImg = true;
     private List<String> userIds = new ArrayList<>();
     private boolean mLocalRecordStart = false;
-    private UCloudRtcSdkStreamInfo mStreamInfo;
-    private TextureView mTextureView;
+    private TextureView mTestTextureView;
     /**
      * SDK视频录制对象
      */
@@ -171,7 +168,12 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
     private View.OnClickListener mScreenShotOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-             addScreenShotCallBack((UCloudRtcSdkSurfaceVideoView)v);
+//             addScreenShotCallBack((UCloudRtcSdkSurfaceVideoView)v);
+            if(v == localrenderview){
+                if(localrenderview.getTag() != null && localrenderview.getTag() instanceof UCloudRtcSdkStreamInfo){
+                    takeScreenShot(true,(UCloudRtcSdkStreamInfo)localrenderview.getTag());
+                }
+            }
         }
     };
 
@@ -308,12 +310,12 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                             if (!sdkEngine.isAudioOnlyMode()) {
 //                                localrenderview.setBackgroundColor(Color.TRANSPARENT);
                                 sdkEngine.startPreview(info.getMediaType(),
-                                        localrenderview);
+                                        localrenderview, (info, view) -> Log.d(TAG, "onLocalFirstFrameRender: " + "view: "+ view));
                                 mLocalStreamInfo = info;
                                 localrenderview.setTag(mLocalStreamInfo);
 //                                localrenderview.refreshRemoteOp(View.INVISIBLE);
                                 //和交换大小功能触发重叠，App使用者可以另行定义触发
-//                                localrenderview.setOnClickListener(mScreenShotOnClickListener);
+                                localrenderview.setOnClickListener(mScreenShotOnClickListener);
                             }
 
                         } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN.ordinal()) {
@@ -394,7 +396,8 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                     Log.d(TAG, "onRemotePublish: " + info.getUId() + " me : " + mUserid);
                     if(!mUserid.equals(info.getUId())){
                         mSteamList.add(info);
-                        if (sdkEngine.isAutoSubscribe()) {
+//                        sdkEngine.startRemoteView(info,mTestTextureView,(info, view) -> Log.d(TAG, "onRemoteFirstFrameRender: " + "view: "+ view));
+                        if (!sdkEngine.isAutoSubscribe()) {
                             sdkEngine.subscribe(info);
                         } else {
                             mSpinnerPopupWindowScribe.notifyUpdate();
@@ -454,12 +457,10 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
 //                            videoView.setOnClickListener(mScreenShotOnClickListener);
 
                             //textureview
-                            textureView = new TextureView(getApplicationContext());
-                            vinfo.setmRenderview(textureView);
-                            mStreamInfo = info;
-                            mTextureView = textureView;
-                            textureView.setTag(info);
-                            textureView.setId(R.id.video_view);
+//                            textureView = new TextureView(getApplicationContext());
+//                            vinfo.setmRenderview(textureView);
+//                            textureView.setTag(info);
+//                            textureView.setId(R.id.video_view);
                         }
                         vinfo.setmUid(info.getUId());
                         vinfo.setmMediatype(info.getMediaType());
@@ -471,14 +472,12 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                         if (mVideoAdapter != null) {
                             mVideoAdapter.addStreamView(mkey, vinfo, info);
                         }
-//                        if (vinfo != null && videoView != null) {
-//                            sdkEngine.startRemoteView(info, videoView);
-//                            videoView.refreshRemoteOp(View.VISIBLE);
-//                        }
                         if (vinfo != null && textureView != null) {
-                            sdkEngine.startRemoteView(info, textureView);
+//                            sdkEngine.startRemoteView(info, textureView);
+//                            sdkEngine.startRemoteView(info,mTestTextureView);
                             mIsSub = true;
                         }
+
                         //如果订阅成功就删除待订阅列表中的数据
                         mSpinnerPopupWindowScribe.removeStreamInfoByUid(info.getUId());
                         refreshStreamInfoText();
@@ -775,10 +774,12 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         } else {
             gridLayoutManager = new GridLayoutManager(this, COL_SIZE_P);
         }
-        mRemoteGridView.setLayoutManager(gridLayoutManager);
-        mVideoAdapter = new RemoteVideoAdapter(this);
-        mRemoteGridView.setAdapter(mVideoAdapter);
+
         sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
+        mVideoAdapter = new RemoteHasViewVideoAdapter(this,sdkEngine);
+        mRemoteGridView.setLayoutManager(gridLayoutManager);
+        mRemoteGridView.getItemAnimator().setAddDuration(0);
+        mRemoteGridView.setAdapter(mVideoAdapter);
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
@@ -790,6 +791,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         mMuteCam = findViewById(R.id.button_call_toggle_cam);
         mStreamSelect = findViewById(R.id.stream_select);
         mTextStream = findViewById(R.id.stream_text_view);
+        mTestTextureView = findViewById(R.id.test_textureview);
         refreshStreamInfoText();
         mOpBtn = findViewById(R.id.opBtn);
         //user can chose the suitable type
@@ -890,76 +892,79 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         //手动发布
         mPublish = findViewById(R.id.button_call_pub);
         mPublish.setOnClickListener(v -> {
-            if(mIsSub){
-               sdkEngine.stopRemoteView(mStreamInfo);
-            }else{
-                sdkEngine.startRemoteView(mStreamInfo,mTextureView);
-            }
-
-//            if (!mIsPublished) {
-//                List<Integer> results = new ArrayList<>();
-//                StringBuffer errorMessage = new StringBuffer();
-//                switch (mCaptureMode) {
-//                    //音频
-//                    case CommonUtils.audio_capture_mode:
-//                        results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
-//                        break;
-//                    //视频
-//                    case CommonUtils.camera_capture_mode:
-//                        results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
-//                        break;
-//                    //屏幕捕捉
-//                    case CommonUtils.screen_capture_mode:
-//                        if (isScreenCaptureSupport) {
-//                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
-//                        } else {
-//                            errorMessage.append("设备不支持屏幕捕捉\n");
-//                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
-//                        }
-//                        break;
-//                    //音频+屏幕捕捉
-//                    case CommonUtils.screen_Audio_mode:
-//                        if (isScreenCaptureSupport) {
-//                            //推一路桌面一路音频,桌面流不需要带音频
-//                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, false, false).getErrorCode());
-//                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
-//                        } else {
-//                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
-//                        }
-//                        break;
-//                    //视频+屏幕捕捉
-//                    case CommonUtils.multi_capture_mode:
-//                        if (isScreenCaptureSupport) {
-//                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
-//                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
-//                        } else {
-//                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
-//                        }
-//                        break;
-//                }
-//
-////            List<Integer> errorCodes = results.stream()
-////                    .filter(result -> result != 0)
-////                    .collect(Collectors.toList());
-//                List<Integer> errorCodes = new ArrayList<>();
-//                for (Integer result : results) {
-//                    if (result != 0)
-//                        errorCodes.add(result);
-//                }
-//                if (!errorCodes.isEmpty()) {
-//                    for (Integer errorCode : errorCodes) {
-//                        if (errorCode != NET_ERR_CODE_OK.ordinal())
-//                            errorMessage.append("UCLOUD_RTC_SDK_ERROR_CODE:" + errorCode + "\n");
-//                    }
-//                }
-//                if (errorMessage.length() > 0)
-//                    ToastUtils.shortShow(RoomTextureActivity.this, errorMessage.toString());
-//                else {
-//                    ToastUtils.shortShow(RoomTextureActivity.this, "发布");
-//                }
-//            } else {
-//                sdkEngine.unPublish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+            //手动停止渲染远端
+//            if(mIsSub){
+//               sdkEngine.stopRemoteView(mStreamInfo);
+//                mIsSub = false;
+//            }else{
+//                sdkEngine.startRemoteView(mStreamInfo,mTextureView);
+//                mIsSub = true;
 //            }
+
+            if (!mIsPublished) {
+                List<Integer> results = new ArrayList<>();
+                StringBuffer errorMessage = new StringBuffer();
+                switch (mCaptureMode) {
+                    //音频
+                    case CommonUtils.audio_capture_mode:
+                        results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
+                        break;
+                    //视频
+                    case CommonUtils.camera_capture_mode:
+                        results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                        break;
+                    //屏幕捕捉
+                    case CommonUtils.screen_capture_mode:
+                        if (isScreenCaptureSupport) {
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
+                        } else {
+                            errorMessage.append("设备不支持屏幕捕捉\n");
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                        }
+                        break;
+                    //音频+屏幕捕捉
+                    case CommonUtils.screen_Audio_mode:
+                        if (isScreenCaptureSupport) {
+                            //推一路桌面一路音频,桌面流不需要带音频
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, false, false).getErrorCode());
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
+                        } else {
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
+                        }
+                        break;
+                    //视频+屏幕捕捉
+                    case CommonUtils.multi_capture_mode:
+                        if (isScreenCaptureSupport) {
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                        } else {
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                        }
+                        break;
+                }
+
+//            List<Integer> errorCodes = results.stream()
+//                    .filter(result -> result != 0)
+//                    .collect(Collectors.toList());
+                List<Integer> errorCodes = new ArrayList<>();
+                for (Integer result : results) {
+                    if (result != 0)
+                        errorCodes.add(result);
+                }
+                if (!errorCodes.isEmpty()) {
+                    for (Integer errorCode : errorCodes) {
+                        if (errorCode != NET_ERR_CODE_OK.ordinal())
+                            errorMessage.append("UCLOUD_RTC_SDK_ERROR_CODE:" + errorCode + "\n");
+                    }
+                }
+                if (errorMessage.length() > 0)
+                    ToastUtils.shortShow(RoomTextureActivity.this, errorMessage.toString());
+                else {
+                    ToastUtils.shortShow(RoomTextureActivity.this, "发布");
+                }
+            } else {
+                sdkEngine.unPublish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+            }
         });
         mHangup.setOnClickListener(v -> callHangUp());
 
@@ -1043,7 +1048,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         int classType = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL.ordinal());
         mClass = UCloudRtcSdkRoomType.valueOf(classType);
         sdkEngine.setClassType(mClass);
-//        mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
+        mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
 //        sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
         mPublishMode = 1;
         sdkEngine.setAutoPublish(false);
@@ -1068,13 +1073,15 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         sdkEngine.joinChannel(info);
     }
 
-    private void addScreenShotCallBack(UCloudRtcSdkSurfaceVideoView view){
-        view.setScreenShotBack(new UcloudRTCSceenShot() {
+    private void takeScreenShot(boolean isLocal,UCloudRtcSdkStreamInfo streamInfo){
+        sdkEngine.takeSnapShot(isLocal,streamInfo,new UcloudRTCScreenShot() {
             @Override
             public void onReceiveRGBAData(ByteBuffer rgbBuffer, int width, int height) {
+                Log.d(TAG, "onReceiveRGBAData: rgbBuffer: " + rgbBuffer + " width: " + width + " height: " + height);
                 final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
+
                 bitmap.copyPixelsFromBuffer(rgbBuffer);
-                String name = "/mnt/sdcard/urtcscreen_"+System.currentTimeMillis() +".jpg";
+                String name = "/mnt/sdcard/urtcscreen_" + System.currentTimeMillis() + "_local.jpg";
                 File file = new File(name);
                 try {
                     FileOutputStream out = new FileOutputStream(file);
@@ -1088,9 +1095,34 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                     e.printStackTrace();
                 }
                 Log.d(TAG, "screen shoot : " + name);
-                ToastUtils.shortShow(RoomTextureActivity.this,"screen shoot : " + name);
             }
-        });
+        } );
+    }
+
+    private void addScreenShotCallBack(UCloudRtcSdkSurfaceVideoView view){
+//        view.setScreenShotBack(new UcloudRTCScreenShot() {
+//            @Override
+//            public void onReceiveRGBAData(ByteBuffer rgbBuffer, int width, int height) {
+//                final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
+//                bitmap.copyPixelsFromBuffer(rgbBuffer);
+//                String name = "/mnt/sdcard/urtcscreen_"+System.currentTimeMillis() +".jpg";
+//                File file = new File(name);
+//                try {
+//                    FileOutputStream out = new FileOutputStream(file);
+//                    if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
+//                        out.flush();
+//                        out.close();
+//                    }
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                Log.d(TAG, "screen shoot : " + name);
+//                ToastUtils.shortShow(RoomTextureActivity.this,"screen shoot : " + name);
+//            }
+//        });
+
     }
 
     @Override
