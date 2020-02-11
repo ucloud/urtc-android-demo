@@ -70,7 +70,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
+
 import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_REMOTE_RECORD;
+import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_LOCAL_RECORD;
+import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_SEND_MSG;
 
 
 public class RoomActivity extends AppCompatActivity {
@@ -95,7 +98,6 @@ public class RoomActivity extends AppCompatActivity {
     private GridLayoutManager gridLayoutManager;
     private RemoteVideoAdapter mVideoAdapter;
     RecyclerView mRemoteGridView = null;
-
     UCloudRtcSdkEngine sdkEngine = null;
 
     ImageButton mPublish = null;
@@ -476,7 +478,7 @@ public class RoomActivity extends AppCompatActivity {
                 public void run() {
                     if (code == 0) {
                         ToastUtils.shortShow(RoomActivity.this, " 加入房间成功");
-//                        mRecordBtn.setVisibility(View.VISIBLE);
+//                        mOpBtn.setVisibility(View.VISIBLE);
                         startTimeShow();
                     } else {
                         ToastUtils.shortShow(RoomActivity.this, " 加入房间失败 " +
@@ -922,7 +924,7 @@ public class RoomActivity extends AppCompatActivity {
                         mIsRecording = false;
                         mOpBtn.setText("start record");
                     }
-                    }
+                }
             });
         }
 
@@ -1001,7 +1003,6 @@ public class RoomActivity extends AppCompatActivity {
         mOpBtn.setTag(OP_REMOTE_RECORD);
         mOpBtn.setText("record");
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
-
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
             UCloudRtcSdkEnv.setFrontCameraMirror(isChecked);
@@ -1010,7 +1011,6 @@ public class RoomActivity extends AppCompatActivity {
             BtnOp btnOp = (BtnOp)mOpBtn.getTag();
             switch (btnOp){
                 case OP_SEND_MSG:
-
                      break;
                 case OP_LOCAL_RECORD:
 
@@ -1018,6 +1018,7 @@ public class RoomActivity extends AppCompatActivity {
                 case OP_REMOTE_RECORD:
             if (!mIsRecording) {
                 mAtomOpStart = true;
+
 //                如果主窗口是当前用户
                 UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
                         .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
@@ -1036,7 +1037,7 @@ public class RoomActivity extends AppCompatActivity {
 //                        .build();
 //                sdkEngine.startRecord(recordAudioProfile);
 
-                //如果主窗口不是当前推流用户，而是被订阅的用户
+                        //如果主窗口不是当前推流用户，而是被订阅的用户
 //                UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo = mVideoAdapter.getStreamInfo(0);
 //                if(uCloudRtcSdkStreamInfo != null){
 //                    UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
@@ -1052,10 +1053,10 @@ public class RoomActivity extends AppCompatActivity {
 //                            .build();
 //                    sdkEngine.startRecord(recordProfile);
 //                }
-            } else if(!mAtomOpStart){
-                mAtomOpStart = true;
-                sdkEngine.stopRecord();
-            }
+                    } else if(!mAtomOpStart){
+                        mAtomOpStart = true;
+                        sdkEngine.stopRecord();
+                    }
                     break;
             }
         });
