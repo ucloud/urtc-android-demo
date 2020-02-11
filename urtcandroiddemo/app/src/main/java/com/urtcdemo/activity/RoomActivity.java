@@ -24,11 +24,6 @@ import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.ucloud.business.im.UcloudIMSdkEngine;
-import com.ucloud.business.im.UcloudIMSdkEventListener;
-import com.ucloud.business.im.sdkengine.define.UCloudIMErrorCode;
-import com.ucloud.business.im.sdkengine.define.UCloudIMSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
@@ -75,6 +70,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
+import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_REMOTE_RECORD;
 
 
 public class RoomActivity extends AppCompatActivity {
@@ -101,7 +97,6 @@ public class RoomActivity extends AppCompatActivity {
     RecyclerView mRemoteGridView = null;
 
     UCloudRtcSdkEngine sdkEngine = null;
-    UcloudIMSdkEngine imEngine = null;
 
     ImageButton mPublish = null;
     ImageButton mHangup = null;
@@ -109,8 +104,7 @@ public class RoomActivity extends AppCompatActivity {
     ImageButton mMuteMic = null;
     ImageButton mLoudSpkeader = null;
     ImageButton mMuteCam = null;
-    TextView mRecordBtn = null;
-    TextView mSendMsgBtn = null;
+    TextView mOpBtn = null;
     CheckBox  mCheckBoxMirror = null;
     private SteamScribePopupWindow mSpinnerPopupWindowScribe;
     private View mStreamSelect;
@@ -141,6 +135,11 @@ public class RoomActivity extends AppCompatActivity {
     private AtomicInteger memoryCount = new AtomicInteger(0);
     private List<String> userIds = new ArrayList<>();
 
+    enum BtnOp{
+        OP_LOCAL_RECORD,
+        OP_REMOTE_RECORD,
+        OP_SEND_MSG
+    }
     class RGBSourceData{
         Bitmap srcData;
         int width;
@@ -456,66 +455,6 @@ public class RoomActivity extends AppCompatActivity {
             mTextStream.setText(String.format("当前有%d路流可以订阅", mSteamList.size()));
         }
     }
-
-    UcloudIMSdkEventListener mIMSdkEventListener = new UcloudIMSdkEventListener(){
-        @Override
-        public void onSendCustomerMsg(String msg) {
-            Log.d(TAG, "onIMSendCustomerMsg: "  + " msg: "+ msg);
-            try {
-                JSONObject jsonObject = new JSONObject(msg);
-                JSONObject data = jsonObject.getJSONObject("msg");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onReceiveCustomMsg(String msg) {
-            Log.d(TAG, "onReceiveCustomMsg: "  + " msg: "+ msg);
-            JSONObject jsonObject = null;
-            try {
-                jsonObject = new JSONObject(msg);
-                JSONObject data = jsonObject.getJSONObject("msg");
-                String content = data.getString("content");
-                Log.d(TAG, "onReceiveCustomMsg: "  + " content: "+ content.toString());
-                JSONObject contentJson = new JSONObject(content);
-                Log.d(TAG, "onReceiveCustomMsg: "  + " contentJson: "+ contentJson.getString("title"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        @Override
-        public void onJoinRoomResult(int code, String msg, String roomid) {
-            Log.d(TAG, "onIMJoinRoomResult: " + code + " msg: "+ msg + " roomid: "+ roomid);
-        }
-
-        @Override
-        public void onLeaveRoomResult(int code, String msg, String roomid) {
-            Log.d(TAG, "onIMLeaveRoomResult: " + code + " msg: "+ msg + " roomid: "+ roomid);
-        }
-
-        @Override
-        public void onRejoiningRoom(String roomid) {
-            Log.d(TAG, "onIMRejoiningRoom: "+ roomid);
-        }
-
-        @Override
-        public void onRejoinRoomResult(String roomid) {
-            Log.d(TAG, "onIMRejoinRoomResult: "+ roomid);
-        }
-
-        @Override
-        public void onServerDisconnect() {
-            Log.d(TAG, "onIMonServerDisconnect: ");
-        }
-
-        @Override
-        public void onServerConnect() {
-            Log.d(TAG, "onIMonServerConnect: ");
-        }
-    };
 
     UCloudRtcSdkEventListener eventListener = new UCloudRtcSdkEventListener() {
         @Override
@@ -963,7 +902,7 @@ public class RoomActivity extends AppCompatActivity {
                         Log.d(TAG,videoPath);
                         ToastUtils.longShow(RoomActivity.this, "观看地址: " +videoPath );
                         mIsRecording = true;
-                        mRecordBtn.setText("stop record");
+                        mOpBtn.setText("stop record");
                         if(mAtomOpStart)
                             mAtomOpStart = false;
                     }else{
@@ -981,9 +920,9 @@ public class RoomActivity extends AppCompatActivity {
                     ToastUtils.longShow(RoomActivity.this, "录制结束: " + (code == NET_ERR_CODE_OK.ordinal()?"成功":"失败: "+ code));
                     if(mIsRecording){
                         mIsRecording = false;
-                        mRecordBtn.setText("start record");
+                        mOpBtn.setText("start record");
                     }
-                }
+                    }
             });
         }
 
@@ -1041,7 +980,6 @@ public class RoomActivity extends AppCompatActivity {
         mVideoAdapter.setRemoveRemoteStreamReceiver(mRemoveRemoteStreamReceiver);
         mRemoteGridView.setAdapter(mVideoAdapter);
         sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
-        imEngine = UcloudIMSdkEngine.createEngine(mIMSdkEventListener);
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
@@ -1054,15 +992,30 @@ public class RoomActivity extends AppCompatActivity {
         mStreamSelect = findViewById(R.id.stream_select);
         mTextStream = findViewById(R.id.stream_text_view);
         refreshStreamInfoText();
-        mRecordBtn = findViewById(R.id.opRecord);
-        mSendMsgBtn = findViewById(R.id.sendMessage);
+        mOpBtn = findViewById(R.id.opBtn);
+        //user can chose the suitable type
+//        mOpBtn.setTag(OP_SEND_MSG);
+//        mOpBtn.setText("sendmsg");
+//        mOpBtn.setTag(OP_LOCAL_RECORD);
+//        mOpBtn.setText("lrecord");
+        mOpBtn.setTag(OP_REMOTE_RECORD);
+        mOpBtn.setText("record");
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
 
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
             UCloudRtcSdkEnv.setFrontCameraMirror(isChecked);
         });
-        mRecordBtn.setOnClickListener(v -> {
+        mOpBtn.setOnClickListener(v -> {
+            BtnOp btnOp = (BtnOp)mOpBtn.getTag();
+            switch (btnOp){
+                case OP_SEND_MSG:
+
+                     break;
+                case OP_LOCAL_RECORD:
+
+                    break;
+                case OP_REMOTE_RECORD:
             if (!mIsRecording) {
                 mAtomOpStart = true;
 //                如果主窗口是当前用户
@@ -1103,18 +1056,7 @@ public class RoomActivity extends AppCompatActivity {
                 mAtomOpStart = true;
                 sdkEngine.stopRecord();
             }
-        });
-        mSendMsgBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                try {
-                    JSONObject content = new JSONObject();
-                    content.put("title","haha");
-                    imEngine.pushCustomerMessage("test",content.toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                    break;
             }
         });
 
@@ -1423,11 +1365,6 @@ public class RoomActivity extends AppCompatActivity {
             UCloudRtcSdkEngine.onRGBCaptureResult(mUCloudRTCDataProvider);
         }
         sdkEngine.joinChannel(info);
-        UCloudIMSdkAuthInfo imSdkAuthInfo = new UCloudIMSdkAuthInfo();
-        imSdkAuthInfo.setAppId(mAppid);
-        imSdkAuthInfo.setRoomId(mRoomid);
-        imSdkAuthInfo.setUId(mUserid);
-        imEngine.joinChannel(imSdkAuthInfo);
     }
 
     private void recycleBitmap(Bitmap bitmap){
@@ -1604,7 +1541,6 @@ public class RoomActivity extends AppCompatActivity {
             }
         }
         UCloudRtcSdkEngine.destory();
-        UcloudIMSdkEngine.destory();
         System.gc();
     }
 
