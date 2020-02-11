@@ -35,6 +35,7 @@ import com.urtcdemo.utils.URTCFileUtil;
 
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -265,8 +266,9 @@ public class ConnectActivity extends AppCompatActivity {
         public void run() {
             if(context != null && context.get()!=null){
                 String storageFileDir = context.get().getResources().getString(R.string.mix_file_dir);
-                String storageFilePath = storageFileDir+File.separator+"dy.mp3";
+                String storageFilePath = storageFileDir+File.separator+"tomb.txt";
                 File fileStorage = new File(storageFilePath);
+                File fileInput = new File("/data/user/0/com.urtcdemo/app_bugly/tomb_1577175913612.txt");
                 boolean needCopy = false;
                 if(!fileStorage.exists()){
                     needCopy = true;
@@ -277,7 +279,16 @@ public class ConnectActivity extends AppCompatActivity {
                     if (!file.exists()) {//如果文件夹不存在，则创建新的文件夹
                         file.mkdirs();
                     }
-                    readInputStream(storageFilePath,context.get().getResources().openRawResource(R.raw.dy));
+//                    readInputStream(storageFilePath,context.get().getResources().openRawResource(R.raw.dy));
+
+                    try {
+                        FileInputStream fis=new FileInputStream(fileInput);
+//                        readInputStream(storageFilePath,context.get().getResources().openRawResource(R.raw.dy));
+                        readInputStream(storageFilePath,fis);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
                     handler.post(new Runnable() {
                         @Override
                         public void run() {

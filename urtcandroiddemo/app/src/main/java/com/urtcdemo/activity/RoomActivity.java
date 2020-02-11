@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -59,6 +60,12 @@ import com.urtcdemo.view.URTCVideoViewInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.webrtc.ucloud.record.DeviceUtils;
+import org.webrtc.ucloud.record.FileUtils;
+import org.webrtc.ucloud.record.URTCRecordManager;
+import org.webrtc.ucloud.record.MediaRecorderBase;
+import org.webrtc.ucloud.record.MediaRecorderNative;
+import org.webrtc.ucloud.record.model.MediaObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -141,6 +148,15 @@ public class RoomActivity extends AppCompatActivity {
     private List<String> userIds = new ArrayList<>();
     private boolean receiveLeaveIMQuit = false;
     private boolean receiveRTCQuit = false;
+    private boolean mLocalRecordStart = false;
+    /**
+     * SDK视频录制对象
+     */
+    private MediaRecorderBase mMediaRecorder;
+    /**
+     * 视频信息
+     */
+    private MediaObject mMediaObject;
 
     class RGBSourceData{
         Bitmap srcData;
@@ -625,7 +641,36 @@ public class RoomActivity extends AppCompatActivity {
                                 localrenderview.setTag(mLocalStreamInfo);
                                 localrenderview.refreshRemoteOp(View.INVISIBLE);
                                 //和交换大小功能触发重叠，App使用者可以另行定义触发
-                                localrenderview.setOnClickListener(mScreenShotOnClickListener);
+//                                localrenderview.setOnClickListener(mScreenShotOnClickListener);
+                                localrenderview.setOnClickListener(new View.OnClickListener(){
+                                    @Override
+                                    public void onClick(View v) {
+                                        if(!mLocalRecordStart){
+                                            Log.d(TAG, "java start record: ");
+                                            mMediaRecorder.startRecord();
+                                            mLocalRecordStart = true;
+                                        }else{
+                                            Log.d(TAG, "java stop record: ");
+                                            mMediaRecorder.stopRecord();
+                                            mLocalRecordStart = false;
+                                        }
+                                    }
+                                });
+//                                localrenderview.setOnLongClickListener(new View.OnLongClickListener() {
+//                                    @Override
+//                                    public boolean onLongClick(View v) {
+//                                        Log.d(TAG, "java start record: ");
+//                                        if(!mLocalRecordStart){
+//                                           mMediaRecorder.startRecord();
+//                                            mLocalRecordStart = true;
+//                                        }else{
+//                                            Log.d(TAG, "java stop record: ");
+//                                            mMediaRecorder.stopRecord();
+//                                            mLocalRecordStart = false;
+//                                        }
+//                                        return true;
+//                                    }
+//                                });
                             }
 
                         } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN.ordinal()) {
@@ -929,6 +974,7 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(TAG,"remote uid: "+uid + " volume: "+ volume);
                     if (mVideoAdapter != null) {
                         String mkey = uid + UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.toString();
                     }
@@ -1439,6 +1485,9 @@ public class RoomActivity extends AppCompatActivity {
         imSdkAuthInfo.setUId(mUserid);
 //        imSdkAuthInfo.setIMRole(UCloudIMRole.UCLOUD_IM_ROLE_TEACHER);
         imEngine.joinChannel(imSdkAuthInfo);
+
+        //record
+        initSmallVideo();
     }
 
     private void recycleBitmap(Bitmap bitmap){
@@ -1581,6 +1630,7 @@ public class RoomActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        initMediaRecorder();
     }
 
     @Override
@@ -1738,6 +1788,79 @@ public class RoomActivity extends AppCompatActivity {
     private void stopTimeShow() {
         timeshow.stop();
     }
+
+    //record 部分
+    //初始化视频
+    public static void initSmallVideo() {
+        // 设置拍摄视频缓存路径
+        File dcim = Environment
+                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        if (DeviceUtils.isZte()) {
+            if (dcim.exists()) {
+                URTCRecordManager.setVideoCachePath(dcim + "/urtc/");
+            } else {
+                URTCRecordManager.setVideoCachePath(dcim.getPath().replace("/sdcard/",
+                        "/sdcard-ext/")
+                        + "/urtc/");
+            }
+        } else {
+            URTCRecordManager.setVideoCachePath(dcim + "/urtc/");
+        }
+        // 初始化拍摄
+        URTCRecordManager.initialize(false, null);
+    }
+        /**
+         * 初始化拍摄SDK
+         */
+        private void initMediaRecorder () {
+            mMediaRecorder = new MediaRecorderNative();
+            mMediaRecorder.setOnErrorListener(new MediaRecorderBase.OnErrorListener() {
+                @Override
+                public void onVideoError(int what, int extra) {
+
+                }
+
+                @Override
+                public void onAudioError(int what, String message) {
+
+                }
+            });
+            mMediaRecorder.setOnEncodeListener(new MediaRecorderBase.OnEncodeListener() {
+                @Override
+                public void onEncodeStart() {
+
+                }
+
+                @Override
+                public void onEncodeProgress(int progress) {
+
+                }
+
+                @Override
+                public void onEncodeComplete() {
+
+                }
+
+                @Override
+                public void onEncodeError() {
+
+                }
+            });
+            mMediaRecorder.setOnPreparedListener(new MediaRecorderBase.OnPreparedListener() {
+                @Override
+                public void onPrepared() {
+
+                }
+            });
+
+            File f = new File(URTCRecordManager.getVideoCachePath());
+            if (!FileUtils.checkFile(f)) {
+                f.mkdirs();
+            }
+            String key = String.valueOf(System.currentTimeMillis());
+            mMediaObject = mMediaRecorder.setOutputDirectory(key,
+                    URTCRecordManager.getVideoCachePath() + key);
+        }
 
 }
 
