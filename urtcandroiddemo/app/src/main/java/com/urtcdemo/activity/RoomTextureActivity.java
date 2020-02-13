@@ -32,6 +32,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStats;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
@@ -177,6 +178,18 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
     };
 
+    private View.OnClickListener mLocalChangeScaleTypeListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+//             addScreenShotCallBack((UCloudRtcSdkSurfaceVideoView)v);
+            if(v == localrenderview){
+                if(localrenderview.getTag() != null && localrenderview.getTag() instanceof UCloudRtcSdkStreamInfo){
+                    sdkEngine.setRenderViewMode(true,(UCloudRtcSdkStreamInfo)localrenderview.getTag(),UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+                }
+            }
+        }
+    };
+
     private UCloudRtcSdkSurfaceVideoView.RemoteOpTrigger mOnRemoteOpTrigger = new UCloudRtcSdkSurfaceVideoView.RemoteOpTrigger() {
         @Override
         public void onRemoteVideo(View v, UCloudRtcSdkSurfaceVideoView parent) {
@@ -310,12 +323,14 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                             if (!sdkEngine.isAudioOnlyMode()) {
 //                                localrenderview.setBackgroundColor(Color.TRANSPARENT);
                                 sdkEngine.startPreview(info.getMediaType(),
-                                        localrenderview, (info, view) -> Log.d(TAG, "onLocalFirstFrameRender: " + "view: "+ view));
+                                        localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_FILL,(info, view) -> Log.d(TAG, "onLocalFirstFrameRender: " + "view: "+ view));
                                 mLocalStreamInfo = info;
                                 localrenderview.setTag(mLocalStreamInfo);
 //                                localrenderview.refreshRemoteOp(View.INVISIBLE);
                                 //和交换大小功能触发重叠，App使用者可以另行定义触发
                                 localrenderview.setOnClickListener(mScreenShotOnClickListener);
+                                //动态设置渲染模式
+//                                localrenderview.setOnClickListener(mLocalChangeScaleTypeListener);
                             }
 
                         } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN.ordinal()) {
