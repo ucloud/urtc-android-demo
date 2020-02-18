@@ -151,7 +151,8 @@ public class RoomActivity extends AppCompatActivity {
     enum BtnOp{
         OP_LOCAL_RECORD,
         OP_REMOTE_RECORD,
-        OP_SEND_MSG
+        OP_SEND_MSG,
+        OP_LOCAL_RESAMPLE
     }
     class RGBSourceData{
         Bitmap srcData;
@@ -1742,7 +1743,7 @@ public class RoomActivity extends AppCompatActivity {
         // 设置拍摄视频缓存路径
 //        File dcim = Environment
 //                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        URTCRecordManager.init(false,"", "mnt/sdcard/urtc/mp4");
+        URTCRecordManager.init("mnt/sdcard/urtc/mp4");
         Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
     }
 }

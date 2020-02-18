@@ -13,7 +13,6 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.ucloudrtclib.common.URTCLogUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
@@ -54,7 +53,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        URTCLogUtils.d(TAG, TAG + "onCreateViewHolder");
+        Log.d(TAG, TAG + "onCreateViewHolder");
         View v = mInflater.inflate(R.layout.remote_video_view_texture, parent, false);
         v.getLayoutParams().width = CommonUtils.mItemWidth;
         v.getLayoutParams().height = CommonUtils.mItemHeight;
@@ -71,7 +70,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 //        holder.setIsRecyclable(false);
-        URTCLogUtils.d(TAG, TAG + "onBindViewHolder + " + position);
+        Log.d(TAG, TAG + "onBindViewHolder + " + position);
         FrameLayout holderView = (FrameLayout) holder.itemView;
 //        if (holderView != null) {
 //            if (holderView.getChildCount() != 0) {

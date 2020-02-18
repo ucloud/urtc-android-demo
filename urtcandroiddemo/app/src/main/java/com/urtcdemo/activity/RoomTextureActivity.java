@@ -45,6 +45,7 @@ import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCFirstFrameRendered;
 import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCScreenShot;
+import com.ucloudrtclib.sdkengine.openinterface.UcloudRtcAudioResample;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteHasViewVideoAdapter;
 import com.urtcdemo.utils.CommonUtils;
@@ -70,8 +71,7 @@ import java.util.Timer;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
-import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_LOCAL_RECORD;
-
+import static com.urtcdemo.activity.RoomTextureActivity.BtnOp.OP_LOCAL_RESAMPLE;
 
 
 public class RoomTextureActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener {
@@ -130,6 +130,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
     private boolean startCreateImg = true;
     private List<String> userIds = new ArrayList<>();
     private boolean mLocalRecordStart = false;
+    private boolean mLocalResample = false;
     private TextureView mTestTextureView;
     /**
      * SDK视频录制对象
@@ -163,7 +164,8 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
     enum BtnOp{
         OP_LOCAL_RECORD,
         OP_REMOTE_RECORD,
-        OP_SEND_MSG
+        OP_SEND_MSG,
+        OP_LOCAL_RESAMPLE
     }
 
     private View.OnClickListener mScreenShotOnClickListener = new View.OnClickListener() {
@@ -812,10 +814,12 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         //user can chose the suitable type
 //        mOpBtn.setTag(OP_SEND_MSG);
 //        mOpBtn.setText("sendmsg");
-        mOpBtn.setTag(OP_LOCAL_RECORD);
-        mOpBtn.setText("lrecord");
+//        mOpBtn.setTag(OP_LOCAL_RECORD);
+//        mOpBtn.setText("lrecord");
 //        mOpBtn.setTag(OP_REMOTE_RECORD);
 //        mOpBtn.setText("record");
+        mOpBtn.setTag(OP_LOCAL_RESAMPLE);
+        mOpBtn.setText("resample");
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -824,6 +828,22 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         mOpBtn.setOnClickListener(v -> {
             BtnOp btnOp = (BtnOp)mOpBtn.getTag();
             switch (btnOp){
+                case OP_LOCAL_RESAMPLE:
+                    if(!mLocalResample){
+                        String pcmFile = "sdcard/urtc/audioresample_"+ System.currentTimeMillis()+".pcm";
+                        Log.d(TAG, " start local resample: " + pcmFile);
+                        URTCRecordManager.getInstance().startAudioResample((data, sampleRate, channelCount, bitDepth, type) ->{
+//                            URTCLogUtils.d(TAG, TAG + "audioResample data length:" + data.length + "sampleRate: " + sampleRate + " channelCount: " +
+//                                    channelCount + " bitDepth: " + bitDepth + " type: " + type);
+                        },pcmFile);
+                        mLocalResample = true;
+                    }else{
+                        Log.d(TAG, " stop local resample: ");
+                        URTCRecordManager.getInstance().stopAudioResample();
+                        mLocalResample = false;
+                    }
+
+                    break;
                 case OP_SEND_MSG:
                      sdkEngine.messageNotify("hi");
                      break;
@@ -1086,6 +1106,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         UCloudRtcSdkEnv.setCaptureMode(
                 UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
         sdkEngine.joinChannel(info);
+        initRecordManager();
     }
 
     private void takeScreenShot(boolean isLocal,UCloudRtcSdkStreamInfo streamInfo){
@@ -1369,7 +1390,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         // 设置拍摄视频缓存路径
 //        File dcim = Environment
 //                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        URTCRecordManager.init(false,"", "mnt/sdcard/urtc/mp4");
+        URTCRecordManager.init("mnt/sdcard/urtc/mp4");
         Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
     }
 }
