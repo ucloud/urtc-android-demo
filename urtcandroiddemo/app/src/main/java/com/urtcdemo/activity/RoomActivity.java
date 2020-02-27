@@ -486,13 +486,18 @@ public class RoomActivity extends AppCompatActivity {
 
     UCloudRtcRecordListener mLocalRecordListener = new UCloudRtcRecordListener() {
         @Override
-        public void onLocalRecordStart(String path, int code) {
-            Log.d(TAG, "onLocalRecordStart: " + path + "code: "+ code);
+        public void onLocalRecordStart(String path, int code,String msg) {
+            Log.d(TAG, "onLocalRecordStart: " + path + " code: "+ code + " msg: " + msg);
         }
 
         @Override
         public void onLocalRecordStop(String path, long fileLength, int code) {
             Log.d(TAG, "onLocalRecordStop: " + path + "fileLength: "+ fileLength + "code: "+ code);
+        }
+
+        @Override
+        public void onRecordStatusCallBack(long duration, long fileSize) {
+            Log.d(TAG, "onRecordStatusCallBack duration: " + duration + " fileSize: "+ fileSize);
         }
     };
 
@@ -582,7 +587,7 @@ public class RoomActivity extends AppCompatActivity {
                         if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
                             if (!sdkEngine.isAudioOnlyMode()) {
                                 localrenderview.setBackgroundColor(Color.TRANSPARENT);
-                                localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_FILL);
+                                localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
                                 sdkEngine.startPreview(info.getMediaType(),
                                         localrenderview,null,null);
                                 mLocalStreamInfo = info;
@@ -1077,7 +1082,7 @@ public class RoomActivity extends AppCompatActivity {
                 case OP_LOCAL_RECORD:
                     if(!mLocalRecordStart){
                         Log.d(TAG, " start local record: ");
-                        URTCRecordManager.getInstance().startRecord(System.currentTimeMillis()+"",mLocalRecordListener);
+                        URTCRecordManager.getInstance().startRecord(System.currentTimeMillis()+"",mLocalRecordListener,1000);
                         mLocalRecordStart = true;
                     }else{
                         Log.d(TAG, " stop local record: ");

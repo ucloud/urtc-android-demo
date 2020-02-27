@@ -67,10 +67,12 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
+import static com.urtcdemo.activity.RoomTextureActivity.BtnOp.OP_LOCAL_RECORD;
 import static com.urtcdemo.activity.RoomTextureActivity.BtnOp.OP_LOCAL_RESAMPLE;
 
 
@@ -229,13 +231,18 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
 
     UCloudRtcRecordListener mLocalRecordListener = new UCloudRtcRecordListener() {
         @Override
-        public void onLocalRecordStart(String path, int code) {
-            Log.d(TAG, "onLocalRecordStart: " + path + "code: "+ code);
+        public void onLocalRecordStart(String path, int code,String msg) {
+            Log.d(TAG, "onLocalRecordStart: " + path + "code: "+ code + " msg: "+ msg);
         }
 
         @Override
         public void onLocalRecordStop(String path, long fileLength, int code) {
             Log.d(TAG, "onLocalRecordStop: " + path + "fileLength: "+ fileLength + "code: "+ code);
+        }
+
+        @Override
+        public void onRecordStatusCallBack(long duration, long fileSize) {
+            Log.d(TAG, "onRecordStatusCallBack duration: " + duration + " fileSize: "+ fileSize);
         }
     };
 
@@ -814,12 +821,12 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         //user can chose the suitable type
 //        mOpBtn.setTag(OP_SEND_MSG);
 //        mOpBtn.setText("sendmsg");
-//        mOpBtn.setTag(OP_LOCAL_RECORD);
-//        mOpBtn.setText("lrecord");
+        mOpBtn.setTag(OP_LOCAL_RECORD);
+        mOpBtn.setText("lrecord");
 //        mOpBtn.setTag(OP_REMOTE_RECORD);
 //        mOpBtn.setText("record");
-        mOpBtn.setTag(OP_LOCAL_RESAMPLE);
-        mOpBtn.setText("resample");
+//        mOpBtn.setTag(OP_LOCAL_RESAMPLE);
+//        mOpBtn.setText("resample");
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -850,7 +857,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                 case OP_LOCAL_RECORD:
                     if(!mLocalRecordStart){
                         Log.d(TAG, " start local record: ");
-                        URTCRecordManager.getInstance().startRecord(System.currentTimeMillis()+"",mLocalRecordListener);
+                        URTCRecordManager.getInstance().startRecord(System.currentTimeMillis()+"",mLocalRecordListener,1000);
                         mLocalRecordStart = true;
                     }else{
                         Log.d(TAG, " stop local record: ");
