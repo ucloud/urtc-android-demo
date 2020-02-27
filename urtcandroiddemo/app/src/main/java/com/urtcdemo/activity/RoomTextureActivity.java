@@ -857,7 +857,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                 case OP_LOCAL_RECORD:
                     if(!mLocalRecordStart){
                         Log.d(TAG, " start local record: ");
-//                        URTCRecordManager.getInstance().changeDirectory("mnt/sdcard/urtc/mp4back");
+                        URTCRecordManager.getInstance().changeDirectory("mnt/sdcard/urtc/mp4back");
                         URTCRecordManager.getInstance().startRecord(System.currentTimeMillis()+"",mLocalRecordListener,1000);
                         mLocalRecordStart = true;
                     }else{
