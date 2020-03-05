@@ -184,8 +184,6 @@ public class ConnectActivity extends AppCompatActivity {
                     }
                 });
                 thread.start();
-
-
             }
         });
         setButton.setOnClickListener(new View.OnClickListener() {

@@ -31,6 +31,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStats;
@@ -43,9 +44,7 @@ import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
-import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCFirstFrameRendered;
 import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCScreenShot;
-import com.ucloudrtclib.sdkengine.openinterface.UcloudRtcAudioResample;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteHasViewVideoAdapter;
 import com.urtcdemo.utils.CommonUtils;
@@ -67,13 +66,11 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
 import static com.urtcdemo.activity.RoomTextureActivity.BtnOp.OP_LOCAL_RECORD;
-import static com.urtcdemo.activity.RoomTextureActivity.BtnOp.OP_LOCAL_RESAMPLE;
 
 
 public class RoomTextureActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener {
@@ -332,7 +329,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                             if (!sdkEngine.isAudioOnlyMode()) {
 //                                localrenderview.setBackgroundColor(Color.TRANSPARENT);
                                 sdkEngine.startPreview(info.getMediaType(),
-                                        localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_FILL,(info, view) -> Log.d(TAG, "onLocalFirstFrameRender: " + "view: "+ view));
+                                        localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,(info, view) -> Log.d(TAG, "onLocalFirstFrameRender: " + "view: "+ view));
                                 mLocalStreamInfo = info;
                                 localrenderview.setTag(mLocalStreamInfo);
 //                                localrenderview.refreshRemoteOp(View.INVISIBLE);
@@ -642,6 +639,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
 
         @Override
         public void onLocalAudioLevel(int volume) {
+//            Log.d(TAG, "onLocalAudioLevel: "+ volume);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -652,6 +650,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
 
         @Override
         public void onRemoteAudioLevel(String uid, int volume) {
+//            Log.d(TAG, "onRemoteAudioLevel: "+ "uid: "+ uid + volume);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -858,7 +857,8 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                     if(!mLocalRecordStart){
                         Log.d(TAG, " start local record: ");
 //                        URTCRecordManager.getInstance().changeDirectory("mnt/sdcard/urtc/mp4back");
-                        URTCRecordManager.getInstance().startRecord(System.currentTimeMillis()+"",mLocalRecordListener,1000);
+//                        URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,System.currentTimeMillis()+"",mLocalRecordListener,1000);
+                        URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,"mnt/sdcard/urtc/mp422/"+ System.currentTimeMillis()+".mp4",mLocalRecordListener,1000);
                         mLocalRecordStart = true;
                     }else{
                         Log.d(TAG, " stop local record: ");
@@ -1398,7 +1398,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         // 设置拍摄视频缓存路径
 //        File dcim = Environment
 //                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        URTCRecordManager.init("mnt/sdcard/urtc/mp4");
+        URTCRecordManager.init("");
         Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
     }
 }

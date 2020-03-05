@@ -31,12 +31,15 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStats;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
+import com.ucloudrtclib.sdkengine.define.UcloudRtcRenderView;
+
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
 import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkCaptureMode;
@@ -712,8 +715,7 @@ public class RoomActivity extends AppCompatActivity {
                 public void run() {
                     if (code == 0) {
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo(null);
-                        UCloudRtcSdkSurfaceVideoView videoView = null;
-
+                        UcloudRtcRenderView videoView = null;
                         Log.d(TAG, " subscribe info: " + info.getUId() + " hasvideo " + info.isHasVideo());
                         if (info.isHasVideo()) {
                              //外部扩展输出，和默认输出二选一
@@ -722,15 +724,22 @@ public class RoomActivity extends AppCompatActivity {
 //                            videoViewCallBack.init(false);
 //                            sdkEngine.startRemoteView(info, videoViewCallBack);
 
-                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
-                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
-                            videoView.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+                             //UCloudRtcSdkSurfaceVideoView 定义的viewgroup,内含UcloudRtcRenderView
+//                           UCloudRtcSdkSurfaceVideoView videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
+//                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
+//                            videoView.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+//                            videoView.setTag(info);
+//                            videoView.setId(R.id.video_view);
+//                            //设置交换
+////                            videoView.setOnClickListener(mSwapRemoteLocalListener);
+//                            //远端截图
+//                            videoView.setOnClickListener(mScreenShotOnClickListener);
+
+                            //自定义的surfaceview
+                            videoView = new UcloudRtcRenderView(getApplicationContext());
+                            videoView.init();
                             vinfo.setmRenderview(videoView);
                             videoView.setTag(info);
-                            videoView.setId(R.id.video_view);
-                            //设置交换
-//                            videoView.setOnClickListener(mSwapRemoteLocalListener);
-                            //远端截图
                             videoView.setOnClickListener(mScreenShotOnClickListener);
                         }
                         vinfo.setmUid(info.getUId());
@@ -744,8 +753,8 @@ public class RoomActivity extends AppCompatActivity {
                             mVideoAdapter.addStreamView(mkey, vinfo, info);
                         }
                         if (vinfo != null && videoView != null) {
-                            sdkEngine.startRemoteView(info, videoView,null,null);
-                            videoView.refreshRemoteOp(View.VISIBLE);
+                            sdkEngine.startRemoteView(info, videoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
+//                            videoView.refreshRemoteOp(View.VISIBLE);
                         }
                         //如果订阅成功就删除待订阅列表中的数据
                         mSpinnerPopupWindowScribe.removeStreamInfoByUid(info.getUId());
@@ -1082,7 +1091,8 @@ public class RoomActivity extends AppCompatActivity {
                 case OP_LOCAL_RECORD:
                     if(!mLocalRecordStart){
                         Log.d(TAG, " start local record: ");
-                        URTCRecordManager.getInstance().startRecord(System.currentTimeMillis()+"",mLocalRecordListener,1000);
+//                        URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,System.currentTimeMillis()+"",mLocalRecordListener,1000);
+                        URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,"mnt/sdcard/urtc/mp4/"+ System.currentTimeMillis()+".mp4",mLocalRecordListener,1000);
                         mLocalRecordStart = true;
                     }else{
                         Log.d(TAG, " stop local record: ");
@@ -1242,7 +1252,6 @@ public class RoomActivity extends AppCompatActivity {
         localrenderview = findViewById(R.id.localview);
 //        localrenderview.init(true, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
         localrenderview.init(false);
-        localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
         localrenderview.setZOrderMediaOverlay(false);
         localrenderview.setMirror(false);
         localprocess = findViewById(R.id.processlocal);
@@ -1748,7 +1757,7 @@ public class RoomActivity extends AppCompatActivity {
         // 设置拍摄视频缓存路径
 //        File dcim = Environment
 //                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        URTCRecordManager.init("mnt/sdcard/urtc/mp4");
+        URTCRecordManager.init("");
         Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
     }
 }
