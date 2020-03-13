@@ -901,7 +901,7 @@ public class RoomActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     if(code == NET_ERR_CODE_OK.ordinal()){
-                        String videoPath = "http://"+ mBucket + "."+ mRegion +".ufileos.com/" + fileName;
+                        String videoPath = "http://"+ mBucket + "."+ mRegion +".ufileos.com/" + fileName+".mp4";
                         Log.d(TAG,videoPath);
                         ToastUtils.longShow(RoomActivity.this, "观看地址: " +videoPath );
                         mIsRecording = true;
