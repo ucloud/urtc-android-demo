@@ -691,6 +691,7 @@ public class RoomActivity extends AppCompatActivity {
                         vinfo.setmUid(info.getUId());
                         vinfo.setmMediatype(info.getMediaType());
                         vinfo.setmEanbleVideo(info.isHasVideo());
+                        vinfo.setEnableAudio(info.isHasAudio());
                         String mkey = info.getUId() + info.getMediaType().toString();
                         vinfo.setKey(mkey);
                         //默认输出，和外部输出代码二选一
@@ -929,6 +930,26 @@ public class RoomActivity extends AppCompatActivity {
         }
 
         @Override
+        public void onMsgNotify(int code, String msg) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onMsgNotify: code: " + code + "msg: " + msg);
+                }
+            });
+        }
+
+        @Override
+        public void onServerBroadCastMsg(String uid, String msg) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, ": uid: " + uid + "msg: " + msg);
+                }
+            });
+        }
+
+        @Override
         public void onAudioDeviceChanged(UCloudRtcSdkAudioDevice device) {
             defaultAudioDevice = device;
 //            URTCLogUtils.d(TAG,"URTCAudioManager: room change device to "+ defaultAudioDevice);
@@ -996,12 +1017,12 @@ public class RoomActivity extends AppCompatActivity {
         refreshStreamInfoText();
         mOpBtn = findViewById(R.id.opBtn);
         //user can chose the suitable type
-//        mOpBtn.setTag(OP_SEND_MSG);
-//        mOpBtn.setText("sendmsg");
+        mOpBtn.setTag(OP_SEND_MSG);
+        mOpBtn.setText("sendmsg");
 //        mOpBtn.setTag(OP_LOCAL_RECORD);
 //        mOpBtn.setText("lrecord");
-        mOpBtn.setTag(OP_REMOTE_RECORD);
-        mOpBtn.setText("record");
+//        mOpBtn.setTag(OP_REMOTE_RECORD);
+//        mOpBtn.setText("record");
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -1011,6 +1032,7 @@ public class RoomActivity extends AppCompatActivity {
             BtnOp btnOp = (BtnOp)mOpBtn.getTag();
             switch (btnOp){
                 case OP_SEND_MSG:
+                     sdkEngine.messageNotify("hi");
                      break;
                 case OP_LOCAL_RECORD:
 
@@ -1244,8 +1266,9 @@ public class RoomActivity extends AppCompatActivity {
             mStreamSelect.setVisibility(View.VISIBLE);
         }
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
-        //设置sdk 外部扩展模式及其采集的帧率，同时sdk内部会自动调整初始码率和最小码率为1500kbps
-//        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_EXTEND.extendParams(30,2080,720));
+        //设置sdk 外部扩展模式及其采集的帧率，同时sdk内部会自动调整初始码率和最小码率
+        //扩展模式只支持720p的分辨率及以下，若要自定义更高分辨率，请联系Ucloud商务定制，否则sdk会抛出异常，终止运行。
+//        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_EXTEND.extendParams(30,640,480));
         sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfile));
         initButtonSize();
         UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo();
