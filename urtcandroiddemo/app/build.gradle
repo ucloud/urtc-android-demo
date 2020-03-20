@@ -9,7 +9,7 @@ android {
         buildToolsVersion "27.0.3"
         targetSdkVersion 26
         versionCode 14
-        versionName '1.6.2'
+        versionName '1.7.1'
         ndk {
 //            abiFilters  "armeabi-v7a", "arm64-v8a"
             abiFilters  "armeabi-v7a"
@@ -73,7 +73,7 @@ dependencies {
     implementation 'com.github.markzhai:blockcanary-android:1.5.0'
     testImplementation 'junit:junit:4.12'
 
-    implementation (name: 'ucloudrtclib_1.6.8_zy_0ebfefa9', ext: 'aar')
+    implementation (name: 'ucloudrtclib_1.7.1_0bd0905e_w', ext: 'aar')
 //    implementation project(path: ':ucloud_business_sdk')
 //    implementation project(':urtc-sdk-android')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

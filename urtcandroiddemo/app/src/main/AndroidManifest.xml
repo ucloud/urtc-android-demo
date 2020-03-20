@@ -20,6 +20,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".Application.UCloudRtcApplication"
@@ -68,6 +69,8 @@
         <activity
             android:name=".activity.SettingActivity"
             android:screenOrientation="portrait"></activity>
+
+        <service android:name=".service.UCloudRtcForeGroundService"></service>
 
         <service
             android:name="com.ucloudrtclib.monitor.MonitorService"
