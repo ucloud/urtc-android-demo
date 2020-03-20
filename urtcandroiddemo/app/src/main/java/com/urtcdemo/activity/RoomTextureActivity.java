@@ -31,6 +31,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMixProfile;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
@@ -40,13 +41,14 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
-import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkCaptureMode;
-import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordProfile;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
-import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCScreenShot;
+import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteHasViewVideoAdapter;
+import com.urtcdemo.service.UCloudRtcForeGroundService;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.UiHelper;
@@ -54,6 +56,7 @@ import com.urtcdemo.view.CustomerClickListener;
 import com.urtcdemo.view.SteamScribePopupWindow;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
+import org.json.JSONArray;
 import org.webrtc.ucloud.record.MediaRecorderBase;
 import org.webrtc.ucloud.record.URTCRecordManager;
 import org.webrtc.ucloud.record.model.MediaObject;
@@ -71,6 +74,7 @@ import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CO
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
 import static com.urtcdemo.activity.RoomTextureActivity.BtnOp.OP_LOCAL_RECORD;
+import static com.urtcdemo.activity.RoomTextureActivity.BtnOp.OP_MIX;
 
 
 public class RoomTextureActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener {
@@ -83,6 +87,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
     private String mBucket = "urtc-test";
     private String mRegion = "cn-bj";
     private boolean mIsRecording = false;
+    private boolean mIsMixing = false;
     private boolean mAtomOpStart = false;
     private boolean mIsPublished = false;
     private boolean mIsSub = false;
@@ -164,7 +169,8 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         OP_LOCAL_RECORD,
         OP_REMOTE_RECORD,
         OP_SEND_MSG,
-        OP_LOCAL_RESAMPLE
+        OP_LOCAL_RESAMPLE,
+        OP_MIX
     }
 
     private View.OnClickListener mScreenShotOnClickListener = new View.OnClickListener() {
@@ -283,6 +289,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(TAG, "on leave room result "+ code + msg+ "roomid: "+ roomid);
                     ToastUtils.shortShow(RoomTextureActivity.this, " 离开房间 " +
                             code + " errmsg " + msg);
 //                    Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
@@ -318,6 +325,13 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
 
         @Override
         public void onLocalPublish(int code, String msg, UCloudRtcSdkStreamInfo info) {
+//            String pcmFile = "sdcard/urtc/audioresample_"+ System.currentTimeMillis()+".pcm";
+//            Log.d(TAG, " start local resample at localpublish: ");
+//            URTCRecordManager.getInstance().startAudioResample((data, sampleRate, channelCount, bitDepth, type) ->{
+//                Log.d(TAG, TAG + "audioResample data length:" + data.length + "sampleRate: " + sampleRate + " channelCount: " +
+//                                    channelCount + " bitDepth: " + bitDepth + " type: " + type);
+//            },pcmFile);
+//            mLocalResample = true;
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -356,6 +370,9 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
 
         @Override
         public void onLocalUnPublish(int code, String msg, UCloudRtcSdkStreamInfo info) {
+//            Log.d(TAG, " stop local resample: ");
+//            URTCRecordManager.getInstance().stopAudioResample();
+//            mLocalResample = false;
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -400,7 +417,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                 @Override
                 public void run() {
                     Log.d(TAG, "remote user " + uid + "leave ,reason: " + reason);
-                    onUserLeave(uid);
+//                    onUserLeave(uid);
                     ToastUtils.shortShow(RoomTextureActivity.this, " 用户 " +
                             uid + " 离开房间，离开原因： " + reason);
                 }
@@ -729,6 +746,37 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
+        public void onMixStart(int code, String fileName) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(code == NET_ERR_CODE_OK.ordinal()){
+                        Log.d(TAG,"onMixStart: " + fileName);
+                        mIsMixing = true;
+                        mOpBtn.setText("stop mix");
+                        if(mAtomOpStart)
+                            mAtomOpStart = false;
+                    }else{
+
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onMixStop(int code, String pushUrls) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(mIsMixing){
+                        mIsMixing = false;
+                        mOpBtn.setText("mix");
+                    }
+                }
+            });
+        }
+
+        @Override
         public void onMsgNotify(int code, String msg) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -759,6 +807,11 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                 mSpeakerOn = false;
                 mLoudSpkeader.setImageResource(R.mipmap.loudspeaker_disable);
             }
+        }
+
+        @Override
+        public void onPeerLostConnection(int type, UCloudRtcSdkStreamInfo info) {
+            Log.d(TAG, "onPeerLostConnection: type: " + type + "info: " + info);
         }
     };
     private int mSelectPos;
@@ -820,12 +873,14 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         //user can chose the suitable type
 //        mOpBtn.setTag(OP_SEND_MSG);
 //        mOpBtn.setText("sendmsg");
-        mOpBtn.setTag(OP_LOCAL_RECORD);
-        mOpBtn.setText("lrecord");
+//        mOpBtn.setTag(OP_LOCAL_RECORD);
+//        mOpBtn.setText("lrecord");
 //        mOpBtn.setTag(OP_REMOTE_RECORD);
 //        mOpBtn.setText("record");
 //        mOpBtn.setTag(OP_LOCAL_RESAMPLE);
 //        mOpBtn.setText("resample");
+        mOpBtn.setTag(OP_MIX);
+        mOpBtn.setText("mix");
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -856,12 +911,15 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                 case OP_LOCAL_RECORD:
                     if(!mLocalRecordStart){
                         Log.d(TAG, " start local record: ");
+                        mOpBtn.setText("lrecordstop");
 //                        URTCRecordManager.getInstance().changeDirectory("mnt/sdcard/urtc/mp4back");
 //                        URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,System.currentTimeMillis()+"",mLocalRecordListener,1000);
-                        URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,"mnt/sdcard/urtc/mp422/"+ System.currentTimeMillis()+".mp4",mLocalRecordListener,1000);
+                        String path = getExternalCacheDir() + "/wonder_moments_5_13_5_53_304805_1583486429840.mp4";
+                        URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,path,mLocalRecordListener,1000);
                         mLocalRecordStart = true;
                     }else{
                         Log.d(TAG, " stop local record: ");
+                        mOpBtn.setText("lrecord");
                         URTCRecordManager.getInstance().stopRecord();
                         mLocalRecordStart = false;
                     }
@@ -870,15 +928,15 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                     if (!mIsRecording) {
                         mAtomOpStart = true;
 //                如果主窗口是当前用户
-                UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-                        .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
+                UCloudRtcSdkRecordProfile recordProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+                        .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
                         .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                         .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
-                        .Average(UcloudRtcSdkRecordProfile.RECORD_UNEVEN)
-                        .WaterType(UcloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
-                        .WaterPosition(UcloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
+                        .Average(UCloudRtcSdkRecordProfile.RECORD_UNEVEN)
+                        .WaterType(UCloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
+                        .WaterPosition(UCloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
                         .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
-                        .Template(UcloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
+                        .Template(UCloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
                         .build();
                 sdkEngine.startRecord(recordProfile);
 //                UcloudRtcSdkRecordProfile recordAudioProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
@@ -906,6 +964,27 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                     } else if(!mAtomOpStart){
                         mAtomOpStart = true;
                         sdkEngine.stopRecord();
+                    }
+                    break;
+                case OP_MIX:
+                    if (!mIsMixing) {
+                        mAtomOpStart = true;
+                        //如果主窗口是当前用户
+                        JSONArray pushURL = new JSONArray();
+//                        pushURL.put("rtmp://push.urtc.com.cn/" + mAppid + "/"+ mUserid);
+//                        pushURL.put("rtmp://push.urtc.com.cn/live/URtc-h4r1txxy123131");
+                        pushURL.put("rtmp://rtcpush.ugslb.com/rtclive/123");
+                        UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+                                .pushUrl(pushURL)
+                                .mainViewUserId(mUserid)
+                                .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                                .build();
+                        sdkEngine.startMix(mixProfile);
+                    } else if (!mAtomOpStart) {
+                        mAtomOpStart = true;
+                        JSONArray jsonArray = new JSONArray();
+                        jsonArray.put("");
+                        sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH,jsonArray);
                     }
                     break;
             }
@@ -1112,13 +1191,13 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         Log.d(TAG, " roomtoken = " + mRoomToken);
         //普通摄像头捕获方式，与扩展模式二选一
         UCloudRtcSdkEnv.setCaptureMode(
-                UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
+                UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
         sdkEngine.joinChannel(info);
         initRecordManager();
     }
 
     private void takeScreenShot(boolean isLocal,UCloudRtcSdkStreamInfo streamInfo){
-        sdkEngine.takeSnapShot(isLocal,streamInfo,new UcloudRTCScreenShot() {
+        sdkEngine.takeSnapShot(isLocal,streamInfo,new UCloudRTCScreenShot() {
             @Override
             public void onReceiveRGBAData(ByteBuffer rgbBuffer, int width, int height) {
                 Log.d(TAG, "onReceiveRGBAData: rgbBuffer: " + rgbBuffer + " width: " + width + " height: " + height);
@@ -1184,16 +1263,23 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "on Stop");
-        for (String key : mVideoAdapter.getStreamViews().keySet()) {
-            URTCVideoViewInfo info = mVideoAdapter.getStreamViews().get(key);
-            View videoView = info.getmRenderview();
-            UCloudRtcSdkStreamInfo videoViewStreamInfo = (UCloudRtcSdkStreamInfo) videoView.getTag();
-            if (videoView != null && videoViewStreamInfo != null) {
-                sdkEngine.stopRemoteView(videoViewStreamInfo);
-            }
+        if(mIsPublished){
+//            sdkEngine.unPublish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+//            Intent service = new Intent(this, UCloudRtcForeGroundService.class);
+//            startService(service);
+            sdkEngine.controlAudio(false);
+            sdkEngine.controlLocalVideo(false);
         }
-        if (mLocalStreamInfo != null)
-            sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
+//        for (String key : mVideoAdapter.getStreamViews().keySet()) {
+//            URTCVideoViewInfo info = mVideoAdapter.getStreamViews().get(key);
+//            View videoView = info.getmRenderview();
+//            UCloudRtcSdkStreamInfo videoViewStreamInfo = (UCloudRtcSdkStreamInfo) videoView.getTag();
+//            if (videoView != null && videoViewStreamInfo != null) {
+//                sdkEngine.stopRemoteView(videoViewStreamInfo);
+//            }
+//        }
+//        if (mLocalStreamInfo != null)
+//            sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
     }
 
 
@@ -1256,6 +1342,10 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
     @Override
     protected void onResume() {
         super.onResume();
+//        Intent service = new Intent(this, UCloudRtcForeGroundService.class);
+//        stopService(service);
+        sdkEngine.controlAudio(true);
+        sdkEngine.controlLocalVideo(true);
     }
 
     @Override

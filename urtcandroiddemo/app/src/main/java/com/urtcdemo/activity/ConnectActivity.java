@@ -72,8 +72,8 @@ public class ConnectActivity extends AppCompatActivity {
             return;
         }
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
-//        startRoomActivity();
-        startRoomTextureActivity();
+        startRoomActivity();
+//        startRoomTextureActivity();
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {

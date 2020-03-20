@@ -14,7 +14,7 @@ import android.widget.ImageView;
 
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
-import com.ucloudrtclib.sdkengine.define.UcloudRtcRenderView;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
@@ -79,9 +79,9 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
                 }
                 if(videoView instanceof UCloudRtcSdkSurfaceVideoView )
                     ((UCloudRtcSdkSurfaceVideoView)videoView).setZOrderMediaOverlay(true);
-                if(videoView instanceof UcloudRtcRenderView){
-                    ((UcloudRtcRenderView)videoView).setZOrderMediaOverlay(true);
-                    ((UcloudRtcRenderView)videoView).setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+                if(videoView instanceof UCloudRtcRenderView){
+                    ((UCloudRtcRenderView)videoView).setZOrderMediaOverlay(true);
+                    ((UCloudRtcRenderView)videoView).setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
                 }
                 videoView.setTag(R.id.index, viewInfo);
                 FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,

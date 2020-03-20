@@ -2,32 +2,21 @@ package com.urtcdemo.adpter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
-import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCScreenShot;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
-import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -170,7 +159,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
     }
 
     public void addStreamView(String mkey, URTCVideoViewInfo videoViewInfo, UCloudRtcSdkStreamInfo streamInfo) {
-        removeStreamView(mkey);
+//        removeStreamView(mkey);
         if (!mStreamViews.containsKey(mkey)) {
             mStreamViews.put(mkey, videoViewInfo);
             videoViewInfo.setStreamInfo(streamInfo);
@@ -179,8 +168,8 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         if (!mScreenState.containsKey(mkey)) {
             mScreenState.put(mkey, false);
         }
-        notifyItemInserted(medialist.size() - 1);
-//        notifyDataSetChanged();
+//        notifyItemInserted(medialist.size() - 1);
+        notifyDataSetChanged();
     }
 
     public UCloudRtcSdkStreamInfo getStreamInfo(int position) {
@@ -198,7 +187,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
     public void removeStreamView(String mkey) {
         if (mStreamViews.containsKey(mkey)) {
             Log.d(TAG, " removeStreamView key: " + mkey);
-            releaseVideoContainerRes(mkey);
+//            releaseVideoContainerRes(mkey);
             mStreamViews.remove(mkey);
             int index = medialist.indexOf(mkey);
             medialist.remove(mkey);
@@ -222,7 +211,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 
     public void clearAll() {
         for (String streamId : mStreamViews.keySet()) {
-            releaseVideoContainerRes(streamId);
+//            releaseVideoContainerRes(streamId);
         }
         medialist.clear();
         mStreamViews.clear();
