@@ -62,8 +62,8 @@ public class UCloudRtcForeGroundService extends Service {
         Notification notification=new Notification.Builder (this,ID)
                 .setContentTitle ("收到一条重要通知")
                 .setContentText ("这是重要通知")
-                .setSmallIcon (R.mipmap.ic_launcher)
-                .setLargeIcon (BitmapFactory.decodeResource (getResources (),R.mipmap.u))
+                .setSmallIcon (R.mipmap.u)
+                .setLargeIcon (BitmapFactory.decodeResource (getResources (),R.mipmap.ic_launcher))
                 .build ();
         startForeground (1,notification);
     }
