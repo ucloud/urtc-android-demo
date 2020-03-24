@@ -64,6 +64,8 @@ import com.urtcdemo.view.SteamScribePopupWindow;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.webrtc.ucloud.record.MediaRecorderBase;
 import org.webrtc.ucloud.record.URTCRecordManager;
 import org.webrtc.ucloud.record.model.MediaObject;
@@ -84,6 +86,7 @@ import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
 import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_LOCAL_RECORD;
 import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_MIX;
+import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_MIX_MANUAL;
 
 
 public class RoomActivity extends AppCompatActivity {
@@ -99,6 +102,7 @@ public class RoomActivity extends AppCompatActivity {
     private boolean mIsMixing = false;
     private boolean mAtomOpStart = false;
     private boolean mIsPublished = false;
+    private boolean mMixAddOrDel = true;
 
     TextView title = null;
     UCloudRtcSdkSurfaceVideoView localrenderview = null;
@@ -117,6 +121,7 @@ public class RoomActivity extends AppCompatActivity {
     ImageButton mLoudSpkeader = null;
     ImageButton mMuteCam = null;
     TextView mOpBtn = null;
+    TextView mAddDelBtn = null;
     CheckBox  mCheckBoxMirror = null;
     private SteamScribePopupWindow mSpinnerPopupWindowScribe;
     private View mStreamSelect;
@@ -161,7 +166,8 @@ public class RoomActivity extends AppCompatActivity {
         OP_REMOTE_RECORD,
         OP_SEND_MSG,
         OP_LOCAL_RESAMPLE,
-        OP_MIX
+        OP_MIX,
+        OP_MIX_MANUAL
     }
     class RGBSourceData{
         Bitmap srcData;
@@ -1019,6 +1025,26 @@ public class RoomActivity extends AppCompatActivity {
         }
 
         @Override
+        public void onAddStreams(int code, String msg) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onAddStreams: "+ code + msg);
+                }
+            });
+        }
+
+        @Override
+        public void onDelStreams(int code, String msg) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onDelStreams: "+ code + msg);
+                }
+            });
+        }
+
+        @Override
         public void onMsgNotify(int code, String msg) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -1117,8 +1143,13 @@ public class RoomActivity extends AppCompatActivity {
 //        mOpBtn.setText("lrecord");
 //        mOpBtn.setTag(OP_REMOTE_RECORD);
 //        mOpBtn.setText("record");
-        mOpBtn.setTag(OP_MIX);
-        mOpBtn.setText("mix");
+//        mOpBtn.setTag(OP_MIX);
+//        mOpBtn.setText("mix");
+        mOpBtn.setTag(OP_MIX_MANUAL);
+        mOpBtn.setText("mix_manual");
+        mAddDelBtn = findViewById(R.id.addDelBtn);
+        mAddDelBtn.setText("add_st");
+        mAddDelBtn.setVisibility(View.VISIBLE);
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -1205,9 +1236,80 @@ public class RoomActivity extends AppCompatActivity {
                         sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH,jsonArray);
                     }
                     break;
+                case OP_MIX_MANUAL:
+                    if (!mIsMixing) {
+                        mAtomOpStart = true;
+                        //如果主窗口是当前用户
+                        JSONArray pushURL = new JSONArray();
+//                        pushURL.put("rtmp://push.urtc.com.cn/" + mAppid + "/"+ mUserid);
+//                        pushURL.put("rtmp://push.urtc.com.cn/live/URtc-h4r1txxy123131");
+                        pushURL.put("rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
+                        JSONArray streams = new JSONArray();
+                        JSONObject local = new JSONObject();
+                        try {
+                            local.put("user_id",mUserid);
+                            local.put("media_type",1);
+                            streams.put(local);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+                                .pushUrl(pushURL)
+                                .streams(streams)
+                                .mainViewUserId(mUserid)
+                                .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                                .build();
+                        sdkEngine.startMix(mixProfile);
+                    } else if (!mAtomOpStart) {
+                        mAtomOpStart = true;
+                        JSONArray jsonArray = new JSONArray();
+                        jsonArray.put("");
+                        sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH,jsonArray);
+                    }
+                    break;
+
             }
 
         });
+        //动态增加流或者删除混流
+        mAddDelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               if(mMixAddOrDel){
+                   mMixAddOrDel = false;
+                   mAddDelBtn.setText("del_st");
+                   UCloudRtcSdkStreamInfo info = mVideoAdapter.getStreamInfo(0);
+                   Log.d(TAG, "add stream: " + info);
+                   JSONArray streams = new JSONArray();
+                   JSONObject remote = new JSONObject();
+                   try {
+                       remote.put("user_id",info.getUId());
+                       remote.put("media_type",info.getMediaType().ordinal());
+                       streams.put(remote);
+                   } catch (JSONException e) {
+                       e.printStackTrace();
+                   }
+                  sdkEngine.addMixStream(streams);
+               }else{
+                   mMixAddOrDel = true;
+                   mAddDelBtn.setText("add_st");
+                   UCloudRtcSdkStreamInfo info = mVideoAdapter.getStreamInfo(0);
+                   Log.d(TAG, "add stream: " + info);
+                   JSONArray streams = new JSONArray();
+                   JSONObject remote = new JSONObject();
+                   try {
+                       remote.put("user_id",info.getUId());
+                       remote.put("media_type",info.getMediaType().ordinal());
+                       streams.put(remote);
+                   } catch (JSONException e) {
+                       e.printStackTrace();
+                   }
+                   sdkEngine.delMixStream(streams);
+               }
+            }
+        });
+
         mTextStream.setOnClickListener(new CustomerClickListener() {
             @Override
             protected void onSingleClick() {

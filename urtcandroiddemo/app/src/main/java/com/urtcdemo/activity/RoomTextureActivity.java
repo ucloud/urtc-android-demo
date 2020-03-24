@@ -777,6 +777,16 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
+        public void onAddStreams(int code, String msg) {
+
+        }
+
+        @Override
+        public void onDelStreams(int code, String msg) {
+
+        }
+
+        @Override
         public void onMsgNotify(int code, String msg) {
             runOnUiThread(new Runnable() {
                 @Override
