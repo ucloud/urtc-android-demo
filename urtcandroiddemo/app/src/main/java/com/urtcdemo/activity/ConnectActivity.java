@@ -72,8 +72,8 @@ public class ConnectActivity extends AppCompatActivity {
             return;
         }
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
-        startRoomActivity();
-//        startRoomTextureActivity();
+//        startRoomActivity();
+        startRoomTextureActivity();
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -113,6 +113,7 @@ public class ConnectActivity extends AppCompatActivity {
                         UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
                     }else{
                         startRoomActivity();
+//                        startRoomTextureActivity();
                     }
                 }else {
                     //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
@@ -351,4 +352,8 @@ public class ConnectActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }
