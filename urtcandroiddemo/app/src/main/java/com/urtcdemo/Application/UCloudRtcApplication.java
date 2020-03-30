@@ -13,8 +13,10 @@ import android.view.WindowManager;
 import com.github.moduth.blockcanary.BlockCanaryContext;
 import com.tencent.bugly.crashreport.CrashReport;
 //import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkPushEncode;
+import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkPushEncode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkPushOrentation;
+import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.urtcdemo.BuildConfig;
 import com.urtcdemo.utils.CommonUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
@@ -27,6 +29,7 @@ public class UCloudRtcApplication extends Application {
     private static final String TAG = "UCloudRtcApplication";
     private static Context sContext;
     private static String sUserId;
+    private static UCloudRtcSdkEngine rtcSdkEngine;
 
     @Override
     public void onCreate() {
@@ -38,6 +41,23 @@ public class UCloudRtcApplication extends Application {
         }
     }
 
+    public UCloudRtcSdkEngine createRtcEngine(UCloudRtcSdkEventListener eventListener){
+        if(rtcSdkEngine == null){
+            rtcSdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
+        }else{
+            rtcSdkEngine.setEventListener(eventListener);
+        }
+        return  rtcSdkEngine;
+    }
+
+    public void destroyEngine(){
+        if(rtcSdkEngine != null){
+            Log.d(TAG, "destroyEngine: ");
+            UCloudRtcSdkEngine.destory();
+            rtcSdkEngine = null;
+        }
+    }
+
     private void init(){
         sContext = this;
         UCloudRtcSdkEnv.initEnv(getApplicationContext());
@@ -46,6 +66,7 @@ public class UCloudRtcApplication extends Application {
         UCloudRtcSdkEnv.setEncodeMode(UCloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);
         UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo);
         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
+        UCloudRtcSdkEnv.setReConnectTimes(60);
         UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.SEC_KEY);
 //        UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_LANDSCAPE_MODE);
         //私有化部署
@@ -124,5 +145,10 @@ public class UCloudRtcApplication extends Application {
             }
         }
         return null;
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
     }
 }

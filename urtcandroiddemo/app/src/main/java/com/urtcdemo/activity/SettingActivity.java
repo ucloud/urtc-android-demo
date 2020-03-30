@@ -261,7 +261,7 @@ public class SettingActivity extends AppCompatActivity {
                 break;
             case UCLOUD_RTC_SDK_ROOM_LARGE:
                 mRBRoomLarge.setChecked(true);
-                mRBRoleBoth.setEnabled(false);
+                mRBRoleBoth.setEnabled(true);
                 break;
         }
 
@@ -319,11 +319,12 @@ public class SettingActivity extends AppCompatActivity {
                     mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_SUB;
                     break;
                 case R.id.rb_role_both:
-                    if (mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE) {
-                        ToastUtils.shortShow(this, "大班课模式不能选择全部");
-                    } else {
-                        mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH;
-                    }
+                    mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH;
+//                    if (mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE) {
+//                        ToastUtils.shortShow(this, "大班课模式不能选择全部");
+//                    } else {
+//                        mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH;
+//                    }
                     break;
             }
         });
@@ -336,7 +337,7 @@ public class SettingActivity extends AppCompatActivity {
                     break;
                 case R.id.rb_type_large_room:
                     mRoomType = UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE;
-                    mRBRoleBoth.setEnabled(false);
+                    mRBRoleBoth.setEnabled(true);
                     checkRole();
                     break;
             }
@@ -419,11 +420,11 @@ public class SettingActivity extends AppCompatActivity {
 
     private void checkRole() {
         if (mRole == UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH) {
-            ToastUtils.shortShow(this, "大班课模式不能选择全部权限,默认重新选择下行权限");
+//            ToastUtils.shortShow(this, "大班课模式不能选择全部权限,默认重新选择下行权限");
         }
-        SettingActivity.this.mRBRolePublish.setChecked(false);
-        SettingActivity.this.mRBRoleScribe.setChecked(true);
-        SettingActivity.this.mRBRoleBoth.setChecked(false);
+//        SettingActivity.this.mRBRolePublish.setChecked(false);
+//        SettingActivity.this.mRBRoleScribe.setChecked(true);
+//        SettingActivity.this.mRBRoleBoth.setChecked(false);
     }
 
     private void showPopupWindow() {

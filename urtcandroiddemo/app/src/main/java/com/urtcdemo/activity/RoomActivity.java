@@ -53,6 +53,7 @@ import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataReceiver;
 //import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
+import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
 import com.urtcdemo.service.UCloudRtcForeGroundService;
@@ -522,6 +523,7 @@ public class RoomActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(TAG, "onServerDisconnect: ");
                     ToastUtils.shortShow(RoomActivity.this, " 服务器已断开");
                     stopTimeShow();
                     onMediaServerDisconnect();
@@ -560,6 +562,7 @@ public class RoomActivity extends AppCompatActivity {
                             code + " errmsg " + msg);
 //                    Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
                     onMediaServerDisconnect();
+                    System.gc();
 //                    startActivity(intent);
 //                    finish();
                 }
@@ -1123,6 +1126,7 @@ public class RoomActivity extends AppCompatActivity {
         mVideoAdapter.setRemoveRemoteStreamReceiver(mRemoveRemoteStreamReceiver);
         mRemoteGridView.setAdapter(mVideoAdapter);
         sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
+//        sdkEngine = UCloudRtcApplication.getInstance().createRtcEngine(eventListener);
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
@@ -1485,9 +1489,7 @@ public class RoomActivity extends AppCompatActivity {
         mClass = UCloudRtcSdkRoomType.valueOf(classType);
         sdkEngine.setClassType(mClass);
         mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
-//        sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
-        mPublishMode = 1;
-        sdkEngine.setAutoPublish(false);
+        sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
         mScribeMode = preferences.getInt(CommonUtils.SCRIBE_MODE, CommonUtils.AUTO_MODE);
         if (mScribeMode == CommonUtils.AUTO_MODE) {
             mStreamSelect.setVisibility(View.GONE);
@@ -1618,7 +1620,7 @@ public class RoomActivity extends AppCompatActivity {
             UCloudRtcSdkEngine.onRGBCaptureResult(mUCloudRTCDataProvider);
         }
         sdkEngine.joinChannel(info);
-        initRecordManager();
+//        initRecordManager();
     }
 
     private void recycleBitmap(Bitmap bitmap){
