@@ -1181,9 +1181,9 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         mClass = UCloudRtcSdkRoomType.valueOf(classType);
         sdkEngine.setClassType(mClass);
         mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
-//        sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
-        mPublishMode = 1;
-        sdkEngine.setAutoPublish(false);
+        sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
+//        mPublishMode = 1;
+//        sdkEngine.setAutoPublish(false);
         mScribeMode = preferences.getInt(CommonUtils.SCRIBE_MODE, CommonUtils.AUTO_MODE);
         if (mScribeMode == CommonUtils.AUTO_MODE) {
             mStreamSelect.setVisibility(View.GONE);

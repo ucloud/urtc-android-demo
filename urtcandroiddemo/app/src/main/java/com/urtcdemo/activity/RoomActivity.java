@@ -25,6 +25,7 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.ucloudrtclib.common.URTCLogUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
@@ -926,6 +927,7 @@ public class RoomActivity extends AppCompatActivity {
                 public void run() {
                     if (mVideoAdapter != null) {
                         String mkey = uid + UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.toString();
+                        Log.d(TAG, "uid: "+ uid + " volume: " + volume);
                     }
                 }
             });
@@ -1125,8 +1127,8 @@ public class RoomActivity extends AppCompatActivity {
         mVideoAdapter = new RemoteVideoAdapter(this);
         mVideoAdapter.setRemoveRemoteStreamReceiver(mRemoveRemoteStreamReceiver);
         mRemoteGridView.setAdapter(mVideoAdapter);
-        sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
-//        sdkEngine = UCloudRtcApplication.getInstance().createRtcEngine(eventListener);
+//        sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
+        sdkEngine = UCloudRtcApplication.getInstance().createRtcEngine(eventListener);
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
@@ -1817,7 +1819,7 @@ public class RoomActivity extends AppCompatActivity {
 
             }
         }
-        UCloudRtcSdkEngine.destory();
+//        UCloudRtcSdkEngine.destory();
         System.gc();
     }
 

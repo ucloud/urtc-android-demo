@@ -353,6 +353,14 @@ public class ConnectActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.d(TAG, "onBackPressed: destroy engine start");
+        UCloudRtcApplication.getInstance().destroyEngine();
+        Log.d(TAG, "onBackPressed: destroy engine finish");
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
     }
