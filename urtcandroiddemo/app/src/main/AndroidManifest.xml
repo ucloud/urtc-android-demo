@@ -70,6 +70,10 @@
             android:name=".activity.SettingActivity"
             android:screenOrientation="portrait"></activity>
 
+        <activity
+            android:name=".activity.WebViewActivity"
+            android:screenOrientation="portrait"></activity>
+
         <service android:name=".service.UCloudRtcForeGroundService"></service>
 
         <service

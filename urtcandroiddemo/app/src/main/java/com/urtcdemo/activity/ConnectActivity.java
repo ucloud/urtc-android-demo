@@ -74,6 +74,7 @@ public class ConnectActivity extends AppCompatActivity {
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
         startRoomActivity();
 //        startRoomTextureActivity();
+//        startWebViewActivity();
     }
 
     @Override
@@ -115,6 +116,7 @@ public class ConnectActivity extends AppCompatActivity {
                         } else {
                             startRoomActivity();
 //                        startRoomTextureActivity();
+//                            startWebViewActivity();
                         }
                     } else {
                         //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
@@ -222,6 +224,11 @@ public class ConnectActivity extends AppCompatActivity {
         thread.start();
     }
 
+    private void startWebViewActivity(){
+         Intent intent = new Intent(ConnectActivity.this, WebViewActivity.class);
+         startActivity(intent);
+         finish();
+    }
     private void startRoomActivity() {
         if (!mStartSuccess) {
             mStartSuccess = true;
