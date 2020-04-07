@@ -1,4 +1,17 @@
-# Android SDK 版本说明(非Demo版本)
+# Android SDK 版本说明
+
+## 1.7.3版
+该版本发布于2020-4-5，sdk 20120511 1.7.3
+
+* 增加android 4.3 的兼容
+* 增加本地渲染view，远端view首帧渲染接口回调
+* 增加本地渲染view，远端view截屏回调
+* 增加URTCRenderView的单纯surfaceview控件
+* 增加TextureView渲染控件支持
+* 增加本地录音重采样回调
+* 增加后台和锁屏的操作接口，可以用来暂停和恢复音视频模块
+* 完善断线重连机制
+* 增加cdn转推部分接口
 
 ## 1.6.2版
 
