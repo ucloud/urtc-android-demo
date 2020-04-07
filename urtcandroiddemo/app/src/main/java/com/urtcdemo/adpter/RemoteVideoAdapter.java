@@ -161,6 +161,7 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
     }
 
     public void removeStreamView(String mkey) {
+        Log.d(TAG, " mStreamViews size: " + mStreamViews.size() + " mScreenState size "+ mScreenState.size());
         if (mStreamViews.containsKey(mkey)) {
             Log.d(TAG, " removeStreamView key: " + mkey);
             releaseVideoContainerRes(mkey);

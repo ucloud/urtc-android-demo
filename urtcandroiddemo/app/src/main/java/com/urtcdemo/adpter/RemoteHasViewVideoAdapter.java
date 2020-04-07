@@ -13,6 +13,7 @@ import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
+import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
@@ -113,7 +114,13 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                     mSdkEngine.setRenderViewMode(false, viewInfo.getStreamInfo(), UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_FILL);
                 }
             });
-            mSdkEngine.startRemoteView(viewInfo.getStreamInfo(), videoView, null, (info, view) -> Log.d(TAG, "onRemoteFirstFrameRender: " + "view: " + view));
+            mSdkEngine.startRemoteView(viewInfo.getStreamInfo(), videoView, null, new UCloudRTCFirstFrameRendered(){
+
+                @Override
+                public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
+                    Log.d(TAG, "onRemoteFirstFrameRender: " + "view: " + view);
+                }
+            });
         } else {
             holderView.setBackground(mContext.getResources().getDrawable(R.drawable.border));
         }

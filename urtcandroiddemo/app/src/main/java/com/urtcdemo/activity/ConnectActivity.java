@@ -47,34 +47,35 @@ public class ConnectActivity extends AppCompatActivity {
 
     private EditText roomEditText;
     private String mUserId = "";
-    private String mRoomid = "" ;
-    private String mAppid = "" ;
-    private String mRoomToken = "" ;
+    private String mRoomid = "";
+    private String mAppid = "";
+    private String mRoomToken = "";
     private View connectButton;
     private View exportButton;
-    private ImageButton setButton ;
+    private ImageButton setButton;
     private TextView mTextSDKVersion;
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
-    private boolean mStartSuccess=false;
-    private ImageView mAnimal ;
+    private boolean mStartSuccess = false;
+    private ImageView mAnimal;
 
     @Override
     @TargetApi(21)
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK) {
             Toast.makeText(this, "获取桌面采集权限失败",
-                    Toast.LENGTH_LONG).show() ;
+                    Toast.LENGTH_LONG).show();
             return;
         }
         if (requestCode != UCloudRtcSdkEngine.SCREEN_CAPTURE_REQUEST_CODE) {
             Toast.makeText(this, "获取桌面采集权限失败",
-                    Toast.LENGTH_LONG).show() ;
+                    Toast.LENGTH_LONG).show();
             return;
         }
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
-//        startRoomActivity();
-        startRoomTextureActivity();
+        startRoomActivity();
+//        startRoomTextureActivity();
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,10 +86,10 @@ public class ConnectActivity extends AppCompatActivity {
         setContentView(R.layout.activity_connect);
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
-        mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID) ;
-        UCloudRtcSdkEnv.setMixSupport(preferences.getBoolean(CommonUtils.SDK_SUPPORT_MIX,false));
-        UCloudRtcSdkEnv.setLoop(preferences.getBoolean(CommonUtils.SDK_IS_LOOP,true));
-        UCloudRtcSdkEnv.setMixFilePath(preferences.getString(CommonUtils.SDK_MIX_FILE_PATH,getResources().getString(R.string.mix_file_path)));
+        mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID);
+        UCloudRtcSdkEnv.setMixSupport(preferences.getBoolean(CommonUtils.SDK_SUPPORT_MIX, false));
+        UCloudRtcSdkEnv.setLoop(preferences.getBoolean(CommonUtils.SDK_IS_LOOP, true));
+        UCloudRtcSdkEnv.setMixFilePath(preferences.getString(CommonUtils.SDK_MIX_FILE_PATH, getResources().getString(R.string.mix_file_path)));
         UCloudRtcSdkEnv.setLogReport(true);
         mAnimal = findViewById(R.id.userporta);
         ((AnimationDrawable) mAnimal.getBackground()).start();
@@ -96,28 +97,28 @@ public class ConnectActivity extends AppCompatActivity {
         roomEditText = findViewById(R.id.room_edittext);
         roomEditText.requestFocus();
         mTextSDKVersion = findViewById(R.id.tv_sdk_version);
-        mTextSDKVersion.setText(getString(R.string.app_name)+"\n" + UCloudRtcSdkEngine.getSdkVersion());
+        mTextSDKVersion.setText(getString(R.string.app_name) + "\n" + UCloudRtcSdkEngine.getSdkVersion());
         connectButton = findViewById(R.id.connect_button);
-        connectButton.setOnClickListener(view -> {
-            mRoomid = roomEditText.getText().toString() ;
-            if (mRoomid.isEmpty()) {
-                ToastUtils.shortShow(getApplicationContext(),"房间id 不能为空");
-            }
-            else
-            {
-                //测试环境下SDK自动生成token
-                if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL) {
-                    mRoomToken = "testoken" ;
-                    Log.d(TAG, " appid "+ mAppid) ;
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
-                    }else{
-                        startRoomActivity();
+        connectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mRoomid = roomEditText.getText().toString();
+                if (mRoomid.isEmpty()) {
+                    ToastUtils.shortShow(getApplicationContext(), "房间id 不能为空");
+                } else {
+                    //测试环境下SDK自动生成token
+                    if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL) {
+                        mRoomToken = "testoken";
+                        Log.d(TAG, " appid " + mAppid);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
+                        } else {
+                            startRoomActivity();
 //                        startRoomTextureActivity();
-                    }
-                }else {
-                    //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
-                    ToastUtils.shortShow(this,"正式环境下请获取自己服务器的token");
+                        }
+                    } else {
+                        //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
+                        ToastUtils.shortShow(ConnectActivity.this, "正式环境下请获取自己服务器的token");
 //                    new Thread(new Runnable() {
 //                        @Override
 //                        public void run() {
@@ -159,28 +160,28 @@ public class ConnectActivity extends AppCompatActivity {
 //                                });
 //
 //                            }
-//                        }
+                    }
 //                    }).start() ;
                 }
             }
         });
         exportButton = findViewById(R.id.export_button);
-        exportButton.setOnClickListener(new View.OnClickListener(){
+        exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        URTCFileUtil.getInstance().copyFolder("/data/user/0/com.urtcdemo/app_bugly", "/sdcard/urtc/app_bugly"  );
-                        URTCFileUtil.getInstance().copyFolder("/data/tombstones", "/sdcard/urtc/tombstones"  );
-                               Handler handler = new Handler(Looper.getMainLooper());
-                               handler.post(new Runnable() {
-                                   @Override
-                                   public void run() {
-                                       ToastUtils.shortShow(ConnectActivity.this,"拷贝完成");
-                                   }
-                               });
+                        URTCFileUtil.getInstance().copyFolder("/data/user/0/com.urtcdemo/app_bugly", "/sdcard/urtc/app_bugly");
+                        URTCFileUtil.getInstance().copyFolder("/data/tombstones", "/sdcard/urtc/tombstones");
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                ToastUtils.shortShow(ConnectActivity.this, "拷贝完成");
+                            }
+                        });
 
                     }
                 });
@@ -194,22 +195,25 @@ public class ConnectActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        
-        RelativeLayout root = findViewById(R.id.id_rl_root);
-        root.setOnTouchListener((v, event) -> {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_UP:
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (imm != null) {
-                        imm.hideSoftInputFromWindow(root.getWindowToken(), 0);
-                    } else {
-                        Log.e(TAG, "InputMethodManager is null !");
-                    }
-                    break;
-                default:
-                    break;
+
+        final RelativeLayout root = findViewById(R.id.id_rl_root);
+        root.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_UP:
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        if (imm != null) {
+                            imm.hideSoftInputFromWindow(root.getWindowToken(), 0);
+                        } else {
+                            Log.e(TAG, "InputMethodManager is null !");
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                return true;
             }
-            return true;
         });
 
         String[] permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -218,13 +222,13 @@ public class ConnectActivity extends AppCompatActivity {
         thread.start();
     }
 
-    private void startRoomActivity(){
+    private void startRoomActivity() {
         if (!mStartSuccess) {
-            mStartSuccess=true;
-            Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
+            mStartSuccess = true;
+            final Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
             intent.putExtra("room_id", mRoomid);
-            String autoGenUserId = "android_"+ UUID.randomUUID().toString().replace("-", "");
-            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId():autoGenUserId;
+            String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
+            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
             intent.putExtra("user_id", mUserId);
             intent.putExtra("app_id", mAppid);
             intent.putExtra("token", mRoomToken);
@@ -233,19 +237,19 @@ public class ConnectActivity extends AppCompatActivity {
                 public void run() {
                     startActivity(intent);
                     finish();
-                    mStartSuccess=false;
+                    mStartSuccess = false;
                 }
-            },500);
+            }, 500);
         }
     }
 
-    private void startRoomTextureActivity(){
+    private void startRoomTextureActivity() {
         if (!mStartSuccess) {
-            mStartSuccess=true;
-            Intent intent = new Intent(ConnectActivity.this, RoomTextureActivity.class);
+            mStartSuccess = true;
+            final Intent intent = new Intent(ConnectActivity.this, RoomTextureActivity.class);
             intent.putExtra("room_id", mRoomid);
-            String autoGenUserId = "android_"+ UUID.randomUUID().toString().replace("-", "");
-            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId():autoGenUserId;
+            String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
+            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
             intent.putExtra("user_id", mUserId);
             intent.putExtra("app_id", mAppid);
             intent.putExtra("token", mRoomToken);
@@ -254,9 +258,9 @@ public class ConnectActivity extends AppCompatActivity {
                 public void run() {
                     startActivity(intent);
                     finish();
-                    mStartSuccess=false;
+                    mStartSuccess = false;
                 }
-            },500);
+            }, 500);
         }
     }
 
@@ -268,12 +272,12 @@ public class ConnectActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        Log.d(TAG, "activity onStop") ;
+        Log.d(TAG, "activity onStop");
         super.onStop();
         ((AnimationDrawable) mAnimal.getBackground()).stop();
     }
 
-    static class CopyMixFileTask implements Runnable{
+    static class CopyMixFileTask implements Runnable {
 
         WeakReference<AppCompatActivity> context;
 
@@ -283,30 +287,30 @@ public class ConnectActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            if(context != null && context.get()!=null){
+            if (context != null && context.get() != null) {
                 String storageFileDir = context.get().getResources().getString(R.string.mix_file_dir);
-                String storageFilePath = storageFileDir+File.separator+"dy.mp3";
+                String storageFilePath = storageFileDir + File.separator + "dy.mp3";
                 File fileStorage = new File(storageFilePath);
                 boolean needCopy = false;
-                if(!fileStorage.exists()){
+                if (!fileStorage.exists()) {
                     needCopy = true;
                 }
                 Handler handler = new Handler(Looper.getMainLooper());
-                if(needCopy){
+                if (needCopy) {
                     File file = new File(storageFileDir);
                     if (!file.exists()) {//如果文件夹不存在，则创建新的文件夹
                         file.mkdirs();
                     }
-                    readInputStream(storageFilePath,context.get().getResources().openRawResource(R.raw.dy));
+                    readInputStream(storageFilePath, context.get().getResources().openRawResource(R.raw.dy));
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                                if(UCloudRtcSdkEnv.getApplication() != null){
-                                    ToastUtils.shortShow(UCloudRtcSdkEnv.getApplication(),"default mix file copy success");
-                                }
+                            if (UCloudRtcSdkEnv.getApplication() != null) {
+                                ToastUtils.shortShow(UCloudRtcSdkEnv.getApplication(), "default mix file copy success");
+                            }
                         }
                     });
-                }else{
+                } else {
 //                    handler.post(new Runnable() {
 //                        @Override
 //                        public void run() {
@@ -355,9 +359,9 @@ public class ConnectActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Log.d(TAG, "onBackPressed: destroy engine start");
-        UCloudRtcApplication.getInstance().destroyEngine();
-        Log.d(TAG, "onBackPressed: destroy engine finish");
+//        Log.d(TAG, "onBackPressed: destroy engine start");
+//        UCloudRtcApplication.getInstance().destroyEngine();
+//        Log.d(TAG, "onBackPressed: destroy engine finish");
     }
 
     @Override

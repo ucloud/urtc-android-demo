@@ -9,10 +9,11 @@ android {
         buildToolsVersion "27.0.3"
         targetSdkVersion 26
         versionCode 14
-        versionName '1.7.2'
+        versionName '1.7.3'
         ndk {
-//            abiFilters  "armeabi-v7a", "arm64-v8a"
-            abiFilters  "armeabi-v7a"
+            abiFilters  "armeabi-v7a", "arm64-v8a"
+//            abiFilters   "arm64-v8a"
+//            abiFilters  "armeabi-v7a"
         }
     }
 
@@ -73,7 +74,7 @@ dependencies {
     implementation 'com.github.markzhai:blockcanary-android:1.5.0'
     testImplementation 'junit:junit:4.12'
 
-    implementation (name: 'ucloudrtclib_1.7.2_43_c54ff0ac_w', ext: 'aar')
+    implementation (name: 'ucloudrtclib_1.7.3_20120511_w', ext: 'aar')
 //    implementation project(path: ':ucloud_business_sdk')
 //    implementation project(':urtc-sdk-android')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
@@ -81,4 +82,7 @@ dependencies {
     //bugly
     implementation 'com.tencent.bugly:crashreport:latest.release'
     implementation 'com.tencent.bugly:nativecrashreport:latest.release'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
+    implementation 'tv.danmaku.ijk.media:ijkplayer-exo:0.8.8'
 }

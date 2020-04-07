@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -45,7 +46,9 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordProfile;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
+import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
+import com.ucloudrtclib.sdkengine.openinterface.UCloudRtcAudioResample;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteHasViewVideoAdapter;
 import com.urtcdemo.service.UCloudRtcForeGroundService;
@@ -324,7 +327,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
-        public void onLocalPublish(int code, String msg, UCloudRtcSdkStreamInfo info) {
+        public void onLocalPublish(final int code,final String msg, final UCloudRtcSdkStreamInfo info) {
 //            String pcmFile = "sdcard/urtc/audioresample_"+ System.currentTimeMillis()+".pcm";
 //            Log.d(TAG, " start local resample at localpublish: ");
 //            URTCRecordManager.getInstance().startAudioResample((data, sampleRate, channelCount, bitDepth, type) ->{
@@ -343,7 +346,12 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                             if (!sdkEngine.isAudioOnlyMode()) {
 //                                localrenderview.setBackgroundColor(Color.TRANSPARENT);
                                 sdkEngine.startPreview(info.getMediaType(),
-                                        localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,(info, view) -> Log.d(TAG, "onLocalFirstFrameRender: " + "view: "+ view));
+                                        localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, new UCloudRTCFirstFrameRendered() {
+                                            @Override
+                                            public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
+                                                Log.d(TAG, "onLocalFirstFrameRender: " + "view: "+ view);
+                                            }
+                                        });
                                 mLocalStreamInfo = info;
                                 localrenderview.setTag(mLocalStreamInfo);
 //                                localrenderview.refreshRemoteOp(View.INVISIBLE);
@@ -369,7 +377,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
-        public void onLocalUnPublish(int code, String msg, UCloudRtcSdkStreamInfo info) {
+        public void onLocalUnPublish(final int code,final String msg,final UCloudRtcSdkStreamInfo info) {
 //            Log.d(TAG, " stop local resample: ");
 //            URTCRecordManager.getInstance().stopAudioResample();
 //            mLocalResample = false;
@@ -610,7 +618,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
-        public void onRemoteTrackNotify(String uid, UCloudRtcSdkMediaType mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
+        public void onRemoteTrackNotify(final String uid, UCloudRtcSdkMediaType mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
             Log.d(TAG, " uid " + uid + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
@@ -718,7 +726,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                 public void run() {
                     if(code == NET_ERR_CODE_OK.ordinal()){
                         String videoPath = "http://"+ mBucket + "."+ mRegion +".ufileos.com/" + fileName;
-                        Log.d(TAG,videoPath);
+                        Log.d(TAG,"remote record path: " +  videoPath+".mp4");
                         ToastUtils.longShow(RoomTextureActivity.this, "观看地址: " +videoPath );
                         mIsRecording = true;
                         mOpBtn.setText("stop record");
@@ -893,69 +901,77 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         mOpBtn.setText("mix");
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
-        mCheckBoxMirror.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            UCloudRtcSdkEnv.setFrontCameraMirror(isChecked);
+        mCheckBoxMirror.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                UCloudRtcSdkEnv.setFrontCameraMirror(isChecked);
+            }
         });
-        mOpBtn.setOnClickListener(v -> {
-            BtnOp btnOp = (BtnOp)mOpBtn.getTag();
-            switch (btnOp){
-                case OP_LOCAL_RESAMPLE:
-                    if(!mLocalResample){
-                        String pcmFile = "sdcard/urtc/audioresample_"+ System.currentTimeMillis()+".pcm";
-                        Log.d(TAG, " start local resample: " + pcmFile);
-                        URTCRecordManager.getInstance().startAudioResample((data, sampleRate, channelCount, bitDepth, type) ->{
-//                            URTCLogUtils.d(TAG, TAG + "audioResample data length:" + data.length + "sampleRate: " + sampleRate + " channelCount: " +
-//                                    channelCount + " bitDepth: " + bitDepth + " type: " + type);
-                        },pcmFile);
-                        mLocalResample = true;
-                    }else{
-                        Log.d(TAG, " stop local resample: ");
-                        URTCRecordManager.getInstance().stopAudioResample();
-                        mLocalResample = false;
-                    }
+        mOpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BtnOp btnOp = (BtnOp)mOpBtn.getTag();
+                switch (btnOp){
+                    case OP_LOCAL_RESAMPLE:
+                        if(!mLocalResample){
+                            String pcmFile = "sdcard/urtc/audioresample_"+ System.currentTimeMillis()+".pcm";
+                            Log.d(TAG, " start local resample: " + pcmFile);
+                            URTCRecordManager.getInstance().startAudioResample(new UCloudRtcAudioResample() {
+                                @Override
+                                public void onAudioRecordCallback(byte[] bytes, int i, int i1, int i2, int i3) {
+                                    Log.d(TAG, TAG + "audioResample data length:" + bytes.length + "sampleRate: " + i + " channelCount: " + i1
+                                     + " bitDepth: " + i2 + " type: " + i3);
+                                }
+                            }, pcmFile);
+                            mLocalResample = true;
+                        }else{
+                            Log.d(TAG, " stop local resample: ");
+                            URTCRecordManager.getInstance().stopAudioResample();
+                            mLocalResample = false;
+                        }
 
-                    break;
-                case OP_SEND_MSG:
-                     sdkEngine.messageNotify("hi");
-                     break;
-                case OP_LOCAL_RECORD:
-                    if(!mLocalRecordStart){
-                        Log.d(TAG, " start local record: ");
-                        mOpBtn.setText("lrecordstop");
+                        break;
+                    case OP_SEND_MSG:
+                        sdkEngine.messageNotify("hi");
+                        break;
+                    case OP_LOCAL_RECORD:
+                        if(!mLocalRecordStart){
+                            Log.d(TAG, " start local record: ");
+                            mOpBtn.setText("lrecordstop");
 //                        URTCRecordManager.getInstance().changeDirectory("mnt/sdcard/urtc/mp4back");
 //                        URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,System.currentTimeMillis()+"",mLocalRecordListener,1000);
-                        String path = getExternalCacheDir() + "/wonder_moments_5_13_5_53_304805_1583486429840.mp4";
-                        URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,path,mLocalRecordListener,1000);
-                        mLocalRecordStart = true;
-                    }else{
-                        Log.d(TAG, " stop local record: ");
-                        mOpBtn.setText("lrecord");
-                        URTCRecordManager.getInstance().stopRecord();
-                        mLocalRecordStart = false;
-                    }
-                    break;
-                case OP_REMOTE_RECORD:
-                    if (!mIsRecording) {
-                        mAtomOpStart = true;
+                            String path = getExternalCacheDir() + "/wonder_moments_5_13_5_53_304805_1583486429840.mp4";
+                            URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,path,mLocalRecordListener,1000);
+                            mLocalRecordStart = true;
+                        }else{
+                            Log.d(TAG, " stop local record: ");
+                            mOpBtn.setText("lrecord");
+                            URTCRecordManager.getInstance().stopRecord();
+                            mLocalRecordStart = false;
+                        }
+                        break;
+                    case OP_REMOTE_RECORD:
+                        if (!mIsRecording) {
+                            mAtomOpStart = true;
 //                如果主窗口是当前用户
-                UCloudRtcSdkRecordProfile recordProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-                        .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
-                        .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-                        .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
-                        .Average(UCloudRtcSdkRecordProfile.RECORD_UNEVEN)
-                        .WaterType(UCloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
-                        .WaterPosition(UCloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
-                        .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
-                        .Template(UCloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
-                        .build();
-                sdkEngine.startRecord(recordProfile);
+                            UCloudRtcSdkRecordProfile recordProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+                                    .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
+                                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                                    .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
+                                    .Average(UCloudRtcSdkRecordProfile.RECORD_UNEVEN)
+                                    .WaterType(UCloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
+                                    .WaterPosition(UCloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
+                                    .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
+                                    .Template(UCloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
+                                    .build();
+                            sdkEngine.startRecord(recordProfile);
 //                UcloudRtcSdkRecordProfile recordAudioProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
 //                        .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_AUDIO)
 //                        .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
 //                        .build();
 //                sdkEngine.startRecord(recordAudioProfile);
 
-                        //如果主窗口不是当前推流用户，而是被订阅的用户
+                            //如果主窗口不是当前推流用户，而是被订阅的用户
 //                UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo = mVideoAdapter.getStreamInfo(0);
 //                if(uCloudRtcSdkStreamInfo != null){
 //                    UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
@@ -971,34 +987,35 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
 //                            .build();
 //                    sdkEngine.startRecord(recordProfile);
 //                }
-                    } else if(!mAtomOpStart){
-                        mAtomOpStart = true;
-                        sdkEngine.stopRecord();
-                    }
-                    break;
-                case OP_MIX:
-                    if (!mIsMixing) {
-                        mAtomOpStart = true;
-                        //如果主窗口是当前用户
-                        JSONArray pushURL = new JSONArray();
+                        } else if(!mAtomOpStart){
+                            mAtomOpStart = true;
+                            sdkEngine.stopRecord();
+                        }
+                        break;
+                    case OP_MIX:
+                        if (!mIsMixing) {
+                            mAtomOpStart = true;
+                            //如果主窗口是当前用户
+                            JSONArray pushURL = new JSONArray();
 //                        pushURL.put("rtmp://push.urtc.com.cn/" + mAppid + "/"+ mUserid);
 //                        pushURL.put("rtmp://push.urtc.com.cn/live/URtc-h4r1txxy123131");
-                        pushURL.put("rtmp://rtcpush.ugslb.com/rtclive/123");
-                        UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
-                                .pushUrl(pushURL)
-                                .mainViewUserId(mUserid)
-                                .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-                                .build();
-                        sdkEngine.startMix(mixProfile);
-                    } else if (!mAtomOpStart) {
-                        mAtomOpStart = true;
-                        JSONArray jsonArray = new JSONArray();
-                        jsonArray.put("");
-                        sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH,jsonArray);
-                    }
-                    break;
-            }
+                            pushURL.put("rtmp://rtcpush.ugslb.com/rtclive/123");
+                            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+                                    .pushUrl(pushURL)
+                                    .mainViewUserId(mUserid)
+                                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                                    .build();
+                            sdkEngine.startMix(mixProfile);
+                        } else if (!mAtomOpStart) {
+                            mAtomOpStart = true;
+                            JSONArray jsonArray = new JSONArray();
+                            jsonArray.put("");
+                            sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH,jsonArray);
+                        }
+                        break;
+                }
 
+            }
         });
         mTextStream.setOnClickListener(new CustomerClickListener() {
             @Override
@@ -1023,91 +1040,110 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         ((SteamScribePopupWindow) mSpinnerPopupWindowScribe).setmOnSubScribeListener(mOnSubscribeListener);
         //手动发布
         mPublish = findViewById(R.id.button_call_pub);
-        mPublish.setOnClickListener(v -> {
-            //手动停止渲染远端
-//            if(mIsSub){
-//               sdkEngine.stopRemoteView(mStreamInfo);
-//                mIsSub = false;
-//            }else{
-//                sdkEngine.startRemoteView(mStreamInfo,mTextureView);
-//                mIsSub = true;
-//            }
-
-            if (!mIsPublished) {
-                List<Integer> results = new ArrayList<>();
-                StringBuffer errorMessage = new StringBuffer();
-                switch (mCaptureMode) {
-                    //音频
-                    case CommonUtils.audio_capture_mode:
-                        results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
-                        break;
-                    //视频
-                    case CommonUtils.camera_capture_mode:
-                        results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
-                        break;
-                    //屏幕捕捉
-                    case CommonUtils.screen_capture_mode:
-                        if (isScreenCaptureSupport) {
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
-                        } else {
-                            errorMessage.append("设备不支持屏幕捕捉\n");
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
-                        }
-                        break;
-                    //音频+屏幕捕捉
-                    case CommonUtils.screen_Audio_mode:
-                        if (isScreenCaptureSupport) {
-                            //推一路桌面一路音频,桌面流不需要带音频
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, false, false).getErrorCode());
+        mPublish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mIsPublished) {
+                    List<Integer> results = new ArrayList<>();
+                    StringBuffer errorMessage = new StringBuffer();
+                    switch (mCaptureMode) {
+                        //音频
+                        case CommonUtils.audio_capture_mode:
                             results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
-                        } else {
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
-                        }
-                        break;
-                    //视频+屏幕捕捉
-                    case CommonUtils.multi_capture_mode:
-                        if (isScreenCaptureSupport) {
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
+                            break;
+                        //视频
+                        case CommonUtils.camera_capture_mode:
                             results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
-                        } else {
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
-                        }
-                        break;
-                }
+                            break;
+                        //屏幕捕捉
+                        case CommonUtils.screen_capture_mode:
+                            if (isScreenCaptureSupport) {
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
+                            } else {
+                                errorMessage.append("设备不支持屏幕捕捉\n");
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                            }
+                            break;
+                        //音频+屏幕捕捉
+                        case CommonUtils.screen_Audio_mode:
+                            if (isScreenCaptureSupport) {
+                                //推一路桌面一路音频,桌面流不需要带音频
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, false, false).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
+                            } else {
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
+                            }
+                            break;
+                        //视频+屏幕捕捉
+                        case CommonUtils.multi_capture_mode:
+                            if (isScreenCaptureSupport) {
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                            } else {
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                            }
+                            break;
+                    }
 
 //            List<Integer> errorCodes = results.stream()
 //                    .filter(result -> result != 0)
 //                    .collect(Collectors.toList());
-                List<Integer> errorCodes = new ArrayList<>();
-                for (Integer result : results) {
-                    if (result != 0)
-                        errorCodes.add(result);
-                }
-                if (!errorCodes.isEmpty()) {
-                    for (Integer errorCode : errorCodes) {
-                        if (errorCode != NET_ERR_CODE_OK.ordinal())
-                            errorMessage.append("UCLOUD_RTC_SDK_ERROR_CODE:" + errorCode + "\n");
+                    List<Integer> errorCodes = new ArrayList<>();
+                    for (Integer result : results) {
+                        if (result != 0)
+                            errorCodes.add(result);
                     }
+                    if (!errorCodes.isEmpty()) {
+                        for (Integer errorCode : errorCodes) {
+                            if (errorCode != NET_ERR_CODE_OK.ordinal())
+                                errorMessage.append("UCLOUD_RTC_SDK_ERROR_CODE:" + errorCode + "\n");
+                        }
+                    }
+                    if (errorMessage.length() > 0)
+                        ToastUtils.shortShow(RoomTextureActivity.this, errorMessage.toString());
+                    else {
+                        ToastUtils.shortShow(RoomTextureActivity.this, "发布");
+                    }
+                } else {
+                    sdkEngine.unPublish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
                 }
-                if (errorMessage.length() > 0)
-                    ToastUtils.shortShow(RoomTextureActivity.this, errorMessage.toString());
-                else {
-                    ToastUtils.shortShow(RoomTextureActivity.this, "发布");
-                }
-            } else {
-                sdkEngine.unPublish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
             }
         });
-        mHangup.setOnClickListener(v -> callHangUp());
+        mHangup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callHangUp();
+            }
+        });
 
-        mSwitchcam.setOnClickListener(v -> switchCamera());
+        mSwitchcam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switchCamera();
+            }
+        });
 
-        mMuteMic.setOnClickListener(v -> onToggleMic());
+        mMuteMic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onToggleMic();
+            }
+        });
 
-        mLoudSpkeader.setOnClickListener(v ->
-                onLoudSpeaker(!mSpeakerOn));
+        mLoudSpkeader.setOnClickListener(new View.OnClickListener() {
+                                             @Override
+                                             public void onClick(View v) {
+                                                 onLoudSpeaker(!mSpeakerOn);
+                                             }
+                                         }
+        );
 
-        mMuteCam.setOnClickListener(v -> onToggleCamera());
+        mMuteCam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onToggleCamera();
+            }
+        });
 
         title = findViewById(R.id.text_room);
         title.setText("roomid: " + mRoomid);

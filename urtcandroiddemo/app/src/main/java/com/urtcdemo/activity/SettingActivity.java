@@ -310,58 +310,70 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
-        mRGRole.setOnCheckedChangeListener((group, checkedId) -> {
-            switch (group.getCheckedRadioButtonId()) {
-                case R.id.rb_role_pub:
-                    mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_PUB;
-                    break;
-                case R.id.rb_role_scribe:
-                    mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_SUB;
-                    break;
-                case R.id.rb_role_both:
-                    mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH;
+        mRGRole.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (group.getCheckedRadioButtonId()) {
+                    case R.id.rb_role_pub:
+                        mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_PUB;
+                        break;
+                    case R.id.rb_role_scribe:
+                        mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_SUB;
+                        break;
+                    case R.id.rb_role_both:
+                        mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH;
 //                    if (mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE) {
 //                        ToastUtils.shortShow(this, "大班课模式不能选择全部");
 //                    } else {
 //                        mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH;
 //                    }
-                    break;
+                        break;
+                }
             }
         });
 
-        mRGClass.setOnCheckedChangeListener((group, checkedId) -> {
-            switch (group.getCheckedRadioButtonId()) {
-                case R.id.rb_type_small_room:
-                    mRoomType = UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL;
-                    mRBRoleBoth.setEnabled(true);
-                    break;
-                case R.id.rb_type_large_room:
-                    mRoomType = UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE;
-                    mRBRoleBoth.setEnabled(true);
-                    checkRole();
-                    break;
+        mRGClass.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (group.getCheckedRadioButtonId()) {
+                    case R.id.rb_type_small_room:
+                        mRoomType = UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL;
+                        mRBRoleBoth.setEnabled(true);
+                        break;
+                    case R.id.rb_type_large_room:
+                        mRoomType = UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE;
+                        mRBRoleBoth.setEnabled(true);
+                        checkRole();
+                        break;
+                }
             }
         });
 
-        mRGPublish.setOnCheckedChangeListener((group, checkedId) -> {
-            switch (group.getCheckedRadioButtonId()) {
-                case R.id.rb_pub_auto:
-                    mPublishMode = CommonUtils.AUTO_MODE;
-                    break;
-                case R.id.rb_pub_manual:
-                    mPublishMode = CommonUtils.MANUAL_MODE;
-                    break;
+        mRGPublish.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (group.getCheckedRadioButtonId()) {
+                    case R.id.rb_pub_auto:
+                        mPublishMode = CommonUtils.AUTO_MODE;
+                        break;
+                    case R.id.rb_pub_manual:
+                        mPublishMode = CommonUtils.MANUAL_MODE;
+                        break;
+                }
             }
         });
 
-        mRGScribe.setOnCheckedChangeListener((group, checkedId) -> {
-            switch (group.getCheckedRadioButtonId()) {
-                case R.id.rb_scribe_auto:
-                    mScribeMode = CommonUtils.AUTO_MODE;
-                    break;
-                case R.id.rb_scribe_manual:
-                    mScribeMode = CommonUtils.MANUAL_MODE;
-                    break;
+        mRGScribe.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (group.getCheckedRadioButtonId()) {
+                    case R.id.rb_scribe_auto:
+                        mScribeMode = CommonUtils.AUTO_MODE;
+                        break;
+                    case R.id.rb_scribe_manual:
+                        mScribeMode = CommonUtils.MANUAL_MODE;
+                        break;
+                }
             }
         });
 
