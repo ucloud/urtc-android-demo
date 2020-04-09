@@ -57,6 +57,7 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Log.d(TAG,"onBindViewHolder "+ position);
         holder.setIsRecyclable(false);
         FrameLayout holderView = (FrameLayout) holder.itemView;
         if (holderView != null) {
@@ -77,16 +78,17 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
                 if (parent != null) {
                     ((FrameLayout) parent).removeView(videoView);
                 }
-                if(videoView instanceof UCloudRtcSdkSurfaceVideoView )
+                if(videoView instanceof UCloudRtcSdkSurfaceVideoView ){
                     ((UCloudRtcSdkSurfaceVideoView)videoView).setZOrderMediaOverlay(true);
-                if(videoView instanceof UCloudRtcRenderView){
+                }
+                else if(videoView instanceof UCloudRtcRenderView){
                     ((UCloudRtcRenderView)videoView).setZOrderMediaOverlay(true);
-                    ((UCloudRtcRenderView)videoView).setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
                 }
                 videoView.setTag(R.id.index, viewInfo);
                 FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT);
                 holderView.addView(videoView, layoutParams);
+                Log.d(TAG,"add video view " + videoView + "position: "+ position);
             } else {
                 FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT);

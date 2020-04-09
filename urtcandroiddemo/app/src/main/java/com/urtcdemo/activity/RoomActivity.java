@@ -1132,10 +1132,10 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
     private int mSelectPos;
 
     private void onUserLeave(String uid) {
-        if (mVideoAdapter != null) {
-            mVideoAdapter.removeStreamView(uid + UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
-            mVideoAdapter.removeStreamView(uid + UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN);
-        }
+//        if (mVideoAdapter != null) {
+//            mVideoAdapter.removeStreamView(uid + UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+//            mVideoAdapter.removeStreamView(uid + UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN);
+//        }
     }
 
     private void onMediaServerDisconnect() {
