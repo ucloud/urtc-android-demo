@@ -74,7 +74,7 @@ dependencies {
     implementation 'com.github.markzhai:blockcanary-android:1.5.0'
     testImplementation 'junit:junit:4.12'
 
-    implementation (name: 'ucloudrtclib_1.7.3_c0ed0250_w', ext: 'aar')
+    implementation (name: 'ucloudrtclib_1.7.3_75c0d898_w', ext: 'aar')
 //    implementation project(path: ':ucloud_business_sdk')
 //    implementation project(':urtc-sdk-android')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
