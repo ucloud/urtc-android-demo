@@ -648,9 +648,9 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                             if (!sdkEngine.isAudioOnlyMode()) {
                                 localrenderview.setVisibility(View.VISIBLE);
                                 localrenderview.setBackgroundColor(Color.TRANSPARENT);
-                                localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+//                                localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
                                 sdkEngine.startPreview(info.getMediaType(),
-                                        localrenderview,null,null);
+                                        localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
                                 mLocalStreamInfo = info;
                                 localrenderview.setTag(mLocalStreamInfo);
 //                                localrenderview.refreshRemoteOp(View.INVISIBLE);
@@ -773,7 +773,8 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                 public void run() {
                     if (code == 0) {
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo(null);
-                        UCloudRtcRenderView videoView = null;
+//                        UCloudRtcRenderView videoView = null;
+                        UCloudRtcSdkSurfaceVideoView videoView = null;
                         Log.d(TAG, " subscribe info: " + info.getUId() + " hasvideo " + info.isHasVideo());
                         if (info.isHasVideo()) {
                              //外部扩展输出，和默认输出二选一
@@ -783,23 +784,24 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 //                            sdkEngine.startRemoteView(info, videoViewCallBack);
 
                              //UCloudRtcSdkSurfaceVideoView 定义的viewgroup,内含UcloudRtcRenderView
-//                           UCloudRtcSdkSurfaceVideoView videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
-//                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
+                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
+                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
 //                            videoView.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
-//                            videoView.setTag(info);
-//                            videoView.setId(R.id.video_view);
-//                            //设置交换
-////                            videoView.setOnClickListener(mSwapRemoteLocalListener);
+                            videoView.setTag(info);
+                            videoView.setId(R.id.video_view);
+                            //设置交换
+//                            videoView.setOnClickListener(mSwapRemoteLocalListener);
 //                            //远端截图
 //                            videoView.setOnClickListener(mScreenShotOnClickListener);
 
                             //自定义的surfaceview
-                            videoView = new UCloudRtcRenderView(getApplicationContext());
-                            videoView.init();
-                            vinfo.setmRenderview(videoView);
-                            videoView.setTag(info);
-                            videoView.setOnClickListener(mScreenShotOnClickListener);
+//                            videoView = new UCloudRtcRenderView(getApplicationContext());
+//                            videoView.init();
+//
+//                            videoView.setTag(info);
+//                            videoView.setOnClickListener(mScreenShotOnClickListener);
                         }
+                        vinfo.setmRenderview(videoView);
                         vinfo.setmUid(info.getUId());
                         vinfo.setmMediatype(info.getMediaType());
                         vinfo.setmEanbleVideo(info.isHasVideo());
@@ -811,7 +813,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                             mVideoAdapter.addStreamView(mkey, vinfo, info);
                         }
                         if (vinfo != null && videoView != null) {
-                            sdkEngine.startRemoteView(info, videoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
+                            sdkEngine.startRemoteView(info, videoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
 //                            videoView.refreshRemoteOp(View.VISIBLE);
                         }
                         //如果订阅成功就删除待订阅列表中的数据
@@ -1506,7 +1508,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 
         localrenderview = findViewById(R.id.localview);
 //        localrenderview.init(true, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
-        localrenderview.init(false);
+        localrenderview.init(true);
         localrenderview.setZOrderMediaOverlay(false);
         localrenderview.setMirror(false);
         localprocess = findViewById(R.id.processlocal);
