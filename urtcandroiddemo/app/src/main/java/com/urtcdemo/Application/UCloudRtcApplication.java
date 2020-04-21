@@ -63,7 +63,7 @@ public class UCloudRtcApplication extends Application {
         UCloudRtcSdkEnv.initEnv(getApplicationContext());
         UCloudRtcSdkEnv.setWriteToLogCat(true);
         UCloudRtcSdkEnv.setLogReport(true);
-        UCloudRtcSdkEnv.setEncodeMode(UCloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);
+//        UCloudRtcSdkEnv.setEncodeMode(UCloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);
         UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo);
         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
         UCloudRtcSdkEnv.setReConnectTimes(60);
@@ -71,7 +71,7 @@ public class UCloudRtcApplication extends Application {
 //        UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_LANDSCAPE_MODE);
         //私有化部署
 //        UCloudRtcSdkEnv.setPrivateDeploy(true);
-//        UCloudRtcSdkEnv.setPrivateDeployRoomURL("wss://192.168.20.90:5228/ws");
+//        UCloudRtcSdkEnv.setPrivateDeployRoomURL("ws://mediapoc1.pingan.com.cn:5005/ws");
         //无限重连
 //        UCloudRtcSdkEnv.setReConnectTimes(-1);
         //默认vp8编码，可以改成h264
