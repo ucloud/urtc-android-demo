@@ -28,7 +28,6 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.ucloudrtclib.netengine.URTCWSDefine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;

@@ -14,12 +14,36 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:id="@+id/local_parent">
             <com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView
                 android:id="@+id/localview"
-                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+
+                <FrameLayout
+                    android:layout_marginTop="200dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:id="@+id/test_t"
+                    android:visibility="gone"
+                    android:background="@color/color_4C3BA6CC"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:id="@+id/test_bottom"
+                    android:visibility="gone"
+                    android:background="@color/color_FFFFA700"/>
+            </LinearLayout>
+
+
 
             <com.urtcdemo.utils.VideoPlayer
                 android:id="@+id/playView"
