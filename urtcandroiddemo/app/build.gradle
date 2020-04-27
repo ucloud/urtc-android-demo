@@ -77,7 +77,7 @@ dependencies {
 //    implementation (name: 'ucloudrtclib_1.7.4_d2cc9466', ext: 'aar')
 //    implementation project(path: ':ucloud_business_sdk')
 //    implementation project(':urtc-sdk-android')
-    implementation 'com.ucloud:ucloudrtclib:1.0.0'
+    implementation 'com.ucloud:ucloudrtclib:1.7.4'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     //bugly
