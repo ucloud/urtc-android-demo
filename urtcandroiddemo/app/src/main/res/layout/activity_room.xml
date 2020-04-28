@@ -16,7 +16,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/local_parent">
-            <com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView
+<!--            <com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView-->
+<!--                android:id="@+id/localview"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent" />-->
+
+            <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
                 android:id="@+id/localview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

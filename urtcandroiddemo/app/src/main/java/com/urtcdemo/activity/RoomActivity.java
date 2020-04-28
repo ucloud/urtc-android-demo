@@ -119,7 +119,8 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
     private boolean mMixAddOrDel = true;
 
     TextView title = null;
-    UCloudRtcSdkSurfaceVideoView localrenderview = null;
+//    UCloudRtcSdkSurfaceVideoView localrenderview = null;
+    UCloudRtcRenderView localrenderview = null;
     ProgressBar localprocess = null;
 
     final int COL_SIZE_P = 3;
@@ -429,30 +430,30 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
     };
 
-    private View.OnClickListener mSwapRemoteLocalListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (v instanceof UCloudRtcSdkSurfaceVideoView) {
-                String key = ((URTCVideoViewInfo) v.getTag(R.id.index)).getKey();
-                if (mVideoAdapter.checkCanSwap(key)) {
-                    boolean state = mVideoAdapter.checkState(key);
-                    if (!state) {
-                        UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
-                        sdkEngine.stopRemoteView(remoteStreamInfo);
-                        if (mLocalStreamInfo != null) {
-                            sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
-                            sdkEngine.startPreview(mLocalStreamInfo.getMediaType(), (UCloudRtcSdkSurfaceVideoView) v,null, null);
-                            v.setTag(R.id.swap_info, mLocalStreamInfo);
-                        }
-                        sdkEngine.startRemoteView(remoteStreamInfo, (UCloudRtcSdkSurfaceVideoView) localrenderview,null,null);
-                        ((UCloudRtcSdkSurfaceVideoView) v).refreshRemoteOp(View.INVISIBLE);
-                        ((UCloudRtcSdkSurfaceVideoView) localrenderview).refreshRemoteOp(View.VISIBLE);
-                        localrenderview.setTag(R.id.swap_info, remoteStreamInfo);
-                        if (mClass == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE) {
-                            localrenderview.setVisibility(View.VISIBLE);
-                            localrenderview.setTag(R.id.view_info, v);
-                            localrenderview.setBackgroundColor(Color.TRANSPARENT);
-                            v.setVisibility(View.INVISIBLE);
+//    private View.OnClickListener mSwapRemoteLocalListener = new View.OnClickListener() {
+//        @Override
+//        public void onClick(View v) {
+//            if (v instanceof UCloudRtcSdkSurfaceVideoView) {
+//                String key = ((URTCVideoViewInfo) v.getTag(R.id.index)).getKey();
+//                if (mVideoAdapter.checkCanSwap(key)) {
+//                    boolean state = mVideoAdapter.checkState(key);
+//                    if (!state) {
+//                        UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
+//                        sdkEngine.stopRemoteView(remoteStreamInfo);
+//                        if (mLocalStreamInfo != null) {
+//                            sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
+//                            sdkEngine.startPreview(mLocalStreamInfo.getMediaType(), (UCloudRtcSdkSurfaceVideoView) v,null, null);
+//                            v.setTag(R.id.swap_info, mLocalStreamInfo);
+//                        }
+//                        sdkEngine.startRemoteView(remoteStreamInfo, (UCloudRtcSdkSurfaceVideoView) localrenderview,null,null);
+//                        ((UCloudRtcSdkSurfaceVideoView) v).refreshRemoteOp(View.INVISIBLE);
+//                        ((UCloudRtcSdkSurfaceVideoView) localrenderview).refreshRemoteOp(View.VISIBLE);
+//                        localrenderview.setTag(R.id.swap_info, remoteStreamInfo);
+//                        if (mClass == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE) {
+//                            localrenderview.setVisibility(View.VISIBLE);
+//                            localrenderview.setTag(R.id.view_info, v);
+//                            localrenderview.setBackgroundColor(Color.TRANSPARENT);
+//                            v.setVisibility(View.INVISIBLE);
                             //和本地view截图功能触发重叠，App使用者可以另行定义触发
 //                            localrenderview.setOnClickListener(new View.OnClickListener() {
 //                                @Override
@@ -469,28 +470,28 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 //                                    }
 //                                }
 //                            });
-                        }
-                    } else {
-                        //有交换过
-                        UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
-                        //停止交换过的大窗渲染远端
-                        sdkEngine.stopRemoteView(remoteStreamInfo);
-                        //停止本地视频渲染
-                        sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
-                        sdkEngine.startPreview(mLocalStreamInfo.getMediaType(), localrenderview,null,null);
-                        sdkEngine.startRemoteView(remoteStreamInfo, (UCloudRtcSdkSurfaceVideoView) v,null,null);
-                        ((UCloudRtcSdkSurfaceVideoView) v).refreshRemoteOp(View.VISIBLE);
-                        ((UCloudRtcSdkSurfaceVideoView) localrenderview).refreshRemoteOp(View.INVISIBLE);
-                        v.setTag(R.id.swap_info, null);
-                        localrenderview.setTag(R.id.swap_info, null);
-                    }
-                    mVideoAdapter.reverseState(key);
-                } else {
-                    ToastUtils.shortShow(RoomActivity.this, "其它窗口已经交换过，请先交换回来");
-                }
-            }
-        }
-    };
+//                        }
+//                    } else {
+//                        //有交换过
+//                        UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
+//                        //停止交换过的大窗渲染远端
+//                        sdkEngine.stopRemoteView(remoteStreamInfo);
+//                        //停止本地视频渲染
+//                        sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
+//                        sdkEngine.startPreview(mLocalStreamInfo.getMediaType(), localrenderview,null,null);
+//                        sdkEngine.startRemoteView(remoteStreamInfo, (UCloudRtcSdkSurfaceVideoView) v,null,null);
+//                        ((UCloudRtcSdkSurfaceVideoView) v).refreshRemoteOp(View.VISIBLE);
+//                        ((UCloudRtcSdkSurfaceVideoView) localrenderview).refreshRemoteOp(View.INVISIBLE);
+//                        v.setTag(R.id.swap_info, null);
+//                        localrenderview.setTag(R.id.swap_info, null);
+//                    }
+//                    mVideoAdapter.reverseState(key);
+//                } else {
+//                    ToastUtils.shortShow(RoomActivity.this, "其它窗口已经交换过，请先交换回来");
+//                }
+//            }
+//        }
+//    };
 
     private View.OnClickListener mScreenShotOnClickListener = new View.OnClickListener() {
         @Override
@@ -502,7 +503,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
     private View.OnClickListener mLocalChangeRenderMode =new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+//            localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
         }
     };
 
@@ -705,13 +706,13 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                         mIsPublished = false;
                         if (info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
                             if (localrenderview != null) {
-                                localrenderview.refresh();
+//                                localrenderview.refresh();
                             }
                         } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
                             if (mCaptureMode == CommonUtils.screen_capture_mode) {
-                                if (localrenderview != null) {
-                                    localrenderview.refresh();
-                                }
+//                                if (localrenderview != null) {
+//                                    localrenderview.refresh();
+//                                }
                             }
                         }
                         ToastUtils.shortShow(RoomActivity.this, "取消发布视频成功");
@@ -809,7 +810,6 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 //                             UCloudRtcSdkSurfaceVideoView 定义的viewgroup,内含UcloudRtcRenderView
                             videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
                             videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
-                            videoView.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
                             //设置交换
@@ -1575,9 +1575,10 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 
         localrenderview = findViewById(R.id.localview);
 //        localrenderview.init(true, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
-        localrenderview.init(true);
+//        localrenderview.init(true);
+        localrenderview.init();
         localrenderview.setZOrderMediaOverlay(false);
-        localrenderview.setMirror(false);
+        localrenderview.setMirror(true);
         localprocess = findViewById(R.id.processlocal);
         isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture();
         Log.d(TAG, " mCaptureMode " + mCaptureMode);
@@ -2060,7 +2061,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
             }
         } else {
             if (mute) {
-                localrenderview.refresh();
+//                localrenderview.refresh();
                 localrenderview.setVisibility(View.INVISIBLE);
             } else {
                 localrenderview.setVisibility(View.VISIBLE);
