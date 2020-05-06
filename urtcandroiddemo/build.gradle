@@ -18,7 +18,8 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven { url "https://raw.githubusercontent.com/ucloud/urtc-android-demo/master" }
+        //maven { url "https://raw.githubusercontent.com/ucloud/urtc-android-demo/master" }
+        maven { url "https://gitee.com/lukesong/urtc-android-demo/raw/master" }
     }
 }
 
