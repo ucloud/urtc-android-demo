@@ -60,5 +60,5 @@
     <color name="color_FFF26D58">#FFF26D58</color>
     <color name="color_FFFFA700">#FFFFA700</color>
     <color name="color_26000000">#26000000</color>
-    color_26000000
+    <color name="dim_foreground_dark">#bebebe</color>
 </resources>

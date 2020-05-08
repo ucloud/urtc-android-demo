@@ -2,6 +2,10 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ijkplayer-arm64/src/main/jni/ijkmedia/ijksoundtouch" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ijkplayer-arm64/src/main/jni/ijkmedia/ijkyuv" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ijkplayer-armv7a/src/main/jni/ijkmedia/ijksoundtouch" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ijkplayer-armv7a/src/main/jni/ijkmedia/ijkyuv" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/ucloud_business_sdk" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/ucloud_rtc_base" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/urtc-sdk-android" vcs="Git" />
