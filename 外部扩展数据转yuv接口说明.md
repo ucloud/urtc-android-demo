@@ -41,9 +41,9 @@ public interface UcloudRTCDataProvider {
 //设置捕获模式，二选一
 //        UCloudRtcSdkEnv.setRGBCaptureMode(
 //        UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
-        //rgb数据捕获
-        UCloudRtcSdkEnv.setRGBCaptureMode(
-                UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_RGB);
+        //外部采集数据捕获，与普通捕获模式二选一
+//        UCloudRtcSdkEnv.setCaptureMode(
+//                UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND);
 ```
 
 
