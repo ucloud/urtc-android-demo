@@ -11,6 +11,10 @@ buildscript {
         
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+
+        // 添加上传到jcenter所需的插件
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
     }
 }
 
@@ -19,7 +23,6 @@ allprojects {
         google()
         jcenter()
         //maven { url "https://raw.githubusercontent.com/ucloud/urtc-android-demo/master" }
-        maven { url "https://gitee.com/lukesong/urtc-android-demo/raw/master" }
     }
 }
 
