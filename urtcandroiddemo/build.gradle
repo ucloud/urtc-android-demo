@@ -23,6 +23,8 @@ allprojects {
         google()
         jcenter()
         //maven { url "https://raw.githubusercontent.com/ucloud/urtc-android-demo/master" }
+        //jcenter无法下载时，添加以下地址
+        maven { url 'https://dl.bintray.com/lukesong07/maven' }
     }
 }
 
