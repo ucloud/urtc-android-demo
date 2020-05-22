@@ -13,7 +13,7 @@ public class DataUtil {
         videoList.add(new Video("One",
                 413000,
                 "http://tanzi27niu.cdsb.mobi/wps/wp-content/uploads/2017/05/2017-05-17_17-30-43.jpg",
-                "rtsp://192.168.161.148:554/ch1"));
+                "rtsp://192.168.161.148:554/ch2"));
         videoList.add(new Video("Two",
                 413000,
                 "http://tanzi27niu.cdsb.mobi/wps/wp-content/uploads/2017/05/2017-05-10_10-09-58.jpg",

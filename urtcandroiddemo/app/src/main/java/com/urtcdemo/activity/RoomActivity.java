@@ -665,7 +665,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                                 localrenderview.setBackgroundColor(Color.TRANSPARENT);
 //                                localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
                                 sdkEngine.startPreview(info.getMediaType(),
-                                        localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                                        localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
 
 //                                UCloudRtcRenderView renderView = new UCloudRtcRenderView(RoomActivity.this);
 //                                FrameLayout frameLayout = findViewById(R.id.local_parent);
@@ -1668,9 +1668,13 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         info.setRoomId(mRoomid);
         info.setUId(mUserid);
         Log.d(TAG, " roomtoken = " + mRoomToken);
-        //普通摄像头捕获方式，与扩展模式二选一
+        UCloudRtcSdkEnv.setRTSPURL("rtsp://192.168.161.148:554/ch1");
         UCloudRtcSdkEnv.setCaptureMode(
-                UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
+                UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_RTSP);
+
+//        //普通摄像头捕获方式，与扩展模式二选一
+//        UCloudRtcSdkEnv.setCaptureMode(
+//                UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
         //rgb数据捕获，与普通捕获模式二选一
 //        UCloudRtcSdkEnv.setCaptureMode(
 //                UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND);

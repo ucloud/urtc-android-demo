@@ -72,9 +72,10 @@ public class ConnectActivity extends AppCompatActivity {
             return;
         }
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
-        startRoomActivity();
+//        startRoomActivity();
 //        startRoomTextureActivity();
 //        startWebViewActivity();
+        startRoomMixerActivity();
     }
 
     @Override
@@ -233,6 +234,27 @@ public class ConnectActivity extends AppCompatActivity {
         if (!mStartSuccess) {
             mStartSuccess = true;
             final Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
+            intent.putExtra("room_id", mRoomid);
+            String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
+            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
+            intent.putExtra("user_id", mUserId);
+            intent.putExtra("app_id", mAppid);
+            intent.putExtra("token", mRoomToken);
+            mMainHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(intent);
+                    finish();
+                    mStartSuccess = false;
+                }
+            }, 500);
+        }
+    }
+
+    private void startRoomMixerActivity() {
+        if (!mStartSuccess) {
+            mStartSuccess = true;
+            final Intent intent = new Intent(ConnectActivity.this, RoomMixerActivity.class);
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
             mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
