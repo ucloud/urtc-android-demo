@@ -46,6 +46,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordProfile;
+import com.ucloudrtclib.sdkengine.define.UcloudRtcCameraMixConfig;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
@@ -836,6 +837,11 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
 
         @Override
         public void onNetWorkQuality(String userId, UCloudRtcSdkStreamType streamType, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkNetWorkQuality quality) {
+
+        }
+
+        @Override
+        public void onLocalMixRenderReady(List<UcloudRtcCameraMixConfig.CameraInfo> infos) {
 
         }
     };

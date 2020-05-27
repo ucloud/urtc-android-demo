@@ -72,7 +72,7 @@
 
         <activity
             android:name=".activity.RoomMixerActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="landscape"></activity>
 
         <activity
             android:name=".activity.RoomTextureActivity"
