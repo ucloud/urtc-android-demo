@@ -137,6 +137,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     ImageButton mMuteCam = null;
     TextView mOpBtn = null;
     TextView mAddDelBtn = null;
+    TextView mSynBtn = null;
+    TextView mSwitchBtn = null;
     CheckBox  mCheckBoxMirror = null;
     private SteamScribePopupWindow mSpinnerPopupWindowScribe;
     private View mStreamSelect;
@@ -174,6 +176,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private FrameLayout testT ,testB;
     private AppCompatSeekBar mSeekBar;
     private UcloudRtcCameraMixConfig mCameraMixConfig;
+    private boolean synFlag = false;
 
     /**
      * SDK视频录制对象
@@ -1261,6 +1264,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mAddDelBtn = findViewById(R.id.addDelBtn);
         mAddDelBtn.setText("add_st");
         mAddDelBtn.setVisibility(View.VISIBLE);
+        mSynBtn = findViewById(R.id.syn);
+        mSwitchBtn = findViewById(R.id.swap);
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -1662,15 +1667,39 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //        UCloudRtcSdkEnv.setRTSPURL("rtsp://192.168.161.148:554/ch1");
         mCameraMixConfig = new UcloudRtcCameraMixConfig();
         mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;
-        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch1",true));
+        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4",true));
         mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3",false));
-        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3",false));
-        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4",false));
+//        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4",false));
+//        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch2",false));
 //        mCameraMixConfig.rtspURLs.add("rtsp://192.168.161.148:554/ch2");
         UCloudRtcSdkEnv.setMixConfig(mCameraMixConfig);
         UCloudRtcSdkEnv.setCaptureMode(
                 UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_MIX);
+        mSynBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!synFlag){
+                    mCameraMixConfig.HDMI_MIX = false;
+                    mCameraMixConfig.rtspURLs.get(0).mix = true;
+                    mCameraMixConfig.rtspURLs.get(1).mix = true;
+//                    mCameraMixConfig.rtspURLs.get(2).mix = false;
+                }else{
+                    mCameraMixConfig.HDMI_MIX = true;
+                    mCameraMixConfig.rtspURLs.get(0).mix = true;
+                    mCameraMixConfig.rtspURLs.get(1).mix = false;
+//                    mCameraMixConfig.rtspURLs.get(2).mix = false;
+                }
+                synFlag = !synFlag;
+                sdkEngine.synMixConfig(mCameraMixConfig);
+            }
+        });
 
+        mSwitchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sdkEngine.switchMixView();
+            }
+        });
 //        //普通摄像头捕获方式，与扩展模式二选一
 //        UCloudRtcSdkEnv.setCaptureMode(
 //                UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
