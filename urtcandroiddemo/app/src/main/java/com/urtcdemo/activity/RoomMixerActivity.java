@@ -1669,8 +1669,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;
         mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4",true));
         mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3",false));
+//        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3",false));
 //        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4",false));
-//        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch2",false));
 //        mCameraMixConfig.rtspURLs.add("rtsp://192.168.161.148:554/ch2");
         UCloudRtcSdkEnv.setMixConfig(mCameraMixConfig);
         UCloudRtcSdkEnv.setCaptureMode(
