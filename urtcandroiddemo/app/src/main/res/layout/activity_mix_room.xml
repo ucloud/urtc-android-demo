@@ -45,10 +45,18 @@
                         android:layout_height="match_parent"
                         android:layout_weight="0.5" >
 
-                        <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
-                            android:id="@+id/RemoteMixView"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/remoteGridView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="5dp"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginBottom="10dp" />
+
+<!--                        <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView-->
+<!--                            android:id="@+id/RemoteMixView"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="match_parent"/>-->
 
                     </FrameLayout>
                 </LinearLayout>
@@ -143,14 +151,7 @@
                 android:progressDrawable="@drawable/processbar_style_v" />
         </FrameLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/remoteGridView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_gravity="bottom" />
+
 
         <FrameLayout
             android:id="@+id/call_fragment_container"

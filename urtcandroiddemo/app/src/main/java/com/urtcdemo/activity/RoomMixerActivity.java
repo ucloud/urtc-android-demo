@@ -1226,11 +1226,12 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mCaptureMode = preferences.getInt(CommonUtils.capture_mode, CommonUtils.camera_capture_mode);
         mVideoProfile = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
         mRemoteGridView = findViewById(R.id.remoteGridView);
-        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            gridLayoutManager = new GridLayoutManager(this, COL_SIZE_L);
-        } else {
-            gridLayoutManager = new GridLayoutManager(this, COL_SIZE_P);
-        }
+//        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            gridLayoutManager = new GridLayoutManager(this, COL_SIZE_L);
+//        } else {
+//            gridLayoutManager = new GridLayoutManager(this, COL_SIZE_P);
+//        }
+        gridLayoutManager = new GridLayoutManager(this, 3);
         mRemoteGridView.setLayoutManager(gridLayoutManager);
         mVideoAdapter = new RemoteVideoAdapter(this);
         mVideoAdapter.setRemoveRemoteStreamReceiver(mRemoveRemoteStreamReceiver);
@@ -1666,11 +1667,11 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         Log.d(TAG, " roomtoken = " + mRoomToken);
 //        UCloudRtcSdkEnv.setRTSPURL("rtsp://192.168.161.148:554/ch1");
         mCameraMixConfig = new UcloudRtcCameraMixConfig();
-        mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;
+        mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MiX_RTSP_RTSP;
         mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4",true));
+        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3",true));
         mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3",false));
-//        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3",false));
-//        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4",false));
+        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch1",false));
 //        mCameraMixConfig.rtspURLs.add("rtsp://192.168.161.148:554/ch2");
         UCloudRtcSdkEnv.setMixConfig(mCameraMixConfig);
         UCloudRtcSdkEnv.setCaptureMode(
