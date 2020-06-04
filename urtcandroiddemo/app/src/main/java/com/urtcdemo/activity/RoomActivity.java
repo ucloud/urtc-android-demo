@@ -1181,6 +1181,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         public void onLocalMixRenderReady(List<UcloudRtcCameraMixConfig.CameraInfo> infos) {
 
         }
+
+        @Override
+        public void onLocalMixSyn(List<UcloudRtcCameraMixConfig.SynInfo> infos) {
+
+        }
     };
     private int mSelectPos;
 
