@@ -17,6 +17,7 @@ import android.support.v7.widget.AppCompatSeekBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.CheckBox;
@@ -93,6 +94,7 @@ import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CO
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
 import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_MIX_MANUAL;
+import static com.urtcdemo.activity.RoomMixerActivity.BtnOp.OP_LOCAL_RECORD;
 
 //import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
 //import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
@@ -121,7 +123,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     UCloudRtcRenderView mRtspView2 = null;
     UCloudRtcRenderView mRtspView3 = null;
     UCloudRtcRenderView mRtspView4 = null;
-    UCloudRtcRenderView mHdmiView = null;
+    SurfaceView mHdmiView = null;
     ProgressBar localprocess = null;
 
     final int COL_SIZE_P = 3;
@@ -536,6 +538,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                 @Override
                 public void run() {
                     if (code == 0) {
+                        sdkEngine.renderRemoteMixStream(mRemoteRenderView);
                         ToastUtils.shortShow(RoomMixerActivity.this, " 加入房间成功");
 //                        mOpBtn.setVisibility(View.VISIBLE);
                         startTimeShow();
@@ -645,12 +648,14 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
                     if (code == 0) {
                         mIsPublished = false;
                         if (info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
                             if (localrenderview != null) {
 //                                localrenderview.refresh();
                             }
+                            UCloudRtcSdkEnv.setCaptureMode(UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
                         } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
                             if (mCaptureMode == CommonUtils.screen_capture_mode) {
 //                                if (localrenderview != null) {
@@ -795,7 +800,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                         }
 
                         if (vinfo != null && videoView != null) {
-                            sdkEngine.startRemoteView(info, videoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                            sdkEngine.startRemoteView(info, videoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
 //                            videoView.refreshRemoteOp(View.VISIBLE);
                         }
                         //如果订阅成功就删除待订阅列表中的数据
@@ -1135,17 +1140,15 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //                                    mRtspView1 = findViewById(R.id.FirstRTSPView);
 //                                    mRtspView1.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
 //                                    mRtspView1.init();
-//                                    ArrayList<SurfaceViewRenderer> renders = new ArrayList();
+//                                    ArrayList<SurfaceView> renders = new ArrayList();
 //                                    renders.add(mRtspView1);
 //                                    sdkEngine.renderMixStream(cameraName, renders);
 //                                    Log.d(TAG, "bound1");
-//                                }
-//
-//                                else if (mRtspView4 == null) {
+//                                } else if (mRtspView4 == null) {
 //                                    mRtspView4 = findViewById(R.id.FourthRTSPView);
 //                                    mRtspView4.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
 //                                    mRtspView4.init();
-//                                    ArrayList<SurfaceViewRenderer> renders = new ArrayList();
+//                                    ArrayList<SurfaceView> renders = new ArrayList();
 //                                    renders.add(mRtspView4);
 //                                    sdkEngine.renderMixStream(cameraName, renders);
 //                                    Log.d(TAG, "bound4");
@@ -1153,49 +1156,49 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //
 //
 //                            }
-                            if (info.url.contains("ch1")) {
-                                mRtspView1 = findViewById(R.id.FirstRTSPView);
-                                mRtspView1.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
-                                mRtspView1.init();
-                                ArrayList<SurfaceViewRenderer> renders = new ArrayList();
-                                renders.add(mRtspView1);
-                                sdkEngine.renderMixStream(cameraName, renders);
-                                Log.d(TAG, "bound1");
-                            }
-                            else if (info.url.contains("ch3")) {
-                                if (mRtspView2 == null) {
-                                    mRtspView2 = findViewById(R.id.SecondRTSPView);
-                                    mRtspView2.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
-                                    mRtspView2.init();
-                                    ArrayList<SurfaceViewRenderer> renders = new ArrayList();
-                                    renders.add(mRtspView2);
-                                    sdkEngine.renderMixStream(cameraName, renders);
-                                    Log.d(TAG, "bound2");
-                                } else if (mRtspView3 == null) {
-                                    mRtspView3 = findViewById(R.id.ThirdRTSPView);
-                                    mRtspView3.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
-                                    mRtspView3.init();
-                                    ArrayList<SurfaceViewRenderer> renders = new ArrayList();
-                                    renders.add(mRtspView3);
-                                    sdkEngine.renderMixStream(cameraName, renders);
-                                    Log.d(TAG, "bound3");
-                                }
-                            }
-                            else if(info.url.contains("ch4") ){
-                                mRtspView4 = findViewById(R.id.FourthRTSPView);
-                                mRtspView4.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
-                                mRtspView4.init();
-                                ArrayList<SurfaceViewRenderer> renders = new ArrayList();
-                                renders.add(mRtspView4);
-                                sdkEngine.renderMixStream(cameraName,renders);
-                                Log.d(TAG, "bound4");
-                            }
-                        } else {
-                            mHdmiView.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
-                            mHdmiView.init();
-                            ArrayList<SurfaceViewRenderer> renders = new ArrayList();
+//                            if (info.url.contains("ch1")) {
+//                                mRtspView1 = findViewById(R.id.FirstRTSPView);
+//                                mRtspView1.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+//                                mRtspView1.init();
+//                                ArrayList<SurfaceView> renders = new ArrayList();
+//                                renders.add(mRtspView1);
+//                                sdkEngine.renderMixStream(cameraName, renders);
+//                                Log.d(TAG, "bound1");
+//                            } else if (info.url.contains("ch3")) {
+//                                if (mRtspView2 == null) {
+//                                    mRtspView2 = findViewById(R.id.SecondRTSPView);
+//                                    mRtspView2.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+//                                    mRtspView2.init();
+//                                    ArrayList<SurfaceView> renders = new ArrayList();
+//                                    renders.add(mRtspView2);
+//                                    sdkEngine.renderMixStream(cameraName, renders);
+//                                    Log.d(TAG, "bound2");
+//                                } else if (mRtspView3 == null) {
+//                                    mRtspView3 = findViewById(R.id.ThirdRTSPView);
+//                                    mRtspView3.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+//                                    mRtspView3.init();
+//                                    ArrayList<SurfaceView> renders = new ArrayList();
+//                                    renders.add(mRtspView3);
+//                                    sdkEngine.renderMixStream(cameraName, renders);
+//                                    Log.d(TAG, "bound3");
+//                                }
+//                            }
+////                            else if(info.url.contains("ch4") ){
+////                                mRtspView4 = findViewById(R.id.FourthRTSPView);
+////                                mRtspView4.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+////                                mRtspView4.init();
+////                                ArrayList<SurfaceViewRenderer> renders = new ArrayList();
+////                                renders.add(mRtspView4);
+////                                sdkEngine.renderMixStream(cameraName,renders);
+////                                Log.d(TAG, "bound4");
+////                            }
+                        }
+                        else {
+//                            mHdmiView.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+//                            mHdmiView.init();
+                            ArrayList<SurfaceView> renders = new ArrayList();
                             renders.add(mHdmiView);
-//                            renders.add(localrenderview);
+////                            renders.add(localrenderview);
                             sdkEngine.renderMixStream(cameraName, renders);
 
                             Log.d(TAG, "bound hdmi");
@@ -1225,7 +1228,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                     mRtspView1 = findViewById(R.id.FirstRTSPView);
                                     mRtspView1.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
                                     mRtspView1.init();
-                                    ArrayList<SurfaceViewRenderer> renders = new ArrayList();
+                                    ArrayList<SurfaceView> renders = new ArrayList();
                                     renders.add(mRtspView1);
                                     sdkEngine.renderMixStream(cameraName, renders);
                                     Log.d(TAG, "bound1");
@@ -1234,7 +1237,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                         mRtspView2 = findViewById(R.id.SecondRTSPView);
                                         mRtspView2.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
                                         mRtspView2.init();
-                                        ArrayList<SurfaceViewRenderer> renders = new ArrayList();
+                                        ArrayList<SurfaceView> renders = new ArrayList();
                                         renders.add(mRtspView2);
                                         sdkEngine.renderMixStream(cameraName, renders);
                                         Log.d(TAG, "bound2");
@@ -1242,7 +1245,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                         mRtspView3 = findViewById(R.id.ThirdRTSPView);
                                         mRtspView3.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
                                         mRtspView3.init();
-                                        ArrayList<SurfaceViewRenderer> renders = new ArrayList();
+                                        ArrayList<SurfaceView> renders = new ArrayList();
                                         renders.add(mRtspView3);
                                         sdkEngine.renderMixStream(cameraName, renders);
                                         Log.d(TAG, "bound3");
@@ -1251,15 +1254,15 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                     mRtspView4 = findViewById(R.id.FourthRTSPView);
                                     mRtspView4.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
                                     mRtspView4.init();
-                                    ArrayList<SurfaceViewRenderer> renders = new ArrayList();
+                                    ArrayList<SurfaceView> renders = new ArrayList();
                                     renders.add(mRtspView4);
                                     sdkEngine.renderMixStream(cameraName, renders);
                                     Log.d(TAG, "bound4");
                                 }
                             } else {
-                                mHdmiView.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
-                                mHdmiView.init();
-                                ArrayList<SurfaceViewRenderer> renders = new ArrayList();
+//                                mHdmiView.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+//                                mHdmiView.init();
+                                ArrayList<SurfaceView> renders = new ArrayList();
                                 renders.add(mHdmiView);
                                 sdkEngine.renderMixStream(cameraName, renders);
                                 Log.d(TAG, "bound hdmi");
@@ -1358,17 +1361,17 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         //user can chose the suitable type
 //        mOpBtn.setTag(OP_SEND_MSG);
 //        mOpBtn.setText("sendmsg");
-//        mOpBtn.setTag(OP_LOCAL_RECORD);
-//        mOpBtn.setText("lrecord");
+        mOpBtn.setTag(OP_LOCAL_RECORD);
+        mOpBtn.setText("lrecord");
 //        mOpBtn.setTag(OP_REMOTE_RECORD);
 //        mOpBtn.setText("record");
 //        mOpBtn.setTag(OP_MIX);
 //        mOpBtn.setText("mix");
-        mOpBtn.setTag(OP_MIX_MANUAL);
-        mOpBtn.setText("mix_manual");
+//        mOpBtn.setTag(OP_MIX_MANUAL);
+//        mOpBtn.setText("mix_manual");
         mAddDelBtn = findViewById(R.id.addDelBtn);
         mAddDelBtn.setText("add_st");
-        mAddDelBtn.setVisibility(View.VISIBLE);
+        mAddDelBtn.setVisibility(View.GONE);
         mSynBtn = findViewById(R.id.syn);
         mSwitchBtn = findViewById(R.id.swap);
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
@@ -1773,12 +1776,13 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mCameraMixConfig = new UcloudRtcCameraMixConfig();
 //        mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;
         mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MiX_RTSP_RTSP;
-        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch1",true));
-//        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3",false));
+        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch1", true));
+//        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3", false));
+//        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3", false));
 //        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4", false));
-        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4", true));
-//        mCameraMixConfig.rtspURLs.add("rtsp://192.168.161.148:554/ch2");
         UCloudRtcSdkEnv.setMixConfig(mCameraMixConfig);
+//        UCloudRtcSdkEnv.setCaptureMode(
+//                UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
         UCloudRtcSdkEnv.setCaptureMode(
                 UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_MIX);
         mSynBtn.setOnClickListener(new View.OnClickListener() {
@@ -1916,8 +1920,11 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //            mTimerCreateImg.scheduleAtFixedRate(timerTask,0,10);
             UCloudRtcSdkEngine.onRGBCaptureResult(mUCloudRTCDataProvider);
         }
+        mRemoteRenderView = findViewById(R.id.RemoteMixView);
+        mRemoteRenderView.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+        mRemoteRenderView.init();
         sdkEngine.joinChannel(info);
-//        initRecordManager();
+        initRecordManager();
     }
 
     private void recycleBitmap(Bitmap bitmap) {
