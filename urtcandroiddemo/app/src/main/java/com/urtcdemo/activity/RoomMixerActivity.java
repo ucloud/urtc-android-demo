@@ -1156,15 +1156,16 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //
 //
 //                            }
-//                            if (info.url.contains("ch1")) {
-//                                mRtspView1 = findViewById(R.id.FirstRTSPView);
-//                                mRtspView1.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
-//                                mRtspView1.init();
-//                                ArrayList<SurfaceView> renders = new ArrayList();
-//                                renders.add(mRtspView1);
-//                                sdkEngine.renderMixStream(cameraName, renders);
-//                                Log.d(TAG, "bound1");
-//                            } else if (info.url.contains("ch3")) {
+                            if (info.url.contains("ch1")) {
+                                mRtspView1 = findViewById(R.id.FirstRTSPView);
+                                mRtspView1.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
+                                mRtspView1.init();
+                                ArrayList<SurfaceView> renders = new ArrayList();
+                                renders.add(mRtspView1);
+                                sdkEngine.renderMixStream(cameraName, renders);
+                                Log.d(TAG, "bound1");
+                            }
+//                            else if (info.url.contains("ch3")) {
 //                                if (mRtspView2 == null) {
 //                                    mRtspView2 = findViewById(R.id.SecondRTSPView);
 //                                    mRtspView2.setScaleType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
@@ -1198,7 +1199,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //                            mHdmiView.init();
                             ArrayList<SurfaceView> renders = new ArrayList();
                             renders.add(mHdmiView);
-////                            renders.add(localrenderview);
+//                            renders.add(localrenderview);
                             sdkEngine.renderMixStream(cameraName, renders);
 
                             Log.d(TAG, "bound hdmi");
@@ -1763,7 +1764,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
         //设置sdk 外部扩展模式及其采集的帧率，同时sdk内部会自动调整初始码率和最小码率
         //扩展模式只支持720p的分辨率及以下，若要自定义更高分辨率，请联系Ucloud商务定制，否则sdk会抛出异常，终止运行。
-//        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_EXTEND.extendParams(30,640,480));
+        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_EXTEND.extendParams(30,640,480));
         sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfile));
         initButtonSize();
         UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo();
@@ -1776,8 +1777,9 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mCameraMixConfig = new UcloudRtcCameraMixConfig();
 //        mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;
         mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MiX_RTSP_RTSP;
-        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch1", true));
-//        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3", false));
+//        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch1", false));
+        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.1.13/ch1", false));
+//        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4", true));
 //        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3", false));
 //        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4", false));
         UCloudRtcSdkEnv.setMixConfig(mCameraMixConfig);
