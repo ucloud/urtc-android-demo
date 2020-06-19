@@ -116,14 +116,14 @@
                         android:layout_height="match_parent"
                         android:layout_weight="0.25" >
 
-                            <SurfaceView
-                                android:id="@+id/HDMIView"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"/>
-<!--                        <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView-->
-<!--                            android:id="@+id/HDMIView"-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="match_parent"/>-->
+<!--                            <SurfaceView-->
+<!--                                android:id="@+id/HDMIView"-->
+<!--                                android:layout_width="match_parent"-->
+<!--                                android:layout_height="match_parent"/>-->
+                        <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
+                            android:id="@+id/HDMIView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
                     </FrameLayout>
                 </LinearLayout>
             </LinearLayout>
