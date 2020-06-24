@@ -20,15 +20,35 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
+            <EditText
+                android:id="@+id/rtsp_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/oval_edit_text_background"
+                android:maxLines="1"
+                android:paddingLeft="15dp"
+                android:paddingTop="8dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="8dp"
+                android:hint="rtsp_url"
+                android:textColor="@color/textcolor"
+                android:textSize="18sp" />
 
             <RelativeLayout
                 android:id="@+id/config_video_profile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
+                android:layout_below="@id/rtsp_edittext"
+                android:layout_marginTop="15dp"
                 android:layout_marginRight="30dp"
                 android:background="@drawable/oval_edit_text_background"
                 android:gravity="center_horizontal"
