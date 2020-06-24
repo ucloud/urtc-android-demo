@@ -88,6 +88,7 @@ public class SettingActivity extends AppCompatActivity {
     private EditText mAppidEditText;
     private EditText mUserIdEditText;
     private EditText mGatewayEditText;
+    private EditText mRtspEditText ;
     private EditText mEditTextMixFilePath;
     private CheckBox mCheckBoxMixSupport;
     private CheckBox mCheckBoxLoop;
@@ -103,6 +104,7 @@ public class SettingActivity extends AppCompatActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
 
+        mRtspEditText = findViewById(R.id.rtsp_edittext);
         mConfigTextView = findViewById(R.id.config_text_view);
         mCaptureModeRadioGroup = findViewById(R.id.capture_mode_button);
         mScreenCapture = findViewById(R.id.screen_capture_button);
@@ -153,6 +155,7 @@ public class SettingActivity extends AppCompatActivity {
                         Context.MODE_PRIVATE).edit();
 
                 mAppid = mAppidEditText.getEditableText().toString();
+                String rtspurl = mRtspEditText.getEditableText().toString();
                 String userId = stringFilter(mUserIdEditText.getEditableText().toString());
                 if(!TextUtils.isEmpty(userId)){
                     if(!userId.startsWith("android_")){
@@ -174,6 +177,7 @@ public class SettingActivity extends AppCompatActivity {
                 mMixFilePath = mEditTextMixFilePath.getText().toString();
                 UCloudRtcSdkEnv.setMixFilePath(mMixFilePath);
                 editor.putString(CommonUtils.SDK_MIX_FILE_PATH, mMixFilePath);
+                editor.putString(CommonUtils.RTSP_URL, rtspurl) ;
                 editor.apply();
                 finish();
             }
@@ -417,6 +421,9 @@ public class SettingActivity extends AppCompatActivity {
         if(!TextUtils.isEmpty(UCloudRtcApplication.getUserId())){
             mUserIdEditText.setText(UCloudRtcApplication.getUserId());
         }
+
+        String rtspurl = preferences.getString(CommonUtils.RTSP_URL, "");
+        mRtspEditText.setText(rtspurl);
     }
 
     public static String stringFilter(String str) throws PatternSyntaxException {

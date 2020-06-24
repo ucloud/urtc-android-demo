@@ -26,6 +26,8 @@ public class CommonUtils {
     public static final String SDK_IS_LOOP = "SDK_IS_LOOP";
     public static final String SDK_MIX_FILE_PATH = "SDK_MIX_FILE_PATH";
 
+    public static final String RTSP_URL = "RTSP_URL_TEXT" ;
+
     public static final String APPID_KEY = "APPID_KEY";
     public static final String APP_ID = "URtc-h4r1txxy";
 public static final String SEC_KEY = "9129304dbf8c5c4bf68d70824462409f";
