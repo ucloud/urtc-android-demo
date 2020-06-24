@@ -820,6 +820,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(TAG, "onUnSubscribeResult: "+ info);
                     ToastUtils.shortShow(RoomMixerActivity.this, " 取消订阅用户 " +
                             info.getUId() + " 类型 " + info.getMediaType());
                     if (mVideoAdapter != null) {
@@ -1792,11 +1793,11 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             @Override
             public void onClick(View v) {
                 if (!synFlag) {
-//                    mCameraMixConfig.rtspURLs.remove(0);
-                    mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MiX_RTSP_RTSP;
+                    mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;
                     mCameraMixConfig.HDMI_ENCODE = false;
                     mCameraMixConfig.rtspURLs.clear();
                     mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch1", false));
+//                    mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.1.13/ch1", false));
 //                    mCameraMixConfig.rtspURLs.get(0).mix = true;
                 } else {
                     mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;
