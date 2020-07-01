@@ -95,6 +95,8 @@ import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
 import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_MIX_MANUAL;
 import static com.urtcdemo.activity.RoomMixerActivity.BtnOp.OP_LOCAL_RECORD;
+import static com.urtcdemo.activity.RoomMixerActivity.BtnOp.OP_MIX;
+import static com.urtcdemo.activity.RoomMixerActivity.BtnOp.OP_REMOTE_RECORD;
 
 //import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
 //import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
@@ -1363,12 +1365,12 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         //user can chose the suitable type
 //        mOpBtn.setTag(OP_SEND_MSG);
 //        mOpBtn.setText("sendmsg");
-        mOpBtn.setTag(OP_LOCAL_RECORD);
-        mOpBtn.setText("lrecord");
+//        mOpBtn.setTag(OP_LOCAL_RECORD);
+//        mOpBtn.setText("lrecord");
 //        mOpBtn.setTag(OP_REMOTE_RECORD);
 //        mOpBtn.setText("record");
-//        mOpBtn.setTag(OP_MIX);
-//        mOpBtn.setText("mix");
+        mOpBtn.setTag(OP_MIX);
+        mOpBtn.setText("mix");
 //        mOpBtn.setTag(OP_MIX_MANUAL);
 //        mOpBtn.setText("mix_manual");
         mAddDelBtn = findViewById(R.id.addDelBtn);
@@ -1408,22 +1410,22 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                         if (!mIsRecording) {
                             mAtomOpStart = true;
 //                如果主窗口是当前用户
-//                UCloudRtcSdkRecordProfile recordProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-//                        .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
-//                        .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-//                        .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
-//                        .Average(UCloudRtcSdkRecordProfile.RECORD_UNEVEN)
-//                        .WaterType(UCloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
-//                        .WaterPosition(UCloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
-//                        .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
-//                        .Template(UCloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
-//                        .build();
+                UCloudRtcSdkRecordProfile recordProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+                        .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
+                        .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                        .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
+                        .Average(UCloudRtcSdkRecordProfile.RECORD_UNEVEN)
+                        .WaterType(UCloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
+                        .WaterPosition(UCloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
+                        .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
+                        .Template(UCloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
+                        .build();
 //                sdkEngine.startRecord(recordProfile);
-                            UCloudRtcSdkRecordProfile recordAudioProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-                                    .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_AUDIO)
-                                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-                                    .build();
-                            sdkEngine.startRecord(recordAudioProfile);
+//                            UCloudRtcSdkRecordProfile recordAudioProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+//                                    .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_AUDIO)
+//                                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+//                                    .build();
+//                            sdkEngine.startRecord(recordAudioProfile);
 
                             //如果主窗口不是当前推流用户，而是被订阅的用户
 //                UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo = mVideoAdapter.getStreamInfo(0);
@@ -1456,6 +1458,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                             pushURL.put("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid);
                             UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
                                     .pushUrl(pushURL)
+                                    .layout(UCloudRtcSdkMixProfile.LAYOUT_AVERAGE)
+                                    .resolution(1920,1080)
                                     .mainViewUserId(mUserid)
                                     .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                                     .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_AUTO)
@@ -1777,14 +1781,14 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //        UCloudRtcSdkEnv.setRTSPURL("rtsp://192.168.161.148:554/ch1");
         mCameraMixConfig = new UcloudRtcCameraMixConfig();
         mCameraMixConfig.HDMI_ENCODE = true;
-       // mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;
-        mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MiX_RTSP_RTSP;
-        String rtspurl = preferences.getString(CommonUtils.RTSP_URL, "");
-        if (rtspurl.length() == 0) {
-            mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch1", false));
-        }else {
-            mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo(rtspurl, false));
-        }
+        mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;
+//        mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MiX_RTSP_RTSP;
+//        String rtspurl = preferences.getString(CommonUtils.RTSP_URL, "");
+//        if (rtspurl.length() == 0) {
+//            mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch1", false));
+//        }else {
+//            mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo(rtspurl, false));
+//        }
 
 //        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.1.13/ch1", false));
 //        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4", true));
