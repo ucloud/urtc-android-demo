@@ -51,7 +51,7 @@ public class ConnectActivity extends AppCompatActivity {
     private String mAppid = "";
     private String mRoomToken = "";
     private View connectButton;
-    private View exportButton;
+    //private View exportButton;
     private ImageButton setButton;
     private TextView mTextSDKVersion;
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
@@ -93,7 +93,7 @@ public class ConnectActivity extends AppCompatActivity {
         UCloudRtcSdkEnv.setMixFilePath(preferences.getString(CommonUtils.SDK_MIX_FILE_PATH, getResources().getString(R.string.mix_file_path)));
         UCloudRtcSdkEnv.setLogReport(true);
         mAnimal = findViewById(R.id.userporta);
-        ((AnimationDrawable) mAnimal.getBackground()).start();
+        //((AnimationDrawable) mAnimal.getBackground()).start();
         setButton = findViewById(R.id.setting_btn);
         roomEditText = findViewById(R.id.room_edittext);
         roomEditText.requestFocus();
@@ -167,7 +167,7 @@ public class ConnectActivity extends AppCompatActivity {
                 }
             }
         });
-        exportButton = findViewById(R.id.export_button);
+/*        exportButton = findViewById(R.id.export_button);
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -189,7 +189,7 @@ public class ConnectActivity extends AppCompatActivity {
                 });
                 thread.start();
             }
-        });
+        });*/
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -274,14 +274,14 @@ public class ConnectActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        ((AnimationDrawable) mAnimal.getBackground()).start();
+        //((AnimationDrawable) mAnimal.getBackground()).start();
     }
 
     @Override
     protected void onStop() {
         Log.d(TAG, "activity onStop");
         super.onStop();
-        ((AnimationDrawable) mAnimal.getBackground()).stop();
+        //((AnimationDrawable) mAnimal.getBackground()).stop();
     }
 
     static class CopyMixFileTask implements Runnable {

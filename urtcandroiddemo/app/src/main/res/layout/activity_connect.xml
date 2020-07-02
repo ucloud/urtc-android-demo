@@ -4,10 +4,19 @@
     android:id="@+id/id_rl_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@mipmap/bg"
+    android:background="@color/lsq_color_white"
     android:orientation="vertical"
     android:weightSum="1"
     android:layout_centerHorizontal="true">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:src="@mipmap/logo"
+        android:layout_margin="16dp" />
 
     <ImageButton
         android:id="@+id/setting_btn"
@@ -25,7 +34,7 @@
         android:layout_height="144dp"
         android:layout_below="@+id/setting_btn"
         android:layout_centerInParent="true"
-        android:background="@drawable/mediacall"
+        android:src="@mipmap/background"
         android:layout_margin="16dp" />
 
     <TextView
@@ -33,34 +42,101 @@
         android:text="@string/app_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/colorWhite"
+        android:textColor="@color/color_CCC5C5C5"
         android:gravity="center_horizontal"
-        android:textSize="24sp"
+        android:textSize="12sp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="50dp" />
 
     <LinearLayout
         android:padding="20dp"
         android:orientation="vertical"
+        android:layout_below="@+id/userporta"
         android:layout_centerInParent="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp">
 
-        <EditText
-            android:id="@+id/room_edittext"
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_centerInParent="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/textcolor"
-            android:textColorHint="@color/textcolor"
-            android:background="@drawable/oval_edit_text_background"
-            android:maxLines="1"
-            android:hint="@string/input_room_name"
-            android:textSize="18sp"
-            android:paddingLeft="15dp"
-            android:paddingTop="8dp"
-            android:paddingRight="15dp"
-            android:paddingBottom="8dp" />
+            android:layout_marginTop="16dp">
+
+            <ImageView
+                android:id="@+id/user_pic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/lsq_color_transparent"
+                android:layout_margin="8dp"
+                android:src="@mipmap/user" />
+
+            <EditText
+                android:id="@+id/user_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/color_FF007AFF"
+                android:textColorHint="@color/color_CCC5C5C5"
+                android:hint="Android_User"
+                android:textSize="18sp"
+                android:paddingLeft="15dp"
+                android:paddingTop="8dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="8dp"
+                android:background="@null"
+                android:textCursorDrawable="@null"
+                android:maxLines="1"
+                android:inputType="text"/>
+        </LinearLayout>
+
+        <View
+            android:layout_height="1dp"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="16dp"
+            android:background="@color/color_CCC5C5C5"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+
+            <ImageView
+                android:id="@+id/room_pic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/lsq_color_transparent"
+                android:layout_margin="8dp"
+                android:src="@mipmap/room" />
+
+            <EditText
+                android:id="@+id/room_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/color_FF007AFF"
+                android:textColorHint="@color/color_CCC5C5C5"
+                android:hint="@string/input_room_name"
+                android:textSize="18sp"
+                android:paddingLeft="15dp"
+                android:paddingTop="8dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="8dp"
+                android:background="@null"
+                android:textCursorDrawable="@null"
+                android:maxLines="1"
+                android:inputType="text"/>
+        </LinearLayout>
+
+        <View
+            android:layout_height="1dp"
+            android:layout_width="match_parent"
+            android:layout_marginBottom="16dp"
+            android:background="@color/color_CCC5C5C5"/>
+
 
         <Button
             android:id="@+id/connect_button"
@@ -76,19 +152,6 @@
             android:background="@drawable/oval_btn_background"
             android:textColor="@color/textcolor" />
 
-        <Button
-            android:id="@+id/export_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/export_log"
-            android:textSize="18sp"
-            android:paddingLeft="15dp"
-            android:paddingTop="8dp"
-            android:paddingRight="15dp"
-            android:paddingBottom="8dp"
-            android:layout_marginTop="30dp"
-            android:background="@drawable/oval_btn_background"
-            android:textColor="@color/textcolor" />
 
         <RadioGroup
             android:visibility="gone"
