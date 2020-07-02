@@ -1,24 +1,40 @@
 # Android SDK 版本说明
 ## 1.7.7
 该版本发布于2020-7-2
+
 1.解决传入Ip地址前两位大于等于128会报错的问题
+
 2.保持io.crossbar.autobahn不混淆
+
 3.增加plc、speech_expand等音频相关指标
+
 4.修改mix相关api的实现方法，把json封装到接口内部
+
 5.修改postString中异常捕获类型
+
 6.初始化ip地址并增加tryCatch,保证连接服务器过程中不停止
+
 7.streamst移除时，当前user还存在其他stream的话，不删除user
+
 8.解决断线前是mute状态时，重连后无法恢复mute的问题
+
 9.修改取消订阅bug
+
 10.deviceinfo的base64加密选项改为NO_WRAP
+
 11.在业务层和信令层调用joinRoom时，增加判断条件authInfo里的内容是否为空
 
 ## 1.7.5
 该版本发布于2020-4-28
+
 1.增加调整录音音量 arm7 arm8
+
 2.增加网络质量回调
+
 3.增加maven 仓库
+
 4.增加修改混流接口
+
 5.修改镜像功能，前置摄像头镜像
 
 ## 1.7.3版
