@@ -1977,7 +1977,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 
             }
         }
-        UCloudRtcSdkEngine.destory();
+//        UCloudRtcSdkEngine.destory();
 //        if(mVideoPlayer != null ){
 //            mVideoPlayer.stop();
 //        }
