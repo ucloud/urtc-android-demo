@@ -239,14 +239,13 @@
     <string name="muti_track">视频通话 + 屏幕共享</string>
 
     <string name="server_address">服务器地址:</string>
-    <string name="start_meeting">加入</string>
+    <string name="start_meeting">进入房间</string>
     <string name="export_log">导出日志</string>
     <string name="connect">连接会议</string>
     <string name="disconnect">断开会议</string>
     <string name="connect_success">连接成功</string>
     <string name="video_meeting">视频会议</string>
     <string name="input_room_name">请输入房间号</string>
-    <string name="input_user_name">请输入用户名</string>
     <string name="cannel">取消</string>
     <string name="yes">确认</string>
     <string name="stats_data_tip"><data><![CDATA[码率: %1$d kbs\n帧率: %2$d fps\n视频大小: %3$d x %4$d\n延时: %5$d ms\n丢包率: %6$d\ncpuAverage: %7$d\ncpuCurrent: %8$d\nfreqScaleAver: %9$d]]></data></string>
@@ -256,4 +255,10 @@
     <string name="is_loop">是否循环混合</string>
     <string name="mix_file_path">/sdcard/urtc/dy.mp3</string>
     <string name="mix_file_dir">/sdcard/urtc/</string>
+    <string name="subscribe_stream">subscribe/unsubscribe stream</string>
+    <string name="camera_title">摄像头</string>
+    <string name="mic_title">麦克风</string>
+    <string name="autopub_title">自动发布</string>
+    <string name="autosub_title">自动订阅</string>
+    <string name="settings">设置</string>
 </resources>

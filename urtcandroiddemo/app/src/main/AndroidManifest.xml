@@ -71,6 +71,9 @@
             android:screenOrientation="portrait"></activity>
 
         <activity
+            android:name=".activity.NewSettingActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
             android:name=".activity.WebViewActivity"
             android:screenOrientation="portrait"></activity>
 
