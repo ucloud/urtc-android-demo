@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -72,7 +71,6 @@ import com.urtcdemo.view.URTCVideoViewInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.SurfaceViewRenderer;
 import org.webrtc.ucloud.record.MediaRecorderBase;
 import org.webrtc.ucloud.record.URTCRecordManager;
 import org.webrtc.ucloud.record.model.MediaObject;
@@ -93,10 +91,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
-import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_MIX_MANUAL;
-import static com.urtcdemo.activity.RoomMixerActivity.BtnOp.OP_LOCAL_RECORD;
 import static com.urtcdemo.activity.RoomMixerActivity.BtnOp.OP_MIX;
-import static com.urtcdemo.activity.RoomMixerActivity.BtnOp.OP_REMOTE_RECORD;
 
 //import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
 //import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
@@ -632,7 +627,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                         } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN.ordinal()) {
                             if (mCaptureMode == CommonUtils.screen_capture_mode) {
 //                                localrenderview.setVisibility(View.VISIBLE);
-                                sdkEngine.startPreview(info.getMediaType(), localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+//                                sdkEngine.startPreview(info.getMediaType(), localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                             }
                         }
 
@@ -1783,22 +1778,22 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mCameraMixConfig.HDMI_ENCODE = true;
         mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;
 //        mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MiX_RTSP_RTSP;
-//        String rtspurl = preferences.getString(CommonUtils.RTSP_URL, "");
+        String rtspurl = preferences.getString(CommonUtils.RTSP_URL_KEY, "rtsp://192.168.161.148:554/ch1");
 //        if (rtspurl.length() == 0) {
 //            mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch1", false));
 //        }else {
 //            mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo(rtspurl, false));
 //        }
-
+        UcloudRtcCameraMixConfig.RTSP_URL = rtspurl;
 //        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.1.13/ch1", false));
 //        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4", true));
 //        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch3", false));
 //        mCameraMixConfig.rtspURLs.add(new UcloudRtcCameraMixConfig.RtspCameraInfo("rtsp://192.168.161.148:554/ch4", false));
         UCloudRtcSdkEnv.setMixConfig(mCameraMixConfig);
-//        UCloudRtcSdkEnv.setCaptureMode(
-//                UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
         UCloudRtcSdkEnv.setCaptureMode(
-                UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_MIX);
+                UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
+//        UCloudRtcSdkEnv.setCaptureMode(
+//                UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_MIX);
         mSynBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

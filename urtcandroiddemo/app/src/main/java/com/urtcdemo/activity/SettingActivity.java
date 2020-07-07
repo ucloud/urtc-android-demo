@@ -26,7 +26,6 @@ import com.urtcdemo.BuildConfig;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.RadioGroupFlow;
-import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
@@ -41,7 +40,7 @@ import java.util.regex.PatternSyntaxException;
 
 public class SettingActivity extends AppCompatActivity {
     private TextView mConfigTextView;
-    private int mSelectPos = 0;
+    private int mSelectPos = 6;
     private ArrayAdapter<String> mAdapter;
     private VideoProfilePopupWindow mSpinnerPopupWindow;
 
@@ -85,6 +84,7 @@ public class SettingActivity extends AppCompatActivity {
     private boolean mTestMode;
     private List<String> mDefaultConfiguration = new ArrayList<>();
     private String mAppid;
+    private String mRtspUrl;
     private EditText mAppidEditText;
     private EditText mUserIdEditText;
     private EditText mGatewayEditText;
@@ -155,7 +155,7 @@ public class SettingActivity extends AppCompatActivity {
                         Context.MODE_PRIVATE).edit();
 
                 mAppid = mAppidEditText.getEditableText().toString();
-                String rtspurl = mRtspEditText.getEditableText().toString();
+                mRtspUrl = mRtspEditText.getEditableText().toString();
                 String userId = stringFilter(mUserIdEditText.getEditableText().toString());
                 if(!TextUtils.isEmpty(userId)){
                     if(!userId.startsWith("android_")){
@@ -177,7 +177,7 @@ public class SettingActivity extends AppCompatActivity {
                 mMixFilePath = mEditTextMixFilePath.getText().toString();
                 UCloudRtcSdkEnv.setMixFilePath(mMixFilePath);
                 editor.putString(CommonUtils.SDK_MIX_FILE_PATH, mMixFilePath);
-                editor.putString(CommonUtils.RTSP_URL, rtspurl) ;
+                editor.putString(CommonUtils.RTSP_URL_KEY, mRtspUrl) ;
                 editor.apply();
                 finish();
             }
@@ -202,6 +202,8 @@ public class SettingActivity extends AppCompatActivity {
         mSpinnerPopupWindow.setOnSpinnerItemClickListener(mOnSpinnerItemClickListener);
 
         mCaptureMode = preferences.getInt(CommonUtils.capture_mode, CommonUtils.camera_capture_mode);
+        mRtspUrl = preferences.getString(CommonUtils.RTSP_URL_KEY, CommonUtils.RTST_URL);
+        mRtspEditText.setText(mRtspUrl);
         switch (mCaptureMode) {
             case CommonUtils.audio_capture_mode:
                 mOnlyAudioCapture.setChecked(true);
@@ -421,9 +423,6 @@ public class SettingActivity extends AppCompatActivity {
         if(!TextUtils.isEmpty(UCloudRtcApplication.getUserId())){
             mUserIdEditText.setText(UCloudRtcApplication.getUserId());
         }
-
-        String rtspurl = preferences.getString(CommonUtils.RTSP_URL, "");
-        mRtspEditText.setText(rtspurl);
     }
 
     public static String stringFilter(String str) throws PatternSyntaxException {
