@@ -11,21 +11,21 @@
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="96dp"
+        android:layout_height="48dp"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
         android:src="@mipmap/logo"
-        android:layout_margin="16dp" />
+        android:layout_marginTop="8dp" />
 
     <ImageButton
         android:id="@+id/setting_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:background="@color/lsq_color_transparent"
-        android:layout_margin="16dp"
+        android:layout_marginTop="8dp"
         android:src="@mipmap/setting" />
 
     <ImageView
@@ -35,7 +35,7 @@
         android:layout_below="@+id/setting_btn"
         android:layout_centerInParent="true"
         android:src="@mipmap/background"
-        android:layout_margin="16dp" />
+        android:layout_margin="8dp" />
 
     <TextView
         android:id="@+id/tv_sdk_version"
@@ -46,28 +46,31 @@
         android:gravity="center_horizontal"
         android:textSize="12sp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="50dp" />
+        android:layout_marginBottom="16dp" />
 
     <LinearLayout
-        android:padding="20dp"
+        android:padding="8dp"
         android:orientation="vertical"
         android:layout_below="@+id/userporta"
         android:layout_centerInParent="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp">
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="40dp">
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_centerInParent="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="8dp">
 
             <ImageView
                 android:id="@+id/user_pic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:background="@color/lsq_color_transparent"
                 android:layout_margin="8dp"
                 android:src="@mipmap/user" />
@@ -94,7 +97,6 @@
         <View
             android:layout_height="1dp"
             android:layout_width="match_parent"
-            android:layout_marginBottom="16dp"
             android:background="@color/color_CCC5C5C5"/>
 
         <LinearLayout
@@ -102,12 +104,12 @@
             android:layout_centerInParent="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="8dp">
 
             <ImageView
                 android:id="@+id/room_pic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:background="@color/lsq_color_transparent"
                 android:layout_margin="8dp"
                 android:src="@mipmap/room" />
@@ -134,9 +136,46 @@
         <View
             android:layout_height="1dp"
             android:layout_width="match_parent"
-            android:layout_marginBottom="16dp"
             android:background="@color/color_CCC5C5C5"/>
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:id="@+id/appid_pic"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@color/lsq_color_transparent"
+                android:layout_margin="8dp"
+                android:src="@mipmap/appid" />
+
+            <EditText
+                android:id="@+id/appid_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/color_FF007AFF"
+                android:textColorHint="@color/color_CCC5C5C5"
+                android:hint="@string/input_appid"
+                android:textSize="18sp"
+                android:paddingLeft="15dp"
+                android:paddingTop="8dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="8dp"
+                android:background="@null"
+                android:textCursorDrawable="@null"
+                android:maxLines="1"
+                android:inputType="text"/>
+        </LinearLayout>
+
+        <View
+            android:layout_height="1dp"
+            android:layout_width="match_parent"
+            android:background="@color/color_CCC5C5C5"/>
 
         <Button
             android:id="@+id/connect_button"
@@ -148,53 +187,23 @@
             android:paddingTop="8dp"
             android:paddingRight="15dp"
             android:paddingBottom="8dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="24dp"
             android:background="@drawable/oval_btn_background"
             android:textColor="@color/textcolor" />
 
-
-        <RadioGroup
-            android:visibility="gone"
-            android:id="@+id/id_radio_group"
+        <Button
+            android:id="@+id/log_output_button"
             android:layout_width="match_parent"
-            android:layout_marginTop="40dp"
-            android:layout_height="30dp"
-            android:background="@drawable/radio_group_bg"
-            android:orientation="horizontal"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+            android:layout_height="wrap_content"
+            android:text="@string/export_log"
+            android:textSize="18sp"
+            android:paddingLeft="15dp"
+            android:paddingTop="8dp"
+            android:paddingRight="15dp"
+            android:paddingBottom="8dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/oval_btn_background"
+            android:textColor="@color/textcolor" />
 
-            <RadioButton
-                android:id="@+id/id_radio_dev"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:background="@drawable/radio_btn_bg"
-                android:button="@null"
-                android:clickable="true"
-                android:gravity="center"
-                android:text="开发环境"
-                android:textColor="@color/colorWhite"
-                android:checked="false"
-                android:textSize="14sp"/>
-
-            <RadioButton
-                android:id="@+id/id_radio_test"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:background="@drawable/radio_btn_bg"
-                android:button="@null"
-                android:clickable="true"
-                android:drawablePadding="10dp"
-                android:gravity="center"
-                android:text="测试环境"
-                android:checked="true"
-                android:textColor="@color/colorWhite"
-                android:textSize="14sp"/>
-
-        </RadioGroup>
     </LinearLayout>
 </RelativeLayout>

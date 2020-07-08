@@ -6,17 +6,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
-
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
+import com.urtcdemo.view.BaseSwitch;
+import com.urtcdemo.view.LSwitch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,23 +38,36 @@ public class NewSettingActivity extends AppCompatActivity {
     @CommonUtils.PubScribeMode
     private int mPublishMode;
     @CommonUtils.PubScribeMode
-    private int mScribeMode;
+    private int mSubScribeMode;
+    private UCloudRtcSdkRoomType mRoomType;
 
     private List<String> mDefaultConfiguration = new ArrayList<>();
     private String mAppid;
 
-    private String mMixFilePath;
+    private LSwitch mCameraSwitch;
+    private LSwitch mMicSwitch;
+    private LSwitch mScreenShareSwitch;
+    private LSwitch mAutoPubSwitch;
+    private LSwitch mAutoSubSwitch;
+    private LSwitch mBroadcastSwitch;
+
+    private boolean mEnableCamera;
+    private boolean mEnableMic;
+    private boolean mEnableScreen;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mEnableCamera = true;
+        mEnableMic = true;
+        mEnableScreen = false;
+
         setContentView(R.layout.activity_setting_new);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
 
         mConfigTextView = findViewById(R.id.config_text_view);
-
         String[] configurations = getResources().getStringArray(R.array.videoResolutions);
         mDefaultConfiguration.addAll(Arrays.asList(configurations));
 
@@ -63,13 +78,15 @@ public class NewSettingActivity extends AppCompatActivity {
                 SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.app_name),
                         Context.MODE_PRIVATE).edit();
 
-                editor.putInt(CommonUtils.videoprofile, mSelectPos);
                 editor.putString(CommonUtils.APPID_KEY, mAppid);
+                editor.putInt(CommonUtils.videoprofile, mSelectPos);
+                editor.putBoolean(CommonUtils.CAMERA_ENABLE, mEnableCamera);
+                editor.putBoolean(CommonUtils.MIC_ENABLE, mEnableMic);
+                editor.putBoolean(CommonUtils.SCREEN_ENABLE, mEnableScreen);
                 editor.putInt(CommonUtils.PUBLISH_MODE, mPublishMode);
-                editor.putInt(CommonUtils.SCRIBE_MODE, mScribeMode);
+                editor.putInt(CommonUtils.SUBSCRIBE_MODE, mSubScribeMode);
+                editor.putInt(CommonUtils.SDK_CLASS_TYPE, mRoomType.ordinal());
 
-                UCloudRtcSdkEnv.setMixFilePath(mMixFilePath);
-                editor.putString(CommonUtils.SDK_MIX_FILE_PATH, mMixFilePath);
                 editor.apply();
                 finish();
             }
@@ -85,11 +102,70 @@ public class NewSettingActivity extends AppCompatActivity {
                 Context.MODE_PRIVATE);
         mSelectPos = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
         mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID);
-        mConfigTextView.setText(mDefaultConfiguration.get(mSelectPos));
+        mEnableCamera = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
+        mEnableMic = preferences.getBoolean(CommonUtils.MIC_ENABLE, CommonUtils.MIC_ON);
+        mEnableScreen = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
+        mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
+        mSubScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
+        int roomInt = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL.ordinal());
+        mRoomType = UCloudRtcSdkRoomType.valueOf(roomInt);
+
+        mConfigTextView.setText(mDefaultConfiguration.get(1));
         mAdapter = new ArrayAdapter<String>(this, R.layout.videoprofile_item, mDefaultConfiguration);
 
         mSpinnerPopupWindow = new VideoProfilePopupWindow(this);
         mSpinnerPopupWindow.setOnSpinnerItemClickListener(mOnSpinnerItemClickListener);
+
+        mCameraSwitch = findViewById(R.id.camera_switch);
+        mCameraSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
+            @Override
+            public void onChecked(boolean isChecked) {
+                mEnableCamera = isChecked;
+            }
+        });
+        mMicSwitch = findViewById(R.id.mic_switch);
+        mMicSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
+            @Override
+            public void onChecked(boolean isChecked) {
+                mEnableMic = isChecked;
+            }
+        });
+        mScreenShareSwitch = findViewById(R.id.screen_switch);
+        mScreenShareSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
+            @Override
+            public void onChecked(boolean isChecked) {
+                mEnableScreen = isChecked;
+            }
+        });
+        mAutoPubSwitch = findViewById(R.id.pub_switch);
+        mAutoPubSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
+            @Override
+            public void onChecked(boolean isChecked) {
+                mPublishMode = isChecked ? CommonUtils.AUTO_MODE : CommonUtils.MANUAL_MODE;
+            }
+        });
+        mAutoSubSwitch = findViewById(R.id.sub_switch);
+        mAutoSubSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
+            @Override
+            public void onChecked(boolean isChecked) {
+                mSubScribeMode = isChecked ? CommonUtils.AUTO_MODE : CommonUtils.MANUAL_MODE;
+            }
+        });
+        mBroadcastSwitch = findViewById(R.id.broadcast_switch);
+        mBroadcastSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
+            @Override
+            public void onChecked(boolean isChecked) {
+                mRoomType = isChecked ? UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE : UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL;
+
+            }
+        });
+        mCameraSwitch.setChecked(mEnableCamera);
+        mMicSwitch.setChecked(mEnableMic);
+        mScreenShareSwitch.setChecked(mEnableScreen);
+        mAutoPubSwitch.setChecked(mPublishMode == CommonUtils.AUTO_MODE);
+        mAutoSubSwitch.setChecked(mSubScribeMode == CommonUtils.AUTO_MODE);
+        mBroadcastSwitch.setChecked(mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE);
+
     }
 
     public static String stringFilter(String str) throws PatternSyntaxException {
@@ -116,5 +192,6 @@ public class NewSettingActivity extends AppCompatActivity {
             mSpinnerPopupWindow.dismiss();
         }
     };
+
 }
 

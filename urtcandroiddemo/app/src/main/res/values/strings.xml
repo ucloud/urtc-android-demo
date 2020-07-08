@@ -246,6 +246,7 @@
     <string name="connect_success">连接成功</string>
     <string name="video_meeting">视频会议</string>
     <string name="input_room_name">请输入房间号</string>
+    <string name="input_appid">请输入AppId</string>
     <string name="cannel">取消</string>
     <string name="yes">确认</string>
     <string name="stats_data_tip"><data><![CDATA[码率: %1$d kbs\n帧率: %2$d fps\n视频大小: %3$d x %4$d\n延时: %5$d ms\n丢包率: %6$d\ncpuAverage: %7$d\ncpuCurrent: %8$d\nfreqScaleAver: %9$d]]></data></string>
@@ -258,6 +259,7 @@
     <string name="subscribe_stream">subscribe/unsubscribe stream</string>
     <string name="camera_title">摄像头</string>
     <string name="mic_title">麦克风</string>
+    <string name="screen_title">屏幕共享</string>
     <string name="autopub_title">自动发布</string>
     <string name="autosub_title">自动订阅</string>
     <string name="settings">设置</string>
