@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
     android:id="@+id/drawer_layout"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="false"
     android:clipToPadding="true">
@@ -10,35 +11,56 @@
     <FrameLayout
         android:id="@+id/drawer_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@mipmap/video_off">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:background="@color/color_7F04A5EB"
             android:layout_height="50dp">
 
-            <Button
-                android:id="@+id/btn_drawer"
-                android:layout_gravity="right|center_vertical"
+            <ImageButton
+                android:id="@+id/img_btn_switch_camera"
+                android:background="#00000000"
+                android:src="@mipmap/switchcamera"
+                android:contentDescription="@string/switch_camera"
+                android:layout_marginLeft="16dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+
+            <Chronometer
+                android:id="@+id/timer"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:text="draw">
-            </Button>
+                android:layout_height="wrap_content"
+                android:format="%s"
+                android:textColor="@color/colorWhite"
+                android:layout_gravity="center_horizontal|center_vertical" />
+
+            <ImageButton
+                android:id="@+id/img_btn_more"
+                android:layout_gravity="right|center_vertical"
+                android:background="#00000000"
+                android:src="@mipmap/more"
+                android:layout_width="50dp"
+                android:layout_height="50dp">
+            </ImageButton>
         </FrameLayout>
 
-        <SurfaceView
+        <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
+            android:id="@+id/localvideoview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="50dp"
-            android:layout_marginBottom="51dp" />
+            android:layout_marginBottom="51dp"/>
 
-        <ImageView
-            android:id="@+id/cover_view"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/remoteGridView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="50dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginBottom="51dp"
-            android:background="@color/color_FFF26D58"/>
+            android:layout_gravity="bottom" />
 
         <View
             android:layout_width="match_parent"
@@ -47,11 +69,57 @@
             android:background="@color/color_19000000"
             android:layout_marginBottom="50dp"/>
 
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_gravity="bottom"></FrameLayout>
+            android:background="@color/lsq_color_white"
+            android:layout_gravity="bottom">
+            <ImageButton
+                android:id="@+id/img_btn_toggle_mic"
+                android:background="@drawable/publish_layer"
+                android:src="@mipmap/mic"
+                android:contentDescription="@string/toggle_mic"
+                android:layout_width="48dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"/>
 
+            <ImageButton
+                android:id="@+id/img_btn_toggle_video"
+                android:background="@drawable/publish_layer"
+                android:src="@mipmap/camera"
+                android:contentDescription="toggle video"
+                android:layout_width="48dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"/>
+
+            <ImageButton
+                android:id="@+id/img_btn_endcall"
+                android:background="@mipmap/end"
+                android:contentDescription="@string/disconnect_call"
+                android:layout_width="32dp"
+                android:layout_height="fill_parent"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_centerInParent="true"
+                android:layout_weight="1"/>
+
+            <ImageButton
+                android:id="@+id/img_btn_speaker"
+                android:background="@drawable/publish_layer"
+                android:src="@mipmap/speaker"
+                android:contentDescription="speaker on/off"
+                android:layout_width="48dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"/>
+            <ImageButton
+                android:id="@+id/img_btn_mirror"
+                android:background="@drawable/publish_layer"
+                android:src="@mipmap/mirror"
+                android:contentDescription="@string/mirror"
+                android:layout_width="48dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"/>
+        </LinearLayout>
     </FrameLayout>
 
     <include
