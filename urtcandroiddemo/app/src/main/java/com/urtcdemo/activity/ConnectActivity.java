@@ -72,7 +72,8 @@ public class ConnectActivity extends AppCompatActivity {
             return;
         }
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
-        startRoomActivity();
+//        startRoomActivity();
+        startLivingActivity();
 //        startRoomTextureActivity();
 //        startWebViewActivity();
     }
@@ -113,6 +114,7 @@ public class ConnectActivity extends AppCompatActivity {
                         Log.d(TAG, " appid " + mAppid);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
+
                         } else {
                             startRoomActivity();
 //                        startRoomTextureActivity();
@@ -270,6 +272,28 @@ public class ConnectActivity extends AppCompatActivity {
             }, 500);
         }
     }
+
+    private void startLivingActivity() {
+        if (!mStartSuccess) {
+            mStartSuccess = true;
+            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+            intent.putExtra("room_id", mRoomid);
+            String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
+            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
+            intent.putExtra("user_id", mUserId);
+            intent.putExtra("app_id", mAppid);
+            intent.putExtra("token", mRoomToken);
+            mMainHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(intent);
+                    finish();
+                    mStartSuccess = false;
+                }
+            }, 500);
+        }
+    }
+
 
     @Override
     public void onResume() {

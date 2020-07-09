@@ -66,6 +66,9 @@
             android:screenOrientation="landscape"
             android:hardwareAccelerated="true"></activity>
 
+        <activity android:name=".activity.UCloudRTCLiveActivity">
+        </activity>
+
         <activity
             android:name=".activity.SettingActivity"
             android:screenOrientation="portrait"></activity>
