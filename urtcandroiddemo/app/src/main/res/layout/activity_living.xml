@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="false"
+    android:fitsSystemWindows="true"
     android:clipToPadding="true">
 
     <FrameLayout
@@ -15,6 +15,7 @@
         android:background="@mipmap/video_off">
 
         <FrameLayout
+            android:id="@+id/title_bar"
             android:layout_width="match_parent"
             android:background="@color/color_7F04A5EB"
             android:layout_height="50dp">
@@ -61,18 +62,12 @@
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="51dp"
             android:layout_gravity="bottom" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_gravity="bottom"
-            android:background="@color/color_19000000"
-            android:layout_marginBottom="50dp"/>
-
         <LinearLayout
+            android:id="@+id/tool_bar"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@color/lsq_color_white"
+            android:layout_weight="1"
             android:layout_gravity="bottom">
             <ImageButton
                 android:id="@+id/img_btn_toggle_mic"
