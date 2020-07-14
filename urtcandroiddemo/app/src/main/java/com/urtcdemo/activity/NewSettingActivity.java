@@ -6,7 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -29,7 +28,7 @@ import java.util.regex.PatternSyntaxException;
 
 public class NewSettingActivity extends AppCompatActivity {
     private TextView mConfigTextView;
-    private int mSelectPos = 0;
+    private int mSelectPos = 1;
     private ArrayAdapter<String> mAdapter;
     private VideoProfilePopupWindow mSpinnerPopupWindow;
 
@@ -110,7 +109,7 @@ public class NewSettingActivity extends AppCompatActivity {
         int roomInt = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL.ordinal());
         mRoomType = UCloudRtcSdkRoomType.valueOf(roomInt);
 
-        mConfigTextView.setText(mDefaultConfiguration.get(1));
+        mConfigTextView.setText(mDefaultConfiguration.get(mSelectPos));
         mAdapter = new ArrayAdapter<String>(this, R.layout.videoprofile_item, mDefaultConfiguration);
 
         mSpinnerPopupWindow = new VideoProfilePopupWindow(this);

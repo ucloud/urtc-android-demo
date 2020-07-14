@@ -51,7 +51,7 @@ public class ConnectActivity extends AppCompatActivity {
     private String mAppid = "";
     private String mRoomToken = "";
     private View connectButton;
-    //private View exportButton;
+    private View exportButton;
     private ImageButton setButton;
     private TextView mTextSDKVersion;
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
@@ -101,6 +101,8 @@ public class ConnectActivity extends AppCompatActivity {
         mTextSDKVersion = findViewById(R.id.tv_sdk_version);
         mTextSDKVersion.setText(getString(R.string.app_name) + "\n" + UCloudRtcSdkEngine.getSdkVersion());
         connectButton = findViewById(R.id.connect_button);
+        exportButton = findViewById(R.id.log_output_button);
+
         connectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -169,7 +171,7 @@ public class ConnectActivity extends AppCompatActivity {
                 }
             }
         });
-/*        exportButton = findViewById(R.id.export_button);
+
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -191,7 +193,8 @@ public class ConnectActivity extends AppCompatActivity {
                 });
                 thread.start();
             }
-        });*/
+        });
+
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

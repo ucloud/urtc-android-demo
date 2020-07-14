@@ -1266,14 +1266,14 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         //user can chose the suitable type
 //        mOpBtn.setTag(OP_SEND_MSG);
 //        mOpBtn.setText("sendmsg");
-//        mOpBtn.setTag(OP_LOCAL_RECORD);
-//        mOpBtn.setText("lrecord");
+        mOpBtn.setTag(OP_LOCAL_RECORD);
+        mOpBtn.setText("lrecord");
 //        mOpBtn.setTag(OP_REMOTE_RECORD);
 //        mOpBtn.setText("record");
 //        mOpBtn.setTag(OP_MIX);
 //        mOpBtn.setText("mix");
-        mOpBtn.setTag(OP_MIX_MANUAL);
-        mOpBtn.setText("mix_manual");
+        //mOpBtn.setTag(OP_MIX_MANUAL);
+        //mOpBtn.setText("mix_manual");
         mAddDelBtn = findViewById(R.id.addDelBtn);
         mAddDelBtn.setText("add_st");
         mAddDelBtn.setVisibility(View.VISIBLE);
@@ -1367,7 +1367,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                             mAtomOpStart = true;
                             JSONArray jsonArray = new JSONArray();
                             jsonArray.put("");
-                            sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_BOTH,"rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
+                            //sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_BOTH,"rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
                         }
                         break;
                     case OP_MIX_MANUAL:
@@ -1400,7 +1400,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                             mAtomOpStart = true;
                             JSONArray jsonArray = new JSONArray();
                             jsonArray.put("");
-                            sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_BOTH,"rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
+                            //sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_BOTH,"rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
                         }
 //                    mVideoPlayer.start();
                         break;
@@ -1425,7 +1425,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                    } catch (JSONException e) {
                        e.printStackTrace();
                    }
-                   sdkEngine.addMixStream(info.getUId(), info.getMediaType().ordinal());
+                   //sdkEngine.addMixStream(info.getUId(), info.getMediaType().ordinal());
                }else{
                    mMixAddOrDel = true;
                    mAddDelBtn.setText("add_st");
@@ -1440,7 +1440,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                    } catch (JSONException e) {
                        e.printStackTrace();
                    }
-                   sdkEngine.delMixStream(info.getUId(), info.getMediaType().ordinal());
+                   //sdkEngine.delMixStream(info.getUId(), info.getMediaType().ordinal());
                }
             }
         });
@@ -1822,7 +1822,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
             UCloudRtcSdkEngine.onRGBCaptureResult(mUCloudRTCDataProvider);
         }
         sdkEngine.joinChannel(info);
-//        initRecordManager();
+        initRecordManager();
     }
 
     private void recycleBitmap(Bitmap bitmap){

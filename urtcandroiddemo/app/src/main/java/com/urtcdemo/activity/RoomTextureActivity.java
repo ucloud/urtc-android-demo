@@ -1017,7 +1017,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                             mAtomOpStart = true;
                             JSONArray jsonArray = new JSONArray();
                             jsonArray.put("");
-                            sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH,"rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
+                            //sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH,"rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
                         }
                         break;
                 }

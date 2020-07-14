@@ -262,5 +262,15 @@
     <string name="screen_title">屏幕共享</string>
     <string name="autopub_title">自动发布</string>
     <string name="autosub_title">自动订阅</string>
-    <string name="settings">设置</string>
+    <string name="settings">设置</string>op
+
+    <string name="start_mix">旁路推流</string>
+    <string name="mixing">推流中</string>
+    <string name="stop_mix">停止推流</string>
+    <string name="start_local_record">本地录制</string>
+    <string name="local_recording">本地录制中</string>
+    <string name="start_remote_record">远端录制</string>
+    <string name="remote_recording">远端录制中</string>
+    <string name="stop_record">停止录制</string>
+    <string name="screenshot">截图</string>
 </resources>
