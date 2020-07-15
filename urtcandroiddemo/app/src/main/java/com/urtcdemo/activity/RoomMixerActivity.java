@@ -177,6 +177,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private AppCompatSeekBar mSeekBar;
     private UcloudRtcCameraMixConfig mCameraMixConfig;
     private boolean synFlag = false;
+    private boolean changeRTSPFlag = false;
 
     /**
      * SDK视频录制对象
@@ -1569,6 +1570,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mIsPublished = false;
                 if (!mIsPublished) {
                     sdkEngine.setStreamRole(UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH);
                     List<Integer> results = new ArrayList<>();
@@ -1580,12 +1582,20 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                             break;
                         //视频
                         case CommonUtils.camera_capture_mode:
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true,false).getErrorCode());
                             break;
                         //屏幕捕捉
                         case CommonUtils.screen_capture_mode:
                             if (isScreenCaptureSupport) {
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
+                                if(changeRTSPFlag){
+                                    UcloudRtcCameraMixConfig.RTSP_URL = "rtsp://192.168.161.148:554/ch3";
+                                    sdkEngine.changeRTSPUrl();
+                                }else{
+                                    UcloudRtcCameraMixConfig.RTSP_URL = "rtsp://192.168.161.148:554/ch1";
+                                    results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true).getErrorCode());
+                                }
+
+                                changeRTSPFlag = !changeRTSPFlag;
                             } else {
                                 errorMessage.append("设备不支持屏幕捕捉\n");
                                 results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
@@ -1604,7 +1614,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                         //视频+屏幕捕捉
                         case CommonUtils.multi_capture_mode:
                             if (isScreenCaptureSupport) {
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true).getErrorCode());
                                 results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
                             } else {
                                 results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());

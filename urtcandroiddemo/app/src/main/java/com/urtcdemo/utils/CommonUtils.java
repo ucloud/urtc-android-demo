@@ -28,6 +28,7 @@ public class CommonUtils {
 
     public static final String RTSP_URL_KEY = "RTSP_URL_TEXT" ;
     public static final String RTST_URL = "rtsp://192.168.161.148:554/ch1";
+//    public static final String RTST_URL = "rtsp://192.168.0.105/ch1";
     public static final String APPID_KEY = "APPID_KEY";
     public static final String APP_ID = "URtc-h4r1txxy";
 

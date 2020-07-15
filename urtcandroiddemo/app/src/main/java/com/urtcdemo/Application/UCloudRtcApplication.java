@@ -75,7 +75,7 @@ public class UCloudRtcApplication extends Application {
         //无限重连
 //        UCloudRtcSdkEnv.setReConnectTimes(-1);
         //默认vp8编码，可以改成h264
-//        UCloudRtcSdkEnv.setEncodeMode(UcloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);
+//        UCloudRtcSdkEnv.setEncodeMode(UcloudRtcSdkPushEncode.);
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics outMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(outMetrics);
