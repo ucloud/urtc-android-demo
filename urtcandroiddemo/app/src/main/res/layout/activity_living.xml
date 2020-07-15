@@ -54,6 +54,23 @@
             android:layout_marginTop="50dp"
             android:layout_marginBottom="51dp"/>
 
+        <ImageView
+            android:id="@+id/mic_volume_img"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="top"
+            android:layout_marginTop="55dp"
+            android:src="@mipmap/mic_volume" />
+
+        <ImageView
+            android:id="@+id/sound_volume_img"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_gravity="top"
+            android:layout_marginTop="55dp"
+            android:layout_marginLeft="27dp"
+            android:src="@mipmap/sound_volume_01" />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/remoteGridView"
             android:layout_width="match_parent"

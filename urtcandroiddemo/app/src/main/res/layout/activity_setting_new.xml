@@ -9,18 +9,16 @@
         android:id="@+id/back_btn"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:layout_margin="16dp"
         android:background="@color/lsq_color_white"
-        android:src="@mipmap/back" />
+        android:src="@mipmap/back"/>
     <TextView
         android:id="@+id/setting_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
-        android:layout_margin="16dp"
+        android:layout_margin="18dp"
         android:textSize="24sp"
         android:textColor="@color/lsq_color_black"
         android:text="@string/settings"/>
@@ -40,6 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
+                android:layout_marginRight="30dp"
                 android:layout_marginEnd="30dp"
                 android:background="@drawable/oval_edit_text_background"
                 android:gravity="center_horizontal"

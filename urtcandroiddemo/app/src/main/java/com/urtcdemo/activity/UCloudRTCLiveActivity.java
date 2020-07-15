@@ -145,6 +145,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity {
     private ImageView mImgScreenshot;
     private ImageView mImgRemoteRecord;
     private TextView mTextRemoteRecord;
+    //音量图片
+    private ImageView soundVolumeImg = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -198,6 +200,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity {
         mImgScreenshot = findViewById(R.id.screenshot_pic);
         mImgRemoteRecord = findViewById(R.id.remote_record_pic);
         mTextRemoteRecord = findViewById(R.id.remote_record_text);
+        soundVolumeImg = findViewById(R.id.sound_volume_img);
 
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
@@ -772,6 +775,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     //localprocess.setProgress(volume);
+                    if (!mMuteMic) {
+                        setVolume(volume);
+                    }
                 }
             });
         }
@@ -1272,6 +1278,27 @@ public class UCloudRTCLiveActivity extends AppCompatActivity {
             Log.d(TAG, " stop mix: ");
             mAtomOpStart = true;
             sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH,"");
+        }
+    }
+
+    /**
+     * 根据音量大小设置录音时的音量动画
+     */
+    private void setVolume(int voiceValue) {
+        if (voiceValue < 15) {
+            soundVolumeImg.setImageResource(R.mipmap.sound_volume_01);
+        } else if (voiceValue > 15 && voiceValue < 30) {
+            soundVolumeImg.setImageResource(R.mipmap.sound_volume_02);
+        } else if (voiceValue > 30 && voiceValue < 45) {
+            soundVolumeImg.setImageResource(R.mipmap.sound_volume_03);
+        } else if (voiceValue > 45 && voiceValue < 60) {
+            soundVolumeImg.setImageResource(R.mipmap.sound_volume_04);
+        } else if (voiceValue > 60 && voiceValue < 75) {
+            soundVolumeImg.setImageResource(R.mipmap.sound_volume_05);
+        } else if (voiceValue > 75 && voiceValue < 90) {
+            soundVolumeImg.setImageResource(R.mipmap.sound_volume_06);
+        } else if (voiceValue > 100) {
+            soundVolumeImg.setImageResource(R.mipmap.sound_volume_07);
         }
     }
 }
