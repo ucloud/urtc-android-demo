@@ -40,7 +40,6 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMixProfile;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkNetWorkQuality;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordProfile;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStats;
@@ -60,7 +59,6 @@ import com.urtcdemo.utils.StatusBarUtils;
 import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
-import org.json.JSONArray;
 import org.webrtc.ucloud.record.URTCRecordManager;
 
 import java.io.File;

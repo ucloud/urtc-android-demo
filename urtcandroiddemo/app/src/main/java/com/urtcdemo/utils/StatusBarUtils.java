@@ -2,14 +2,10 @@ package com.urtcdemo.utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Build;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 
@@ -95,6 +91,15 @@ public class StatusBarUtils {
         }
     }
 
+    //修改状态栏文字颜色
+    public static void setAndroidNativeLightStatusBar(Activity activity, boolean dark) {
+        View decor = activity.getWindow().getDecorView();
+        if (dark) {
+            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        } else {
+            decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        }
+    }
 }
 
 

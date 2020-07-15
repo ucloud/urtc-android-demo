@@ -5,7 +5,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,6 +26,7 @@ import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.PermissionUtils;
+import com.urtcdemo.utils.StatusBarUtils;
 import com.urtcdemo.utils.ToastUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
@@ -102,6 +102,7 @@ public class ConnectActivity extends AppCompatActivity {
         mTextSDKVersion.setText(getString(R.string.app_name) + "\n" + UCloudRtcSdkEngine.getSdkVersion());
         connectButton = findViewById(R.id.connect_button);
         exportButton = findViewById(R.id.log_output_button);
+        StatusBarUtils.setAndroidNativeLightStatusBar(this,true);
 
         connectButton.setOnClickListener(new View.OnClickListener() {
             @Override

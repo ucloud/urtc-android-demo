@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
+import com.urtcdemo.utils.StatusBarUtils;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
 import com.urtcdemo.view.BaseSwitch;
 import com.urtcdemo.view.LSwitch;
@@ -108,6 +109,7 @@ public class NewSettingActivity extends AppCompatActivity {
         mSubScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
         int roomInt = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL.ordinal());
         mRoomType = UCloudRtcSdkRoomType.valueOf(roomInt);
+        StatusBarUtils.setAndroidNativeLightStatusBar(this,true);
 
         mConfigTextView.setText(mDefaultConfiguration.get(mSelectPos));
         mAdapter = new ArrayAdapter<String>(this, R.layout.videoprofile_item, mDefaultConfiguration);
