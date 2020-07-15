@@ -1091,6 +1091,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity {
     private void endCall() {
         sdkEngine.leaveChannel().ordinal();
         Intent intent = new Intent(UCloudRTCLiveActivity.this, ConnectActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         onMediaServerDisconnect();
         startActivity(intent);
         finish();
