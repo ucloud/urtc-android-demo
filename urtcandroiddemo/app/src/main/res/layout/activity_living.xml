@@ -12,7 +12,7 @@
         android:id="@+id/drawer_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@mipmap/video_off">
+        android:background="@mipmap/videooff">
 
         <FrameLayout
             android:id="@+id/title_bar"
@@ -47,7 +47,7 @@
             </ImageButton>
         </FrameLayout>
 
-        <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
+        <TextureView
             android:id="@+id/localvideoview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -55,21 +55,22 @@
             android:layout_marginBottom="51dp"/>
 
         <ImageView
-            android:id="@+id/mic_volume_img"
+            android:id="@+id/mic_status_img"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_gravity="top"
+            android:layout_gravity="right"
             android:layout_marginTop="55dp"
+            android:layout_marginEnd="14dp"
+            android:layout_marginRight="14dp"
             android:src="@mipmap/mic_volume" />
 
         <ImageView
             android:id="@+id/sound_volume_img"
             android:layout_width="wrap_content"
             android:layout_height="25dp"
-            android:layout_gravity="top"
+            android:layout_gravity="right"
             android:layout_marginTop="55dp"
-            android:layout_marginLeft="27dp"
-            android:src="@mipmap/sound_volume_01" />
+            android:src="@mipmap/sound_volume_01"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/remoteGridView"
@@ -110,8 +111,10 @@
                 android:contentDescription="@string/disconnect_call"
                 android:layout_width="32dp"
                 android:layout_height="fill_parent"
-                android:layout_marginLeft="24dp"
-                android:layout_marginRight="24dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
                 android:layout_centerInParent="true"
                 android:layout_weight="1"/>
 

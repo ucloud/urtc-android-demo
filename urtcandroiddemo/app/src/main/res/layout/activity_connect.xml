@@ -24,9 +24,10 @@
         android:layout_height="48dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:background="@color/lsq_color_transparent"
         android:layout_marginTop="8dp"
-        android:src="@mipmap/setting" />
+        android:src="@mipmap/setting"/>
 
     <ImageView
         android:id="@+id/userporta"

@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -75,19 +76,7 @@ public class NewSettingActivity extends AppCompatActivity {
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.app_name),
-                        Context.MODE_PRIVATE).edit();
-
-                editor.putString(CommonUtils.APPID_KEY, mAppid);
-                editor.putInt(CommonUtils.videoprofile, mSelectPos);
-                editor.putBoolean(CommonUtils.CAMERA_ENABLE, mEnableCamera);
-                editor.putBoolean(CommonUtils.MIC_ENABLE, mEnableMic);
-                editor.putBoolean(CommonUtils.SCREEN_ENABLE, mEnableScreen);
-                editor.putInt(CommonUtils.PUBLISH_MODE, mPublishMode);
-                editor.putInt(CommonUtils.SUBSCRIBE_MODE, mSubScribeMode);
-                editor.putInt(CommonUtils.SDK_CLASS_TYPE, mRoomType.ordinal());
-
-                editor.apply();
+                saveSettings();
                 finish();
             }
         });
@@ -169,6 +158,12 @@ public class NewSettingActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        saveSettings();
+    }
+
     public static String stringFilter(String str) throws PatternSyntaxException {
         // 只允许字母和数字
         // String   regEx  =  "[^a-zA-Z0-9]";
@@ -193,6 +188,22 @@ public class NewSettingActivity extends AppCompatActivity {
             mSpinnerPopupWindow.dismiss();
         }
     };
+
+    private void saveSettings() {
+        SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.app_name),
+                Context.MODE_PRIVATE).edit();
+
+        editor.putString(CommonUtils.APPID_KEY, mAppid);
+        editor.putInt(CommonUtils.videoprofile, mSelectPos);
+        editor.putBoolean(CommonUtils.CAMERA_ENABLE, mEnableCamera);
+        editor.putBoolean(CommonUtils.MIC_ENABLE, mEnableMic);
+        editor.putBoolean(CommonUtils.SCREEN_ENABLE, mEnableScreen);
+        editor.putInt(CommonUtils.PUBLISH_MODE, mPublishMode);
+        editor.putInt(CommonUtils.SUBSCRIBE_MODE, mSubScribeMode);
+        editor.putInt(CommonUtils.SDK_CLASS_TYPE, mRoomType.ordinal());
+
+        editor.apply();
+    }
 
 }
 

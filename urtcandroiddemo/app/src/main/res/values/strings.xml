@@ -273,4 +273,5 @@
     <string name="remote_recording">远端录制中</string>
     <string name="stop_record">停止录制</string>
     <string name="screenshot">截图</string>
+    <string name="pub_cancel">取消发布</string>
 </resources>
