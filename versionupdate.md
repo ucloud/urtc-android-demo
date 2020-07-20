@@ -1,7 +1,22 @@
 # Android SDK 版本说明
+## 1.7.8
+该版本发布于2020-7-20
+2020-7-17更新
+
+1.修改startRemoteView逻辑。
+
+2.修改leaveroom释放逻辑。
+
+3.合入webrtc官方改动（https://chromium.googlesource.com/webm/libvpx/+/343352b556f5f61833174c08a35d697d280933e3），解决长时间720p视频播放时会闪退的问题。
+
+4.注释部分native层打印。
+
+5.sdk修改混淆规则，避免混淆内部类。
+
+6.增加接口用于控制本地音频的录制和播放。
+
 ## 1.7.7
 该版本发布于2020-7-2
-2020-7-17更新
 
 1.解决传入Ip地址前两位大于等于128会报错的问题
 
@@ -25,13 +40,6 @@
 
 11.在业务层和信令层调用joinRoom时，增加判断条件authInfo里的内容是否为空
 
-12.修改startRemoteView逻辑。
-
-13.修改leaveroom释放逻辑。
-
-14.合入webrtc官方改动（https://chromium.googlesource.com/webm/libvpx/+/343352b556f5f61833174c08a35d697d280933e3），解决长时间720p视频播放时会闪退的问题。
-
-15.注释部分native层打印。
 
 ## 1.7.5
 该版本发布于2020-4-28
