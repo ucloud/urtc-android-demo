@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
  * @Describe
  */
 public class StatusBarUtils {
+    private static View mStatusView;
     /**
      * 设置状态栏颜色
      *
@@ -28,6 +29,7 @@ public class StatusBarUtils {
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             // 生成一个状态栏大小的矩形
             View statusView = createStatusView(activity, color);
+            mStatusView = statusView;
             // 添加 statusView 到布局中
             ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
             decorView.addView(statusView);
@@ -99,6 +101,27 @@ public class StatusBarUtils {
         } else {
             decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         }
+    }
+
+    public static void addStatusView(Activity activity) {
+            // 添加 statusView 到布局中
+            ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
+            decorView.addView(mStatusView);
+            // 设置根布局的参数
+            ViewGroup rootView = (ViewGroup) ((ViewGroup) activity.findViewById(android.R.id.content)).getChildAt(0);
+            rootView.setFitsSystemWindows(true);
+            rootView.setClipToPadding(true);
+
+    }
+
+    public static void removeStatusView(Activity activity) {
+            // 移除 statusView 到布局中
+            ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
+            decorView.removeView(mStatusView);
+            // 设置根布局的参数
+            ViewGroup rootView = (ViewGroup) ((ViewGroup) activity.findViewById(android.R.id.content)).getChildAt(0);
+            rootView.setFitsSystemWindows(true);
+            rootView.setClipToPadding(true);
     }
 }
 

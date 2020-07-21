@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
@@ -22,9 +23,6 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
-import android.view.animation.TranslateAnimation;
 import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -164,6 +162,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            decorView.setSystemUiVisibility(uiOptions);
         }
 
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
@@ -1213,17 +1215,13 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
 
     public void toggleFullScreen() {
         if (!mLocalViewFullScreen) {
-            //动画效果，隐藏底部工具栏
-            TranslateAnimation mHiddenAction = new TranslateAnimation(
-                    Animation.RELATIVE_TO_SELF,0.0f,
-                    Animation.RELATIVE_TO_SELF,0.0f,
-                    Animation.RELATIVE_TO_SELF,0.0f,
-                    Animation.RELATIVE_TO_SELF,1.0f);
-            mHiddenAction.setDuration(500);
-            mToolBar.startAnimation(mHiddenAction);
+            setSystemUIVisible(false);
+            //隐藏顶部标题和底部工具栏
+            mTitleBar.setVisibility(View.GONE);
             mToolBar.setVisibility(View.GONE);
-            //视频全屏显示
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(screenWidth, screenHeight);
+            StatusBarUtils.removeStatusView(this);
+
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(screenWidth, screenHeight + mToolBar.getHeight());
             params.setMargins(0, 0, 0, 0);
             mLocalVideoView.setLayoutParams(params);
             //抽屉随回显拉长
@@ -1234,23 +1232,17 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
             mImgSoundVolume.setVisibility(View.INVISIBLE);
             mImgMicSts.setVisibility(View.INVISIBLE);
             Log.d(TAG, "Switch full screen width: " + params.width + " height: " + params.height);
-            Log.d(TAG, "Switch origin width: " + localViewWidth + " height: " + localViewHeight);
-
         }
         else {
+            setSystemUIVisible(true);
             //退出全屏
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(localViewWidth, localViewHeight);
             params.setMargins(0, mTitleBar.getHeight(), 0, mToolBar.getHeight());
             mLocalVideoView.setLayoutParams(params);
-            //动画效果，显示底部工具栏
-            TranslateAnimation mShowAction = new TranslateAnimation(
-                    Animation.RELATIVE_TO_SELF, 0.0f,
-                    Animation.RELATIVE_TO_SELF, 0.0f,
-                    Animation.RELATIVE_TO_SELF, 1.0f,
-                    Animation.RELATIVE_TO_SELF, 0.0f);
-            mShowAction.setDuration(100);
-            mToolBar.startAnimation(mShowAction);
+            //显示顶部标题和底部工具栏
+            mTitleBar.setVisibility(View.VISIBLE);
             mToolBar.setVisibility(View.VISIBLE);
+            StatusBarUtils.addStatusView(this);
             //抽屉菜单还原
             DrawerLayout.LayoutParams dl_params = (DrawerLayout.LayoutParams) mDrawerMenu.getLayoutParams();
             dl_params.topMargin = mTitleBar.getHeight();
@@ -1423,5 +1415,28 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
 
     }
 
+    private void setSystemUIVisible(boolean show) {
+        if (show) {
+/*            int uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            uiFlags |= 0x00001000;
+            getWindow().getDecorView().setSystemUiVisibility(uiFlags);*/
+
+
+            final WindowManager.LayoutParams attrs = getWindow().getAttributes();
+            attrs.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().setAttributes(attrs);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        } else {
+/*            int uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN;
+            uiFlags |= 0x00001000;
+            getWindow().getDecorView().setSystemUiVisibility(uiFlags);*/
+
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+    }
 }
 

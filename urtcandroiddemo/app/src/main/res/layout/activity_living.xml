@@ -14,6 +14,11 @@
         android:layout_height="match_parent"
         android:background="@mipmap/videooff">
 
+        <TextureView
+            android:id="@+id/localvideoview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
         <FrameLayout
             android:id="@+id/title_bar"
             android:layout_width="match_parent"
@@ -46,13 +51,6 @@
                 android:layout_height="50dp">
             </ImageButton>
         </FrameLayout>
-
-        <TextureView
-            android:id="@+id/localvideoview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="50dp"
-            android:layout_marginBottom="51dp"/>
 
         <ImageView
             android:id="@+id/mic_status_img"
