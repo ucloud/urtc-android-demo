@@ -164,7 +164,7 @@ public class SettingActivity extends AppCompatActivity {
                 editor.putInt(CommonUtils.capture_mode, mCaptureMode);
                 editor.putString(CommonUtils.APPID_KEY, mAppid);
                 editor.putInt(CommonUtils.PUBLISH_MODE, mPublishMode);
-                editor.putInt(CommonUtils.SCRIBE_MODE, mScribeMode);
+                editor.putInt(CommonUtils.SUBSCRIBE_MODE, mScribeMode);
                 editor.putInt(CommonUtils.SDK_STREAM_ROLE, mRole.ordinal());
                 editor.putInt(CommonUtils.SDK_CLASS_TYPE, mRoomType.ordinal());
                 editor.putBoolean(CommonUtils.SDK_SUPPORT_MIX, mSupportMix);
@@ -226,7 +226,7 @@ public class SettingActivity extends AppCompatActivity {
                 break;
         }
 
-        mScribeMode = preferences.getInt(CommonUtils.SCRIBE_MODE, CommonUtils.AUTO_MODE);
+        mScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
         switch (mScribeMode) {
             case CommonUtils.AUTO_MODE:
                 mRBScribeAuto.setChecked(true);

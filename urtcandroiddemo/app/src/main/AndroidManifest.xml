@@ -36,7 +36,8 @@
             android:name=".activity.ConnectActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan">
+            android:windowSoftInputMode="adjustPan"
+            android:launchMode="standard">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -59,28 +60,52 @@
 
         <activity
             android:name=".activity.RoomActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait">
+
+        </activity>
 
         <activity
             android:name=".activity.RoomTextureActivity"
             android:screenOrientation="landscape"
-            android:hardwareAccelerated="true"></activity>
+            android:hardwareAccelerated="true">
+
+        </activity>
+
+        <activity
+            android:name=".activity.UCloudRTCLiveActivity"
+            android:screenOrientation="portrait">
+            android:launchMode="singleTop">
+        </activity>
 
         <activity
             android:name=".activity.SettingActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait">
+
+        </activity>
 
         <activity
-            android:name=".activity.WebViewActivity"
-            android:screenOrientation="portrait"></activity>
+            android:name=".activity.NewSettingActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop">
 
-        <service android:name=".service.UCloudRtcForeGroundService"></service>
+        </activity>
+        <activity
+            android:name=".activity.WebViewActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
+
+        <service android:name=".service.UCloudRtcForeGroundService">
+
+        </service>
 
         <service
             android:name="com.ucloudrtclib.monitor.MonitorService"
             android:enabled="true"
             android:exported="true"
-            android:process=":remote"></service>
+            android:process=":remote">
+
+        </service>
     </application>
 
 </manifest>

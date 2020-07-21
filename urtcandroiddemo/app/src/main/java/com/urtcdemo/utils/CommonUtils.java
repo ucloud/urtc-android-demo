@@ -16,10 +16,17 @@ public class CommonUtils {
     public static final int AUTO_MODE = 0;
     public static final int MANUAL_MODE = 1;
 
+    public static final boolean CAMERA_ON = true;
+    public static final boolean SCREEN_OFF = false;
+    public static final boolean MIC_ON = true;
+
     public static final String videoprofile = "videoprofile";
     public static final String capture_mode = "capturemode";
+    public static final String CAMERA_ENABLE = "CAMERA_ENABLE";
+    public static final String MIC_ENABLE = "MIC_ENABLE";
+    public static final String SCREEN_ENABLE = "SCREEN_ENABLE";
     public static final String PUBLISH_MODE = "PUBLISH_MODE";
-    public static final String SCRIBE_MODE = "SCRIBE_MODE";
+    public static final String SUBSCRIBE_MODE = "SUBSCRIBE_MODE";
     public static final String SDK_STREAM_ROLE = "SDK_STREAM_ROLE";
     public static final String SDK_CLASS_TYPE = "SDK_CLASS_TYPE";
     public static final String SDK_SUPPORT_MIX = "SDK_SUPPORT_MIX";

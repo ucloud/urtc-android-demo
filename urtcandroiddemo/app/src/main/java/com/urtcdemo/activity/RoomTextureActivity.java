@@ -1017,7 +1017,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                             mAtomOpStart = true;
                             JSONArray jsonArray = new JSONArray();
                             jsonArray.put("");
-                            sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH,"rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
+                            //sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH,"rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
                         }
                         break;
                 }
@@ -1227,7 +1227,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
 //        mPublishMode = 1;
 //        sdkEngine.setAutoPublish(false);
-        mScribeMode = preferences.getInt(CommonUtils.SCRIBE_MODE, CommonUtils.AUTO_MODE);
+        mScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
         if (mScribeMode == CommonUtils.AUTO_MODE) {
             mStreamSelect.setVisibility(View.GONE);
         } else {
