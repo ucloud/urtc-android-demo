@@ -17,6 +17,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -115,7 +116,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 
     TextView title = null;
     //    UCloudRtcSdkSurfaceVideoView localrenderview = null;
-    UCloudRtcRenderView localrenderview = null;
+//    UCloudRtcRenderView localrenderview = null;
+    TextureView localrenderview;
     UCloudRtcRenderView remoteRenderView = null;
     UCloudRtcRenderView mRtspView1 = null;
     UCloudRtcRenderView mRtspView2 = null;
@@ -174,7 +176,10 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private UCloudRtcSdkMediaType mPublishMediaType;
     private VideoPlayer mVideoPlayer;
     private UCloudRtcRenderView mRemoteRenderView;
-    private UCloudRtcRenderView mTestRenderView;
+//    private UCloudRtcRenderView mTestRenderView;
+    private TextureView mTestRenderView;
+
+
     private boolean bigVolume = true;
     private FrameLayout testT, testB;
     private AppCompatSeekBar mSeekBar;
@@ -613,7 +618,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                         if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
                             if (!sdkEngine.isAudioOnlyMode()) {
                                 localrenderview.setVisibility(View.VISIBLE);
-                                localrenderview.setBackgroundColor(Color.TRANSPARENT);
+//                                localrenderview.setBackgroundColor(Color.TRANSPARENT);
 //                                localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
                                 sdkEngine.startPreview(info.getMediaType(),
                                         localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
@@ -753,12 +758,14 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //                            sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
 //                            sdkEngine.startRemoteView(info, localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
                             mRemoteStreamInfo = info;
-                            if (mTestRenderView == null) {
-                                mTestRenderView = new UCloudRtcRenderView(getApplicationContext());
-                                mTestRenderView.setZOrderMediaOverlay(true);
-                                mViewGroup.addView(mTestRenderView);
-                            }
-                            mTestRenderView.init();
+//                            if (mTestRenderView == null) {
+//                                mTestRenderView = new UCloudRtcRenderView(getApplicationContext());
+//                                mTestRenderView.setZOrderMediaOverlay(true);
+//                                mViewGroup.addView(mTestRenderView);
+//                            }
+                            sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+                            localrenderview.setVisibility(View.INVISIBLE);
+                            mTestRenderView.setVisibility(View.VISIBLE);
                             sdkEngine.startRemoteView(info, mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                             swapSurface = true;
                             return ;
@@ -1309,7 +1316,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     }
 
     private void onMediaServerDisconnect() {
-        localrenderview.release();
+//        localrenderview.release();
         clearGridItem();
 //        UCloudRtcSdkEngine.destory();
     }
@@ -1732,9 +1739,9 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         localrenderview = findViewById(R.id.LocalMixView);
 //        localrenderview.init(true, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
 //        localrenderview.init(true);
-        localrenderview.init();
+//        localrenderview.init();
 //        localrenderview.setZOrderMediaOverlay(false);
-        localrenderview.setMirror(false);
+//        localrenderview.setMirror(false);
         remoteRenderView = findViewById(R.id.RemoteMixView);
         mViewGroup = findViewById(R.id.parent_swap);
         mHdmiView = findViewById(R.id.HDMIView);
@@ -1831,8 +1838,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 
 //        mTestRenderView.setZOrderOnTop(true);
         mTestRenderView = findViewById(R.id.TestRemoteView);
-        mTestRenderView.setZOrderMediaOverlay(true);
-        mTestRenderView.init();
+//        mTestRenderView.setZOrderMediaOverlay(true);
+//        mTestRenderView.init();
         mCameraMixConfig = new UcloudRtcCameraMixConfig();
         mCameraMixConfig.HDMI_ENCODE = true;
         mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;
@@ -1881,16 +1888,24 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //                sdkEngine.switchMixView();
                 if(swapSurface){
                       sdkEngine.stopRemoteView(mRemoteStreamInfo);
-                      mTestRenderView.release();
-                      mViewGroup.removeView(mTestRenderView);
-                      mTestRenderView = null;
+//                      mTestRenderView.release();
+//                      mViewGroup.removeView(mTestRenderView);
+//                      mTestRenderView = null;
+                    mTestRenderView.setVisibility(View.INVISIBLE);
+                    localrenderview.setVisibility(View.VISIBLE);
+                    sdkEngine.startPreview(mLocalStreamInfo.getMediaType(),
+                            localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
                       swapSurface = false;
                 }else{
-                    mTestRenderView = new UCloudRtcRenderView(getApplicationContext());
-                    mTestRenderView.init();
-                    mTestRenderView.setZOrderMediaOverlay(true);
-                    mViewGroup.addView(mTestRenderView);
+//                    mTestRenderView = new UCloudRtcRenderView(getApplicationContext());
+//                    mTestRenderView.init();
+//                    mTestRenderView.setZOrderMediaOverlay(true);
+//                    mViewGroup.addView(mTestRenderView);
+                    sdkEngine.stopRemoteView(mLocalStreamInfo);
+                    localrenderview.setVisibility(View.INVISIBLE);
+                    mTestRenderView.setVisibility(View.VISIBLE);
                     sdkEngine.startRemoteView(mRemoteStreamInfo, mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+
                     swapSurface = true;
                 }
             }
@@ -2185,7 +2200,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     protected void onDestroy() {
         Log.d(TAG, "activity destory");
         super.onDestroy();
-        localrenderview.release();
+//        localrenderview.release();
         clearGridItem();
         mVideoAdapter.setRemoveRemoteStreamReceiver(null);
         mUCloudRTCDataProvider.releaseBuffer();
