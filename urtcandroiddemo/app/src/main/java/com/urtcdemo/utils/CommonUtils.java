@@ -39,6 +39,8 @@ public class CommonUtils {
 //    public static final String APP_ID = "urtc-b52rd1v1";
 //    public static final String SEC_KEY = "7bd281bee6edb5d0eb2a5766c95269ef";
 
+
+
     @IntDef({AUTO_MODE, MANUAL_MODE})
     public @interface  PubScribeMode {}
 }

@@ -32,12 +32,20 @@
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="0.5" >
+                        android:layout_weight="0.5"
+                        android:id="@+id/parent_swap">
 
                         <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
                             android:id="@+id/LocalMixView"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
+
+                        <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
+                            android:id="@+id/TestRemoteView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+
+
                     </FrameLayout>
 
                     <FrameLayout

@@ -18,6 +18,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
@@ -154,6 +155,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     boolean isScreenCaptureSupport;
     private List<UCloudRtcSdkStreamInfo> mSteamList;
     private UCloudRtcSdkStreamInfo mLocalStreamInfo;
+    private UCloudRtcSdkStreamInfo mRemoteStreamInfo;
     private boolean mRemoteVideoMute;
     private boolean mRemoteAudioMute;
     private UCloudRtcSdkSurfaceVideoView mMuteView = null;
@@ -172,14 +174,17 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private UCloudRtcSdkMediaType mPublishMediaType;
     private VideoPlayer mVideoPlayer;
     private UCloudRtcRenderView mRemoteRenderView;
+    private UCloudRtcRenderView mTestRenderView;
     private boolean bigVolume = true;
     private FrameLayout testT, testB;
     private AppCompatSeekBar mSeekBar;
     private UcloudRtcCameraMixConfig mCameraMixConfig;
     private boolean synFlag = false;
     private boolean changeRTSPFlag = false;
-    private String RTSP_BACKUP_URL = "rtsp://192.168.161.148:554/ch3";
-//    private String RTSP_BACKUP_URL = "rtsp://192. 168.1.200/ch1";
+    private boolean swapSurface = false;
+    private ViewGroup mViewGroup;
+//    private String RTSP_BACKUP_URL = "rtsp://192.168.161.148:554/ch3";
+    private String RTSP_BACKUP_URL = "rtsp://192.168.1.200/ch1";
 
     /**
      * SDK视频录制对象
@@ -744,9 +749,26 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                 @Override
                 public void run() {
                     if (code == 0) {
+                        if(info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN){
+//                            sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+//                            sdkEngine.startRemoteView(info, localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+                            mRemoteStreamInfo = info;
+                            if (mTestRenderView == null) {
+                                mTestRenderView = new UCloudRtcRenderView(getApplicationContext());
+                                mTestRenderView.setZOrderMediaOverlay(true);
+                                mViewGroup.addView(mTestRenderView);
+                            }
+                            mTestRenderView.init();
+                            sdkEngine.startRemoteView(info, mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                            swapSurface = true;
+                            return ;
+                        }
+//                        if(info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO){
+//                            return;
+//                        }
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo(null);
-//                        UCloudRtcRenderView videoView = null;
-                        UCloudRtcSdkSurfaceVideoView videoView = null;
+                        UCloudRtcRenderView videoView = null;
+//                        UCloudRtcSdkSurfaceVideoView videoView = null;
                         Log.d(TAG, " subscribe info: " + info);
                         if (info.isHasVideo()) {
                             //外部扩展输出，和默认输出二选一
@@ -756,20 +778,20 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //                            sdkEngine.startRemoteView(info, videoViewCallBack);
 
 //                             UCloudRtcSdkSurfaceVideoView 定义的viewgroup,内含UcloudRtcRenderView
-                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
-                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
-                            videoView.setTag(info);
-                            videoView.setId(R.id.video_view);
+//                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
+//                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
+//                            videoView.setTag(info);
+//                            videoView.setId(R.id.video_view);
                             //设置交换
 //                            videoView.setOnClickListener(mSwapRemoteLocalListener);
 //                            //远端截图
-                            videoView.setOnClickListener(mScreenShotOnClickListener);
+//                            videoView.setOnClickListener(mScreenShotOnClickListener);
 
                             //自定义的surfaceview
-//                            videoView = new UCloudRtcRenderView(getApplicationContext());
-//                            videoView.init();
-//                            videoView.setTag(info);
-//                            videoView.setOnClickListener(mScreenShotOnClickListener);
+                            videoView = new UCloudRtcRenderView(getApplicationContext());
+                            videoView.init();
+                            videoView.setTag(info);
+                            videoView.setOnClickListener(mScreenShotOnClickListener);
 //                            mRemoteRenderView = new UCloudRtcRenderView(getApplicationContext());
 //                            mRemoteRenderView.setLayoutParams(new ViewGroup.LayoutParams(-1,-1));
 //                            testT.addView(mRemoteRenderView);
@@ -1711,9 +1733,10 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //        localrenderview.init(true, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
 //        localrenderview.init(true);
         localrenderview.init();
-        localrenderview.setZOrderMediaOverlay(false);
+//        localrenderview.setZOrderMediaOverlay(false);
         localrenderview.setMirror(false);
         remoteRenderView = findViewById(R.id.RemoteMixView);
+        mViewGroup = findViewById(R.id.parent_swap);
         mHdmiView = findViewById(R.id.HDMIView);
         localprocess = findViewById(R.id.processlocal);
         isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture();
@@ -1805,6 +1828,11 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         info.setUId(mUserid);
         Log.d(TAG, " roomtoken = " + mRoomToken);
 //        UCloudRtcSdkEnv.setRTSPURL("rtsp://192.168.161.148:554/ch1");
+
+//        mTestRenderView.setZOrderOnTop(true);
+        mTestRenderView = findViewById(R.id.TestRemoteView);
+        mTestRenderView.setZOrderMediaOverlay(true);
+        mTestRenderView.init();
         mCameraMixConfig = new UcloudRtcCameraMixConfig();
         mCameraMixConfig.HDMI_ENCODE = true;
         mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;
@@ -1850,7 +1878,21 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mSwitchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sdkEngine.switchMixView();
+//                sdkEngine.switchMixView();
+                if(swapSurface){
+                      sdkEngine.stopRemoteView(mRemoteStreamInfo);
+                      mTestRenderView.release();
+                      mViewGroup.removeView(mTestRenderView);
+                      mTestRenderView = null;
+                      swapSurface = false;
+                }else{
+                    mTestRenderView = new UCloudRtcRenderView(getApplicationContext());
+                    mTestRenderView.init();
+                    mTestRenderView.setZOrderMediaOverlay(true);
+                    mViewGroup.addView(mTestRenderView);
+                    sdkEngine.startRemoteView(mRemoteStreamInfo, mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                    swapSurface = true;
+                }
             }
         });
 //        //普通摄像头捕获方式，与扩展模式二选一

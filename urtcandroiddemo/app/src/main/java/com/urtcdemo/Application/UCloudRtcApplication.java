@@ -5,6 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.media.MediaCodecInfo;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -64,10 +65,12 @@ public class UCloudRtcApplication extends Application {
         UCloudRtcSdkEnv.setWriteToLogCat(true);
         UCloudRtcSdkEnv.setLogReport(true);
         UCloudRtcSdkEnv.setEncodeMode(UCloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);
+        UCloudRtcSdkEnv.setMediaCodecBitRateMode(MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
         UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo);
         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
         UCloudRtcSdkEnv.setReConnectTimes(60);
         UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.SEC_KEY);
+
 //        UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_LANDSCAPE_MODE);
         //私有化部署
 //        UCloudRtcSdkEnv.setPrivateDeploy(true);
