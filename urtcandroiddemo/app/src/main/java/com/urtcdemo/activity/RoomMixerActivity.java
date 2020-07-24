@@ -116,8 +116,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 
     TextView title = null;
     //    UCloudRtcSdkSurfaceVideoView localrenderview = null;
-//    UCloudRtcRenderView localrenderview = null;
-    TextureView localrenderview;
+    UCloudRtcRenderView localrenderview = null;
+//    TextureView localrenderview;
     UCloudRtcRenderView remoteRenderView = null;
     UCloudRtcRenderView mRtspView1 = null;
     UCloudRtcRenderView mRtspView2 = null;
@@ -176,8 +176,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private UCloudRtcSdkMediaType mPublishMediaType;
     private VideoPlayer mVideoPlayer;
     private UCloudRtcRenderView mRemoteRenderView;
-//    private UCloudRtcRenderView mTestRenderView;
-    private TextureView mTestRenderView;
+    private UCloudRtcRenderView mTestRenderView;
+//    private TextureView mTestRenderView;
 
 
     private boolean bigVolume = true;
@@ -187,6 +187,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private boolean synFlag = false;
     private boolean changeRTSPFlag = false;
     private boolean swapSurface = false;
+    private boolean preview = false;
     private ViewGroup mViewGroup;
 //    private String RTSP_BACKUP_URL = "rtsp://192.168.161.148:554/ch3";
     private String RTSP_BACKUP_URL = "rtsp://192.168.1.200/ch1";
@@ -613,6 +614,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //                        ToastUtils.shortShow(RoomActivity.this, "发布视频成功");
                         mPublish.setImageResource(R.drawable.unpublish);
                         mIsPublished = true;
+                        preview = true;
                         int mediatype = info.getMediaType().ordinal();
                         mPublishMediaType = UCloudRtcSdkMediaType.matchValue(mediatype);
                         if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
@@ -623,6 +625,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                 sdkEngine.startPreview(info.getMediaType(),
                                         localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
 
+                                sdkEngine.startPreview(info.getMediaType(),
+                                        mRemoteRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
 //                                UCloudRtcRenderView renderView = new UCloudRtcRenderView(RoomActivity.this);
 //                                FrameLayout frameLayout = findViewById(R.id.local_parent);
 //                                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(150,150);
@@ -763,9 +767,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //                                mTestRenderView.setZOrderMediaOverlay(true);
 //                                mViewGroup.addView(mTestRenderView);
 //                            }
-                            sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
-                            localrenderview.setVisibility(View.INVISIBLE);
-                            mTestRenderView.setVisibility(View.VISIBLE);
+//                            mTestRenderView.setVisibility(View.VISIBLE);
                             sdkEngine.startRemoteView(info, mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                             swapSurface = true;
                             return ;
@@ -1680,18 +1682,30 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //                        ToastUtils.shortShow(RoomMixerActivity.this, "发布");
                     }
                 } else {
-                    if(mCaptureMode == CommonUtils.screen_capture_mode || mCaptureMode == CommonUtils.multi_capture_mode){
-                        if(!changeRTSPFlag){
-                            String rtspurl = preferences.getString(CommonUtils.RTSP_URL_KEY, "rtsp://192.168.161.148:554/ch1");
-                            UcloudRtcCameraMixConfig.RTSP_URL = rtspurl;
-                            sdkEngine.changeRTSPUrl();
-                            ToastUtils.shortShow(RoomMixerActivity.this,UcloudRtcCameraMixConfig.RTSP_URL);
-                        }else{
-                            UcloudRtcCameraMixConfig.RTSP_URL = RTSP_BACKUP_URL;
-                            sdkEngine.changeRTSPUrl();
-                            ToastUtils.shortShow(RoomMixerActivity.this,UcloudRtcCameraMixConfig.RTSP_URL);
-                        }
-                        changeRTSPFlag = !changeRTSPFlag;
+//                    if(mCaptureMode == CommonUtils.screen_capture_mode || mCaptureMode == CommonUtils.multi_capture_mode){
+//                        if(!changeRTSPFlag){
+//                            String rtspurl = preferences.getString(CommonUtils.RTSP_URL_KEY, "rtsp://192.168.161.148:554/ch1");
+//                            UcloudRtcCameraMixConfig.RTSP_URL = rtspurl;
+//                            sdkEngine.changeRTSPUrl();
+//                            ToastUtils.shortShow(RoomMixerActivity.this,UcloudRtcCameraMixConfig.RTSP_URL);
+//                        }else{
+//                            UcloudRtcCameraMixConfig.RTSP_URL = RTSP_BACKUP_URL;
+//                            sdkEngine.changeRTSPUrl();
+//                            ToastUtils.shortShow(RoomMixerActivity.this,UcloudRtcCameraMixConfig.RTSP_URL);
+//                        }
+//                        changeRTSPFlag = !changeRTSPFlag;
+//                    }
+                    if(preview){
+//                        sdkEngine.stopPreview(mPublishMediaType);
+//                        sdkEngine.stopPreview(mPublishMediaType,localrenderview);
+                        sdkEngine.stopPreview(mPublishMediaType,mRemoteRenderView);
+                        preview = false;
+                    } else{
+//                        sdkEngine.startPreview(mPublishMediaType,
+//                                localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+                        sdkEngine.startPreview(mPublishMediaType,
+                                mRemoteRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+                        preview = true;
                     }
                 }
             }
@@ -1739,10 +1753,9 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         localrenderview = findViewById(R.id.LocalMixView);
 //        localrenderview.init(true, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
 //        localrenderview.init(true);
-//        localrenderview.init();
+        localrenderview.init();
 //        localrenderview.setZOrderMediaOverlay(false);
 //        localrenderview.setMirror(false);
-        remoteRenderView = findViewById(R.id.RemoteMixView);
         mViewGroup = findViewById(R.id.parent_swap);
         mHdmiView = findViewById(R.id.HDMIView);
         localprocess = findViewById(R.id.processlocal);
@@ -1838,8 +1851,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 
 //        mTestRenderView.setZOrderOnTop(true);
         mTestRenderView = findViewById(R.id.TestRemoteView);
-//        mTestRenderView.setZOrderMediaOverlay(true);
-//        mTestRenderView.init();
+        mTestRenderView.setZOrderMediaOverlay(true);
+        mTestRenderView.init();
         mCameraMixConfig = new UcloudRtcCameraMixConfig();
         mCameraMixConfig.HDMI_ENCODE = true;
         mCameraMixConfig.mixMode = UcloudRtcCameraMixConfig.MixMode.MIX_RTSP_HDMI;

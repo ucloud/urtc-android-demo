@@ -30,14 +30,8 @@ public class CommonUtils {
     public static final String RTST_URL = "rtsp://192.168.161.148:554/ch1";
 //    public static final String RTST_URL = "rtsp://192.168.0.105/ch1";
     public static final String APPID_KEY = "APPID_KEY";
-//    public static final String APP_ID = "URtc-h4r1txxy";
-//    public static final String SEC_KEY = "9129304dbf8c5c4bf68d70824462409f";
-    public static final String APP_ID = "urtc-mxr2seet";
-    public static final String SEC_KEY = "f48b1dd672ed41ee9101100bc091304d";
-//    public static final String APP_ID = "urtc-sonv3xgi";
-//    public static final String SEC_KEY = "463fb1e9f967160afae8d8ada69fbe17";
-//    public static final String APP_ID = "urtc-b52rd1v1";
-//    public static final String SEC_KEY = "7bd281bee6edb5d0eb2a5766c95269ef";
+    public static final String APP_ID = "URtc-h4r1txxy";
+    public static final String SEC_KEY = "9129304dbf8c5c4bf68d70824462409f";
 
 
 
