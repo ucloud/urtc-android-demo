@@ -142,6 +142,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     TextView mAddDelBtn = null;
     TextView mSynBtn = null;
     TextView mSwitchBtn = null;
+    TextView mUnPublishBtn = null;
     CheckBox mCheckBoxMirror = null;
     private SteamScribePopupWindow mSpinnerPopupWindowScribe;
     private View mStreamSelect;
@@ -189,8 +190,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private boolean swapSurface = false;
     private boolean preview = false;
     private ViewGroup mViewGroup;
-//    private String RTSP_BACKUP_URL = "rtsp://192.168.161.148:554/ch3";
-    private String RTSP_BACKUP_URL = "rtsp://192.168.1.200/ch1";
+    private String RTSP_BACKUP_URL = "rtsp://192.168.161.148:554/ch3";
+//    private String RTSP_BACKUP_URL = "rtsp://192.168.1.200/ch1";
 
     /**
      * SDK视频录制对象
@@ -1407,6 +1408,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mAddDelBtn.setVisibility(View.GONE);
         mSynBtn = findViewById(R.id.syn);
         mSwitchBtn = findViewById(R.id.swap);
+        mUnPublishBtn = findViewById(R.id.unpublish);
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -1599,14 +1601,15 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         });
         ((SteamScribePopupWindow) mSpinnerPopupWindowScribe).setmOnSubScribeListener(mOnSubscribeListener);
         //手动发布
-        mPublish = findViewById(R.id.button_call_pub);
-        mPublish.setOnLongClickListener(new View.OnLongClickListener() {
+
+        mUnPublishBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                sdkEngine.unPublish(mPublishMediaType);
-                return false;
+            public void onClick(View v) {
+//                sdkEngine.unPublish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+                sdkEngine.unPublish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN);
             }
         });
+        mPublish = findViewById(R.id.button_call_pub);
         mPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1630,8 +1633,14 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                     Log.d(TAG,"publish screen rtsp "+ UcloudRtcCameraMixConfig.RTSP_URL);
                                     ToastUtils.shortShow(RoomMixerActivity.this,"publish screen "+ UcloudRtcCameraMixConfig.RTSP_URL);
                                     results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true).getErrorCode());
+                                }else{
+                                    UcloudRtcCameraMixConfig.RTSP_URL = RTSP_BACKUP_URL;
+                                    Log.d(TAG,"publish screen rtsp "+ UcloudRtcCameraMixConfig.RTSP_URL);
+                                    ToastUtils.shortShow(RoomMixerActivity.this,"publish screen "+ UcloudRtcCameraMixConfig.RTSP_URL);
+                                    results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true).getErrorCode());
                                 }
                                 changeRTSPFlag = !changeRTSPFlag;
+
                             } else {
                                 errorMessage.append("设备不支持屏幕捕捉\n");
                                 results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
@@ -1650,6 +1659,11 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                         case CommonUtils.multi_capture_mode:
                             if (isScreenCaptureSupport) {
                                 if(!changeRTSPFlag){
+                                    Log.d(TAG,"publish multi screen rtsp "+ UcloudRtcCameraMixConfig.RTSP_URL);
+                                    ToastUtils.shortShow(RoomMixerActivity.this," publish multi screen rtsp " + UcloudRtcCameraMixConfig.RTSP_URL);
+                                    results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true).getErrorCode());
+                                }else{
+                                    UcloudRtcCameraMixConfig.RTSP_URL = RTSP_BACKUP_URL;
                                     Log.d(TAG,"publish multi screen rtsp "+ UcloudRtcCameraMixConfig.RTSP_URL);
                                     ToastUtils.shortShow(RoomMixerActivity.this," publish multi screen rtsp " + UcloudRtcCameraMixConfig.RTSP_URL);
                                     results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true).getErrorCode());
