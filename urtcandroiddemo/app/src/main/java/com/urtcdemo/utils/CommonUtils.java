@@ -32,7 +32,8 @@ public class CommonUtils {
     public static final String APPID_KEY = "APPID_KEY";
     public static final String APP_ID = "URtc-h4r1txxy";
     public static final String SEC_KEY = "9129304dbf8c5c4bf68d70824462409f";
-
+//    public static final String APP_ID = "urtc-mxr2seet";
+//    public static final String SEC_KEY = "f48b1dd672ed41ee9101100bc091304d";
 
 
     @IntDef({AUTO_MODE, MANUAL_MODE})

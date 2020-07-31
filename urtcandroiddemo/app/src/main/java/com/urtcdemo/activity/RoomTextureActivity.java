@@ -849,6 +849,16 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         public void onLocalMixSyn(List<UcloudRtcCameraMixConfig.SynInfo> infos) {
 
         }
+
+        @Override
+        public void onHDMIFreezed() {
+
+        }
+
+        @Override
+        public void onHDMIResume() {
+
+        }
     };
     private int mSelectPos;
 

@@ -143,6 +143,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     TextView mSynBtn = null;
     TextView mSwitchBtn = null;
     TextView mUnPublishBtn = null;
+    TextView mHVoiceBtn = null;
     CheckBox mCheckBoxMirror = null;
     private SteamScribePopupWindow mSpinnerPopupWindowScribe;
     private View mStreamSelect;
@@ -189,6 +190,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private boolean changeRTSPFlag = false;
     private boolean swapSurface = false;
     private boolean preview = false;
+    private boolean turnHdmiVoiceOff = false;
     private ViewGroup mViewGroup;
     private String RTSP_BACKUP_URL = "rtsp://192.168.161.148:554/ch3";
 //    private String RTSP_BACKUP_URL = "rtsp://192.168.1.200/ch1";
@@ -626,8 +628,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                 sdkEngine.startPreview(info.getMediaType(),
                                         localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
 
-                                sdkEngine.startPreview(info.getMediaType(),
-                                        mRemoteRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+//                                sdkEngine.startPreview(info.getMediaType(),
+//                                        mRemoteRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
 //                                UCloudRtcRenderView renderView = new UCloudRtcRenderView(RoomActivity.this);
 //                                FrameLayout frameLayout = findViewById(R.id.local_parent);
 //                                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(150,150);
@@ -759,20 +761,15 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                 @Override
                 public void run() {
                     if (code == 0) {
-//                        if(info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN){
-////                            sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
-////                            sdkEngine.startRemoteView(info, localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
-//                            mRemoteStreamInfo = info;
-////                            if (mTestRenderView == null) {
-////                                mTestRenderView = new UCloudRtcRenderView(getApplicationContext());
-////                                mTestRenderView.setZOrderMediaOverlay(true);
-////                                mViewGroup.addView(mTestRenderView);
-////                            }
-////                            mTestRenderView.setVisibility(View.VISIBLE);
-//                            sdkEngine.startRemoteView(info, mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
-//                            swapSurface = true;
-//                            return ;
-//                        }
+                        if(info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN){
+                            sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+                            localrenderview.setVisibility(View.GONE);
+                            mRemoteStreamInfo = info;
+                            mTestRenderView.setVisibility(View.VISIBLE);
+                            sdkEngine.startRemoteView(info, mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                            swapSurface = true;
+                            return ;
+                        }
 //                        if(info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO){
 //                            return;
 //                        }
@@ -1308,6 +1305,18 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                 }
             });
         }
+
+        @Override
+        public void onHDMIFreezed() {
+            Log.d(TAG, "onHDMIFreezed notify in app");
+            ToastUtils.shortShow(RoomMixerActivity.this, " HDMI freezed " );
+        }
+
+        @Override
+        public void onHDMIResume() {
+            Log.d(TAG, "onHDMIResume notify in app");
+            ToastUtils.shortShow(RoomMixerActivity.this, " HDMI onHDMIResume " );
+        }
     };
     private int mSelectPos;
 
@@ -1409,6 +1418,20 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mSynBtn = findViewById(R.id.syn);
         mSwitchBtn = findViewById(R.id.swap);
         mUnPublishBtn = findViewById(R.id.unpublish);
+        mHVoiceBtn = findViewById(R.id.hdmivoice);
+        mHVoiceBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!turnHdmiVoiceOff) {
+                    sdkEngine.turnHdmiVoiceSwitch(false);
+                    ToastUtils.shortShow(RoomMixerActivity.this,"关闭hdmi 声音");
+                }else{
+                    sdkEngine.turnHdmiVoiceSwitch(true);
+                    ToastUtils.shortShow(RoomMixerActivity.this,"开启hdmi 声音");
+                }
+                turnHdmiVoiceOff = !turnHdmiVoiceOff;
+            }
+        });
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -1920,7 +1943,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //                      mTestRenderView.release();
 //                      mViewGroup.removeView(mTestRenderView);
 //                      mTestRenderView = null;
-                    mTestRenderView.setVisibility(View.INVISIBLE);
+                    mTestRenderView.setVisibility(View.GONE);
                     localrenderview.setVisibility(View.VISIBLE);
                     sdkEngine.startPreview(mLocalStreamInfo.getMediaType(),
                             localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
@@ -1930,8 +1953,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //                    mTestRenderView.init();
 //                    mTestRenderView.setZOrderMediaOverlay(true);
 //                    mViewGroup.addView(mTestRenderView);
-                    sdkEngine.stopRemoteView(mLocalStreamInfo);
-                    localrenderview.setVisibility(View.INVISIBLE);
+                    sdkEngine.stopPreview(mLocalStreamInfo.getMediaType(),localrenderview);
+                    localrenderview.setVisibility(View.GONE);
                     mTestRenderView.setVisibility(View.VISIBLE);
                     sdkEngine.startRemoteView(mRemoteStreamInfo, mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
 

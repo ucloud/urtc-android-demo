@@ -1186,6 +1186,16 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         public void onLocalMixSyn(List<UcloudRtcCameraMixConfig.SynInfo> infos) {
 
         }
+
+        @Override
+        public void onHDMIFreezed() {
+
+        }
+
+        @Override
+        public void onHDMIResume() {
+
+        }
     };
     private int mSelectPos;
 
