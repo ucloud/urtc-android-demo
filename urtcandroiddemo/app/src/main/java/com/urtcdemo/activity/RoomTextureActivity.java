@@ -33,12 +33,14 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMixProfile;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkNetWorkQuality;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStats;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
@@ -754,7 +756,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
-        public void onMixStart(int code, String fileName) {
+        public void onMixStart(int code, String msg, String fileName) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -772,7 +774,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
-        public void onMixStop(int code, String pushUrls) {
+        public void onMixStop(int code, String msg, String pushUrls) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -795,11 +797,26 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
+        public void onLogOffUsers(int code, String msg) {
+
+        }
+
+        @Override
         public void onMsgNotify(int code, String msg) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Log.d(TAG, "onMsgNotify: code: " + code + "msg: " + msg);
+                }
+            });
+        }
+
+        @Override
+        public void onLogOffNotify(int cmdType, String userId) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onLogOffNotify cmdType "+ cmdType +" userid " + userId);
                 }
             });
         }
@@ -830,6 +847,11 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         @Override
         public void onPeerLostConnection(int type, UCloudRtcSdkStreamInfo info) {
             Log.d(TAG, "onPeerLostConnection: type: " + type + "info: " + info);
+        }
+
+        @Override
+        public void onNetWorkQuality(String userId, UCloudRtcSdkStreamType streamType, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkNetWorkQuality quality) {
+
         }
     };
     private int mSelectPos;

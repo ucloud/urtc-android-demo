@@ -33,12 +33,14 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMixProfile;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkNetWorkQuality;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStats;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
 
@@ -159,6 +161,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
     private AtomicInteger memoryCount = new AtomicInteger(0);
     private List<String> userIds = new ArrayList<>();
     private boolean mLocalRecordStart = false;
+    private List<String> users = new ArrayList<>();
     private VideoPlayer mVideoPlayer ;
     /**
      * SDK视频录制对象
@@ -600,13 +603,12 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ToastUtils.shortShow(RoomActivity.this, " 离开房间 " +
-                            code + " errmsg " + msg);
-//                    Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
+                    Log.d(TAG,"onLeaveRoomResult "+ code + " :msg "+ msg + " roomid: "+ roomid);
+                    Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
                     onMediaServerDisconnect();
                     System.gc();
-//                    startActivity(intent);
-//                    finish();
+                    startActivity(intent);
+                    finish();
                 }
             });
         }
@@ -707,6 +709,8 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 
                 @Override
                 public void run() {
+                    Log.d(TAG, "onRemoteUserJoin: " + uid);
+                    users.add(uid);
                     ToastUtils.shortShow(RoomActivity.this, " 用户 "
                             + uid + " 加入房间 ");
                 }
@@ -719,6 +723,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                 @Override
                 public void run() {
                     Log.d(TAG, "remote user " + uid + "leave ,reason: " + reason);
+                    users.remove(uid);
                     onUserLeave(uid);
                     ToastUtils.shortShow(RoomActivity.this, " 用户 " +
                             uid + " 离开房间，离开原因： " + reason);
@@ -1043,10 +1048,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onMixStart(int code, String fileName) {
+        public void onMixStart(int code, String msg, String fileName) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(TAG, "code : "+ code + "msg: "+ msg + "fileName: " + fileName);
                     if(code == NET_ERR_CODE_OK.ordinal()){
                         Log.d(TAG,"onMixStart: " + fileName);
                         mIsMixing = true;
@@ -1059,10 +1065,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onMixStop(int code, String pushUrls) {
+        public void onMixStop(int code, String msg, String pushUrls) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(TAG,"onMixStop: " + code + "msg: "+ msg + " pushUrl: "+ pushUrls);
                     if(mIsMixing){
                         mIsMixing = false;
                         mOpBtn.setText("mix");
@@ -1092,6 +1099,26 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
+        public void onLogOffUsers(int code, String msg) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onLogOffUsers: "+ code + msg);
+                }
+            });
+        }
+
+        @Override
+        public void onLogOffNotify(int cmdType, String userId) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onLogOffNotify cmdType "+ cmdType +" userid " + userId);
+                }
+            });
+        }
+
+        @Override
         public void onMsgNotify(int code, String msg) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -1114,7 +1141,6 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         @Override
         public void onAudioDeviceChanged(UCloudRtcSdkAudioDevice device) {
             defaultAudioDevice = device;
-//            URTCLogUtils.d(TAG,"URTCAudioManager: room change device to "+ defaultAudioDevice);
             if (defaultAudioDevice == UCloudRtcSdkAudioDevice.UCLOUD_RTC_SDK_AUDIODEVICE_SPEAKER) {
                 mLoudSpkeader.setImageResource(R.mipmap.loudspeaker);
                 mSpeakerOn = true;
@@ -1127,6 +1153,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         @Override
         public void onPeerLostConnection(int type, UCloudRtcSdkStreamInfo info) {
             Log.d(TAG, "onPeerLostConnection: type: " + type + "info: " + info);
+        }
+
+        @Override
+        public void onNetWorkQuality(String userId, UCloudRtcSdkStreamType streamType, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkNetWorkQuality quality) {
+
         }
     };
     private int mSelectPos;
@@ -1474,7 +1505,8 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         mSwitchcam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchCamera();
+//                switchCamera();
+                sdkEngine.kickOffOthers(1,users);
             }
         });
 
@@ -1564,7 +1596,6 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         defaultAudioDevice = sdkEngine.getDefaultAudioDevice();
-//        URTCLogUtils.d(TAG,"URTCAudioManager audio device room with: "+defaultAudioDevice);
         if (defaultAudioDevice == UCloudRtcSdkAudioDevice.UCLOUD_RTC_SDK_AUDIODEVICE_SPEAKER) {
             mLoudSpkeader.setImageResource(R.mipmap.loudspeaker);
             mSpeakerOn = true;
@@ -1926,10 +1957,10 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
     private void callHangUp() {
         int ret = sdkEngine.leaveChannel().ordinal();
 //        if (ret != NET_ERR_CODE_OK.ordinal()) {
-            Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
-            onMediaServerDisconnect();
-            startActivity(intent);
-            finish();
+//            Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
+//            onMediaServerDisconnect();
+//            startActivity(intent);
+//            finish();
 //        }
     }
 
