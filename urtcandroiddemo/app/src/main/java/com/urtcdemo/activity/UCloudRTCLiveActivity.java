@@ -157,6 +157,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
     private ImageView mImgSoundVolume = null;
     private ImageView mImgMicSts = null;
     private boolean mLeaveRequest;
+    private List<String> users = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -317,7 +318,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
         mImgBtnMirror.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mirrorSwitch();
+//                mirrorSwitch();
+                sdkEngine.kickOffOthers(3,users);
             }
         });
 
@@ -523,6 +525,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    mLeaveRequest = true;
                     Log.d(TAG, "onLeaveRoomResult: " + code + " msg: " + msg + " roomid: " + roomid);
                     Intent intent = new Intent(UCloudRTCLiveActivity.this, ConnectActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -632,6 +635,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    users.add(uid);
                     ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 用户 "
                             + uid + " 加入房间 ");
                 }
@@ -643,6 +647,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    users.remove(uid);
                     Log.d(TAG, "remote user " + uid + "leave ,reason: " + reason);
                     //onUserLeave(uid);
                     ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 用户 " +
@@ -1199,7 +1204,6 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
 
     private void endCall() {
         sdkEngine.leaveChannel().ordinal();
-        mLeaveRequest = true;
 //        Intent intent = new Intent(UCloudRTCLiveActivity.this, ConnectActivity.class);
 //        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 //        onMediaServerDisconnect();
