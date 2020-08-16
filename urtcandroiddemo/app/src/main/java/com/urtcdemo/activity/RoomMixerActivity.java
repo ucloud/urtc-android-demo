@@ -761,15 +761,15 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                 @Override
                 public void run() {
                     if (code == 0) {
-                        if(info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN){
-                            sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
-                            localrenderview.setVisibility(View.GONE);
-                            mRemoteStreamInfo = info;
-                            mTestRenderView.setVisibility(View.VISIBLE);
-                            sdkEngine.startRemoteView(info, mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
-                            swapSurface = true;
-                            return ;
-                        }
+//                        if(info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN){
+//                            sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+//                            localrenderview.setVisibility(View.GONE);
+//                            mRemoteStreamInfo = info;
+//                            mTestRenderView.setVisibility(View.VISIBLE);
+//                            sdkEngine.startRemoteView(info, mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+//                            swapSurface = true;
+//                            return ;
+//                        }
 //                        if(info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO){
 //                            return;
 //                        }
@@ -1514,6 +1514,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                     .pushUrl(pushURL)
                                     .layout(UCloudRtcSdkMixProfile.LAYOUT_AVERAGE)
                                     .resolution(1920,1080)
+                                    .bitRate(2000)
                                     .mainViewUserId(mUserid)
                                     .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                                     .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_AUTO)

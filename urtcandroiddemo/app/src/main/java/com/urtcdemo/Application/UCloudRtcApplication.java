@@ -74,7 +74,7 @@ public class UCloudRtcApplication extends Application {
 //        UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_LANDSCAPE_MODE);
         //私有化部署
 //        UCloudRtcSdkEnv.setPrivateDeploy(true);
-//        UCloudRtcSdkEnv.setPrivateDeployRoomURL("wss://47.96.6.194:5005/ws");
+//        UCloudRtcSdkEnv.setPrivateDeployRoomURL("wss://223.82.75.118:5005/ws");
         //无限重连
 //        UCloudRtcSdkEnv.setReConnectTimes(-1);
         //默认vp8编码，可以改成h264
