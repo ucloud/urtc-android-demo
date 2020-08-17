@@ -1424,10 +1424,12 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             public void onClick(View v) {
                 if(!turnHdmiVoiceOff) {
                     sdkEngine.turnHdmiVoiceSwitch(false);
-                    ToastUtils.shortShow(RoomMixerActivity.this,"关闭hdmi 声音");
+                    mHVoiceBtn.setText("hdmi voice on");
+                    ToastUtils.shortShow(RoomMixerActivity.this,"已关闭hdmi 声音");
                 }else{
                     sdkEngine.turnHdmiVoiceSwitch(true);
-                    ToastUtils.shortShow(RoomMixerActivity.this,"开启hdmi 声音");
+                    mHVoiceBtn.setText("hdmi voice off");
+                    ToastUtils.shortShow(RoomMixerActivity.this,"已开启hdmi 声音");
                 }
                 turnHdmiVoiceOff = !turnHdmiVoiceOff;
             }
