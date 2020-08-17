@@ -123,8 +123,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
     private UCloudRtcSdkStreamInfo mLocalStreamInfo;
     private UCloudRtcSdkAudioDevice defaultAudioDevice;
     private List<UCloudRtcSdkStreamInfo> mSteamList;
-    //private UCloudRtcRenderView mLocalVideoView = null; //Surfaceview
-    private TextureView mLocalVideoView = null;
+    private UCloudRtcRenderView mLocalVideoView = null; //Surfaceview
+    //private TextureView mLocalVideoView = null;
     private UCloudRtcSdkSurfaceVideoView mMuteView = null;
     private UCloudRtcSdkMediaType mPublishMediaType;
 
@@ -191,9 +191,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
 
         mLocalVideoView = findViewById(R.id.localvideoview);
         //Surfaceview 打开注释
-        //mLocalVideoView.init();
-        //mLocalVideoView.setZOrderMediaOverlay(false);
-        //mLocalVideoView.setMirror(true);
+        mLocalVideoView.init();
+        mLocalVideoView.setZOrderMediaOverlay(false);
+        mLocalVideoView.setMirror(true);
         mDrawer = findViewById(R.id.drawer_layout);
         mDrawer.setScrimColor(0x00ffffff);
         mDrawerContent = findViewById(R.id.drawer_content);
@@ -1002,11 +1002,31 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
         }
 
         @Override
+        public void onLogOffUsers(int code, String msg) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onLogOffUsers: "+ code + " msg: "+ msg);
+                }
+            });
+        }
+
+        @Override
         public void onMsgNotify(int code, String msg) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Log.d(TAG, "onMsgNotify: code: " + code + "msg: " + msg);
+                }
+            });
+        }
+
+        @Override
+        public void onLogOffNotify(int cmdType, String userId) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onLogOffUsers: "+ cmdType + " userId: "+ userId);
                 }
             });
         }
