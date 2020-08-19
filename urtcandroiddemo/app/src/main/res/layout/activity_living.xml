@@ -34,13 +34,28 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"/>
 
-            <Chronometer
-                android:id="@+id/timer"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:format="%s"
-                android:textColor="@color/colorWhite"
-                android:layout_gravity="center_horizontal|center_vertical" />
+                android:layout_gravity="center_horizontal|center_vertical">
+
+                <TextView
+                    android:id="@+id/text_room"
+                    android:text="roomid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorWhite"
+                    android:layout_marginRight="5dp"></TextView>
+
+                <Chronometer
+                    android:id="@+id/timer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:format="%s"
+                    android:textColor="@color/colorWhite" />
+
+            </LinearLayout>
+
 
             <ImageButton
                 android:id="@+id/img_btn_more"

@@ -153,6 +153,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
     private TextView mTextRemoteRecord;
     private ImageView mImgManualPub;
     private TextView mTextManualPub;
+    private TextView mTextRoomId;
     //音量图片
     private ImageView mImgSoundVolume = null;
     private ImageView mImgMicSts = null;
@@ -177,8 +178,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         screenWidth = displaymetrics.widthPixels;
         screenHeight = displaymetrics.heightPixels;
-
         setContentView(R.layout.activity_living);
+        mTextRoomId = findViewById(R.id.text_room);
         mVideoProfile = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
         mRemoteGridView = findViewById(R.id.remoteGridView);
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -318,8 +319,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
         mImgBtnMirror.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mirrorSwitch();
-                sdkEngine.kickOffOthers(3,users);
+                mirrorSwitch();
+//                sdkEngine.kickOffOthers(3,users);
             }
         });
 
@@ -409,8 +410,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
         info.setToken(mRoomToken);
         info.setRoomId(mRoomid);
         info.setUId(mUserid);
+        mTextRoomId.setText("room: "+mRoomid);
         Log.d(TAG, " roomtoken = " + mRoomToken);
-        initRecordManager();
+//        initRecordManager();
         sdkEngine.joinChannel(info);
     }
 
