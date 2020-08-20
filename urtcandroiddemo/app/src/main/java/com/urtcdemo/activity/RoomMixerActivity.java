@@ -1443,13 +1443,13 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             public void onClick(View v) {
                 if(!turnHdmiOnlyVoiceOff) {
                     AudioManager audioManager = ((AudioManager) getSystemService(Context.AUDIO_SERVICE));
-                    audioManager.setParameters("HDMIinOnly_enable=false");
+                    audioManager.setParameters("HDMIinOnly_enable=off");
                     mHdmiOnlyBtn.setText("hdmi only enable=on");
 //                    ToastUtils.shortShow(RoomMixerActivity.this,"已关闭hdmi 声音");
                 }else{
                     AudioManager audioManager = ((AudioManager) getSystemService(Context.AUDIO_SERVICE));
                     audioManager.setParameters("HDMIinOnly_enable=on");
-                    mHdmiOnlyBtn.setText("hdmi only enable=false");
+                    mHdmiOnlyBtn.setText("hdmi only enable=off");
 //                    ToastUtils.shortShow(RoomMixerActivity.this,"已开启hdmi 声音");
                 }
                 turnHdmiOnlyVoiceOff = !turnHdmiOnlyVoiceOff;
