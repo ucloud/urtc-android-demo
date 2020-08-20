@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -144,6 +145,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     TextView mSwitchBtn = null;
     TextView mUnPublishBtn = null;
     TextView mHVoiceBtn = null;
+    TextView mHdmiOnlyBtn = null;
     CheckBox mCheckBoxMirror = null;
     private SteamScribePopupWindow mSpinnerPopupWindowScribe;
     private View mStreamSelect;
@@ -191,6 +193,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private boolean swapSurface = false;
     private boolean preview = false;
     private boolean turnHdmiVoiceOff = false;
+    private boolean turnHdmiOnlyVoiceOff = false;
     private ViewGroup mViewGroup;
     private String RTSP_BACKUP_URL = "rtsp://192.168.161.148:554/ch3";
 //    private String RTSP_BACKUP_URL = "rtsp://192.168.1.200/ch1";
@@ -1434,6 +1437,25 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                 turnHdmiVoiceOff = !turnHdmiVoiceOff;
             }
         });
+        mHdmiOnlyBtn = findViewById(R.id.hdmionly);
+        mHdmiOnlyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!turnHdmiOnlyVoiceOff) {
+                    AudioManager audioManager = ((AudioManager) getSystemService(Context.AUDIO_SERVICE));
+                    audioManager.setParameters("HDMIinOnly_enable=false");
+                    mHdmiOnlyBtn.setText("hdmi only enable=on");
+//                    ToastUtils.shortShow(RoomMixerActivity.this,"已关闭hdmi 声音");
+                }else{
+                    AudioManager audioManager = ((AudioManager) getSystemService(Context.AUDIO_SERVICE));
+                    audioManager.setParameters("HDMIinOnly_enable=on");
+                    mHdmiOnlyBtn.setText("hdmi only enable=false");
+//                    ToastUtils.shortShow(RoomMixerActivity.this,"已开启hdmi 声音");
+                }
+                turnHdmiOnlyVoiceOff = !turnHdmiOnlyVoiceOff;
+            }
+        });
+
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
         mCheckBoxMirror.setChecked(UCloudRtcSdkEnv.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

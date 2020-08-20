@@ -217,7 +217,8 @@
                         android:gravity="center"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
-                        android:textColor="@color/colorWhite"></TextView>
+                        android:textColor="@color/colorWhite"
+                        android:visibility="gone"></TextView>
 
                     <TextView
                         android:layout_marginLeft="20dp"
@@ -229,6 +230,7 @@
                         android:gravity="center"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
+                        android:visibility="gone"
                         android:textColor="@color/colorWhite"></TextView>
 
                     <TextView
@@ -236,7 +238,7 @@
                         android:id="@+id/swap"
                         android:background="@drawable/oval_start_record_background"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="48dp"
                         android:text="swap"
                         android:gravity="center"
                         android:paddingLeft="5dp"
@@ -261,7 +263,7 @@
                         android:id="@+id/unpublish"
                         android:background="@drawable/oval_start_record_background"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="48dp"
                         android:text="unpublish"
                         android:gravity="center"
                         android:paddingLeft="5dp"
@@ -273,8 +275,20 @@
                         android:id="@+id/hdmivoice"
                         android:background="@drawable/oval_start_record_background"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="48dp"
                         android:text="hvoice"
+                        android:gravity="center"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:textColor="@color/colorWhite"></TextView>
+
+                    <TextView
+                        android:layout_marginLeft="20dp"
+                        android:id="@+id/hdmionly"
+                        android:background="@drawable/oval_start_record_background"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:text="hdmionly"
                         android:gravity="center"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
