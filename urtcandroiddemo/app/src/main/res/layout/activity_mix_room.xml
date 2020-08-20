@@ -218,7 +218,7 @@
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:textColor="@color/colorWhite"
-                        android:visibility="gone"></TextView>
+                        android:visibility="visible"></TextView>
 
                     <TextView
                         android:layout_marginLeft="20dp"

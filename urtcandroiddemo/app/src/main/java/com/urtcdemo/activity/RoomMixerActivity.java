@@ -1533,12 +1533,13 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                             JSONArray pushURL = new JSONArray();
 //                        pushURL.put("rtmp://push.urtc.com.cn/" + mAppid + "/"+ mUserid);
 //                        pushURL.put("rtmp://push.urtc.com.cn/live/URtc-h4r1txxy123131");
+//                            pushURL.put("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid);
                             pushURL.put("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid);
                             UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
                                     .pushUrl(pushURL)
                                     .layout(UCloudRtcSdkMixProfile.LAYOUT_AVERAGE)
                                     .resolution(1920,1080)
-                                    .bitRate(2000)
+                                    .bitRate(5000)
                                     .mainViewUserId(mUserid)
                                     .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                                     .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_AUTO)
