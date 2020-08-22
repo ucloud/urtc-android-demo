@@ -1139,6 +1139,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
 
     private boolean muteMic() {
         sdkEngine.muteLocalMic(!mMuteMic);
+        if(!mMuteMic){
+            sdkEngine.changePushResolution(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_320_180);
+        }else{
+            sdkEngine.changePushResolution(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1280_720);
+        }
         return false;
     }
 
