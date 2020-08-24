@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.SurfaceView;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -94,7 +92,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
-import static com.urtcdemo.activity.RoomMixerActivity.BtnOp.OP_MIX;
+import static com.urtcdemo.activity.RoomMixerActivity.BtnOp.OP_MIX_MANUAL;
 
 //import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
 //import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
@@ -137,6 +135,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     ImageButton mHangup = null;
     ImageButton mSwitchcam = null;
     ImageButton mMuteMic = null;
+    ImageButton mMuteScreenMic = null;
     ImageButton mLoudSpkeader = null;
     ImageButton mMuteCam = null;
     TextView mOpBtn = null;
@@ -567,7 +566,6 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                         startActivity(intent);
                         finish();
                     }
-
                 }
             });
         }
@@ -878,7 +876,11 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                 onMuteCamResult(mute);
                             }
                         } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
-                            onMuteCamResult(mute);
+                            if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
+                                onMuteScreenMicResult(mute);
+                            } else if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
+                                onMuteCamResult(mute);
+                            }
                         }
                     }
                 }
@@ -1398,6 +1400,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mHangup = findViewById(R.id.button_call_disconnect);
         mSwitchcam = findViewById(R.id.button_call_switch_camera);
         mMuteMic = findViewById(R.id.button_call_toggle_mic);
+        mMuteScreenMic = findViewById(R.id.button_call_toggle_screen_mic);
         mLoudSpkeader = findViewById(R.id.button_call_loundspeaker);
         mMuteCam = findViewById(R.id.button_call_toggle_cam);
         mStreamSelect = findViewById(R.id.stream_select);
@@ -1411,15 +1414,16 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //        mOpBtn.setText("lrecord");
 //        mOpBtn.setTag(OP_REMOTE_RECORD);
 //        mOpBtn.setText("record");
-        mOpBtn.setTag(OP_MIX);
+        mOpBtn.setTag(OP_MIX_MANUAL);
         mOpBtn.setText("mix");
 //        mOpBtn.setTag(OP_MIX_MANUAL);
 //        mOpBtn.setText("mix_manual");
         mAddDelBtn = findViewById(R.id.addDelBtn);
         mAddDelBtn.setText("add_st");
-        mAddDelBtn.setVisibility(View.GONE);
+//        mAddDelBtn.setVisibility(View.GONE);
         mSynBtn = findViewById(R.id.syn);
         mSwitchBtn = findViewById(R.id.swap);
+        mSwitchBtn.setVisibility(View.GONE);
         mUnPublishBtn = findViewById(R.id.unpublish);
         mHVoiceBtn = findViewById(R.id.hdmivoice);
         mHVoiceBtn.setOnClickListener(new View.OnClickListener() {
@@ -1561,20 +1565,41 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //                        pushURL.put("rtmp://push.urtc.com.cn/" + mAppid + "/"+ mUserid);
 //                        pushURL.put("rtmp://push.urtc.com.cn/live/URtc-h4r1txxy123131");
                             pushURL.put("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid);
+//                            JSONArray streams = new JSONArray();
+//                            JSONObject local = new JSONObject();
+//                            try {
+//                                local.put("user_id", mUserid);
+//                                local.put("media_type", UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal());
+//                                streams.put(local);
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                            UCloudRtcSdkStreamInfo info = mVideoAdapter.getStreamInfo(0);
                             JSONArray streams = new JSONArray();
-                            JSONObject local = new JSONObject();
+//                            JSONObject remote = new JSONObject();
+
                             try {
+//                                remote.put("user_id", info.getUId());
+//                                remote.put("media_type", info.getMediaType().ordinal());
+//                                streams.put(remote);
+                                JSONObject local = new JSONObject();
+//                            try {
                                 local.put("user_id", mUserid);
                                 local.put("media_type", UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal());
                                 streams.put(local);
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-
                             UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
                                     .pushUrl(pushURL)
                                     .streams(streams)
                                     .mainViewUserId(mUserid)
+                                    .resolution(1920,1080)
+                                    .bitRate(3000)
                                     .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                                     .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
                                     .build();
@@ -1597,17 +1622,26 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                 if (mMixAddOrDel) {
                     mMixAddOrDel = false;
                     mAddDelBtn.setText("del_st");
-                    UCloudRtcSdkStreamInfo info = mVideoAdapter.getStreamInfo(0);
-                    Log.d(TAG, "add stream: " + info);
+//                    UCloudRtcSdkStreamInfo info = mVideoAdapter.getStreamInfo(0);
+//                    Log.d(TAG, "add stream: " + info);
+//                    JSONArray streams = new JSONArray();
+//                    JSONObject remote = new JSONObject();
+//                    try {
+//                        remote.put("user_id", info.getUId());
+//                        remote.put("media_type", info.getMediaType().ordinal());
+//                        streams.put(remote);
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
                     JSONArray streams = new JSONArray();
-                    JSONObject remote = new JSONObject();
-                    try {
-                        remote.put("user_id", info.getUId());
-                        remote.put("media_type", info.getMediaType().ordinal());
-                        streams.put(remote);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                            JSONObject local = new JSONObject();
+                            try {
+                                local.put("user_id", mUserid);
+                                local.put("media_type", UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal());
+                                streams.put(local);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                     sdkEngine.addMixStream(streams);
                 } else {
                     mMixAddOrDel = true;
@@ -1793,6 +1827,13 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             @Override
             public void onClick(View v) {
                 onToggleMic();
+            }
+        });
+
+        mMuteScreenMic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onToggleScreenMic();
             }
         });
 
@@ -2348,6 +2389,17 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         return false;
     }
 
+    boolean mMuteScreenMicBool = false;
+    private boolean onToggleScreenMic() {
+        sdkEngine.muteLocalScreenMic(!mMuteScreenMicBool);
+        if (!mMuteScreenMicBool) {
+            ToastUtils.shortShow(RoomMixerActivity.this, "关闭SCREEN麦克风");
+        } else {
+            ToastUtils.shortShow(RoomMixerActivity.this, "打开SCRENN麦克风");
+        }
+        return false;
+    }
+
     boolean mMuteCamBool = false;
 
     private boolean onToggleCamera() {
@@ -2396,6 +2448,11 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private void onMuteMicResult(boolean mute) {
         mMuteMicBool = mute;
         mMuteMic.setImageResource(mute ? R.mipmap.microphone_disable : R.mipmap.microphone);
+    }
+
+    private void onMuteScreenMicResult(boolean mute) {
+        mMuteScreenMicBool = mute;
+        mMuteScreenMic.setImageResource(mute ? R.mipmap.microphone_disable : R.mipmap.microphone);
     }
 
     boolean mSpeakerOn = true;

@@ -212,7 +212,7 @@
                         android:id="@+id/opBtn"
                         android:background="@drawable/oval_start_record_background"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="48dp"
                         android:text="start"
                         android:gravity="center"
                         android:paddingLeft="5dp"
@@ -250,12 +250,12 @@
                         android:id="@+id/addDelBtn"
                         android:background="@drawable/oval_start_record_background"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="48dp"
                         android:text="start"
                         android:gravity="center"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         android:textColor="@color/colorWhite"></TextView>
 
                     <TextView
@@ -393,6 +393,15 @@
 
                 <ImageButton
                     android:id="@+id/button_call_toggle_mic"
+                    android:background="@drawable/publish_layer"
+                    android:src="@mipmap/microphone"
+                    android:contentDescription="@string/toggle_mic"
+                    android:layout_marginRight="8dp"
+                    android:layout_width="54dp"
+                    android:layout_height="54dp"/>
+
+                <ImageButton
+                    android:id="@+id/button_call_toggle_screen_mic"
                     android:background="@drawable/publish_layer"
                     android:src="@mipmap/microphone"
                     android:contentDescription="@string/toggle_mic"
