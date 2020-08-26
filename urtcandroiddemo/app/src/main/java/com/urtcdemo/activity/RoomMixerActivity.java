@@ -1423,7 +1423,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //        mAddDelBtn.setVisibility(View.GONE);
         mSynBtn = findViewById(R.id.syn);
         mSwitchBtn = findViewById(R.id.swap);
-        mSwitchBtn.setVisibility(View.GONE);
+//        mSwitchBtn.setVisibility(View.GONE);
         mUnPublishBtn = findViewById(R.id.unpublish);
         mHVoiceBtn = findViewById(R.id.hdmivoice);
         mHVoiceBtn.setOnClickListener(new View.OnClickListener() {
@@ -2004,29 +2004,30 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mSwitchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                sdkEngine.switchMixView();
-                if(swapSurface){
-                      sdkEngine.stopRemoteView(mRemoteStreamInfo);
-//                      mTestRenderView.release();
-//                      mViewGroup.removeView(mTestRenderView);
-//                      mTestRenderView = null;
-                    mTestRenderView.setVisibility(View.GONE);
-                    localrenderview.setVisibility(View.VISIBLE);
-                    sdkEngine.startPreview(mLocalStreamInfo.getMediaType(),
-                            localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
-                      swapSurface = false;
-                }else{
-//                    mTestRenderView = new UCloudRtcRenderView(getApplicationContext());
-//                    mTestRenderView.init();
-//                    mTestRenderView.setZOrderMediaOverlay(true);
-//                    mViewGroup.addView(mTestRenderView);
-                    sdkEngine.stopPreview(mLocalStreamInfo.getMediaType(),localrenderview);
-                    localrenderview.setVisibility(View.GONE);
-                    mTestRenderView.setVisibility(View.VISIBLE);
-                    sdkEngine.startRemoteView(mRemoteStreamInfo, mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
-
-                    swapSurface = true;
-                }
+////                sdkEngine.switchMixView();
+//                if(swapSurface){
+//                      sdkEngine.stopRemoteView(mRemoteStreamInfo);
+////                      mTestRenderView.release();
+////                      mViewGroup.removeView(mTestRenderView);
+////                      mTestRenderView = null;
+//                    mTestRenderView.setVisibility(View.GONE);
+//                    localrenderview.setVisibility(View.VISIBLE);
+//                    sdkEngine.startPreview(mLocalStreamInfo.getMediaType(),
+//                            localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+//                      swapSurface = false;
+//                }else{
+////                    mTestRenderView = new UCloudRtcRenderView(getApplicationContext());
+////                    mTestRenderView.init();
+////                    mTestRenderView.setZOrderMediaOverlay(true);
+////                    mViewGroup.addView(mTestRenderView);
+//                    sdkEngine.stopPreview(mLocalStreamInfo.getMediaType(),localrenderview);
+//                    localrenderview.setVisibility(View.GONE);
+//                    mTestRenderView.setVisibility(View.VISIBLE);
+//                    sdkEngine.startRemoteView(mRemoteStreamInfo, mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+//
+//                    swapSurface = true;
+//                }
+                sdkEngine.changeRTSPUrl();
             }
         });
 //        //普通摄像头捕获方式，与扩展模式二选一
