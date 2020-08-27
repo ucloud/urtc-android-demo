@@ -23,6 +23,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Chronometer;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -55,9 +56,11 @@ import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
+import com.urtcdemo.service.UCloudRtcForeGroundService;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.StatusBarUtils;
 import com.urtcdemo.utils.ToastUtils;
+import com.urtcdemo.utils.VideoProfilePopupWindow;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
 import org.webrtc.ucloud.record.URTCRecordManager;
@@ -68,6 +71,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
@@ -112,7 +116,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
     private int mPublishMode;
     @CommonUtils.PubScribeMode
     private int mScribeMode;
-    private int mVideoProfile;
+    private int mVideoProfileSelect;
     private int localViewWidth;
     private int localViewHeight;
     private int screenWidth;
@@ -123,6 +127,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
     private UCloudRtcSdkStreamInfo mLocalStreamInfo;
     private UCloudRtcSdkAudioDevice defaultAudioDevice;
     private List<UCloudRtcSdkStreamInfo> mSteamList;
+    private List<String> mResolutionOption = new ArrayList<>();
+    private ArrayAdapter<String> mAdapter;
     private UCloudRtcRenderView mLocalVideoView = null; //Surfaceview
     //private TextureView mLocalVideoView = null;
     private UCloudRtcSdkSurfaceVideoView mMuteView = null;
@@ -153,6 +159,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
     private TextView mTextRemoteRecord;
     private ImageView mImgManualPub;
     private TextView mTextManualPub;
+    private TextView mTextRoomId;
+    private TextView mTextResolution;
+    private VideoProfilePopupWindow mResolutionPopupWindow;
     //音量图片
     private ImageView mImgSoundVolume = null;
     private ImageView mImgMicSts = null;
@@ -160,6 +169,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             View decorView = getWindow().getDecorView();
@@ -177,7 +187,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
         screenHeight = displaymetrics.heightPixels;
 
         setContentView(R.layout.activity_living);
-        mVideoProfile = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
+        mVideoProfileSelect = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
         mRemoteGridView = findViewById(R.id.remoteGridView);
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             gridLayoutManager = new GridLayoutManager(this, COL_SIZE_L);
@@ -222,6 +232,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
         mTextManualPub = findViewById(R.id.manual_publish_text);
         mImgSoundVolume = findViewById(R.id.sound_volume_img);
         mImgMicSts = findViewById(R.id.mic_status_img);
+        mTextResolution = findViewById(R.id.resolution_text);
 
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
@@ -236,6 +247,14 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
         mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
         mScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
         mSteamList = new ArrayList<>();
+
+        //房间号
+        mTextRoomId = findViewById(R.id.roomid_text);
+        mTextRoomId.setText("RoomID:" + mRoomid);
+
+        //分辨率选择菜单
+        String[] resolutions = getResources().getStringArray(R.array.videoResolutions);
+        mResolutionOption.addAll(Arrays.asList(resolutions));
 
         Log.d(TAG, " Camera enable is: " + mCameraEnable + " Mic enable is: " + mMicEnable + " ScreenShare enable is: " + mScreenEnable);
         if (!mScreenEnable && !mCameraEnable && mMicEnable) {
@@ -264,7 +283,14 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
         sdkEngine.setClassType(mClass);
         sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
-        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfile));
+        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
+
+        //分辨率菜单显示
+        mTextResolution.setText(mResolutionOption.get(mVideoProfileSelect));
+        mAdapter = new ArrayAdapter<String>(this, R.layout.videoprofile_item, mResolutionOption);
+
+        mResolutionPopupWindow = new VideoProfilePopupWindow(this);
+        mResolutionPopupWindow.setOnSpinnerItemClickListener(mOnResulutionOptionClickListener);
         //普通摄像头捕获方式
         UCloudRtcSdkEnv.setCaptureMode(
                 UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
@@ -292,6 +318,13 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
             @Override
             public void onClick(View v) {
                 switchCamera();
+            }
+        });
+
+        mTextResolution.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPopupWindow();
             }
         });
 
@@ -445,6 +478,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume");
 //        Intent service = new Intent(this, UCloudRtcForeGroundService.class);
 //        stopService(service);
         sdkEngine.controlAudio(true);
@@ -1437,26 +1471,29 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
 
     private void setSystemUIVisible(boolean show) {
         if (show) {
-/*            int uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-            uiFlags |= 0x00001000;
-            getWindow().getDecorView().setSystemUiVisibility(uiFlags);*/
-
-
             final WindowManager.LayoutParams attrs = getWindow().getAttributes();
             attrs.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().setAttributes(attrs);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         } else {
-/*            int uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN;
-            uiFlags |= 0x00001000;
-            getWindow().getDecorView().setSystemUiVisibility(uiFlags);*/
-
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
     }
+
+    private void showPopupWindow() {
+        mResolutionPopupWindow.setAdapter(mAdapter);
+        mResolutionPopupWindow.setWidth(mTextResolution.getWidth());
+        mResolutionPopupWindow.showAsDropDown(mTextResolution);
+    }
+
+    private VideoProfilePopupWindow.OnSpinnerItemClickListener mOnResulutionOptionClickListener = new VideoProfilePopupWindow.OnSpinnerItemClickListener() {
+        @Override
+        public void onItemClick(int pos) {
+            mVideoProfileSelect = pos;
+            sdkEngine.changePushResolution(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
+            mTextResolution.setText(mResolutionOption.get(mVideoProfileSelect));
+            mResolutionPopupWindow.dismiss();
+        }
+    };
 }
 

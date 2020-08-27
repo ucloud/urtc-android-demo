@@ -7,4 +7,4 @@
     android:paddingTop="8dp"
     android:paddingBottom="8dp"
     android:textColor="@color/textcolor"
-    android:background="@color/editTextBackground" />
+    android:background="@color/color_7F04A5EB" />
