@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:background="@mipmap/videooff">
 
-        <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
+        <TextureView
             android:id="@+id/localvideoview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>

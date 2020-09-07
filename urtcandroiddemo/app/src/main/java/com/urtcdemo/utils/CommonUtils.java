@@ -32,6 +32,7 @@ public class CommonUtils {
     public static final String SDK_SUPPORT_MIX = "SDK_SUPPORT_MIX";
     public static final String SDK_IS_LOOP = "SDK_IS_LOOP";
     public static final String SDK_MIX_FILE_PATH = "SDK_MIX_FILE_PATH";
+    public static final String CAMERA_CAPTURE_MODE = "CAMERA_CAPTURE_MODE";
 
     public static final String APPID_KEY = "APPID_KEY";
     public static final String APP_ID = "URtc-h4r1txxy";

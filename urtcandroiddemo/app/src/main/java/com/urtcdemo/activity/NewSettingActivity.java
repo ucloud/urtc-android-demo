@@ -6,7 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -17,6 +16,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.StatusBarUtils;
+import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
 import com.urtcdemo.view.BaseSwitch;
 import com.urtcdemo.view.LSwitch;
@@ -51,10 +51,12 @@ public class NewSettingActivity extends AppCompatActivity {
     private LSwitch mAutoPubSwitch;
     private LSwitch mAutoSubSwitch;
     private LSwitch mBroadcastSwitch;
+    private LSwitch mExtendCameraSwitch;
 
     private boolean mEnableCamera;
     private boolean mEnableMic;
     private boolean mEnableScreen;
+    private boolean mExtendCamera;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,6 +64,7 @@ public class NewSettingActivity extends AppCompatActivity {
         mEnableCamera = true;
         mEnableMic = true;
         mEnableScreen = false;
+        mExtendCamera = false;
 
         setContentView(R.layout.activity_setting_new);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -96,6 +99,7 @@ public class NewSettingActivity extends AppCompatActivity {
         mEnableScreen = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
         mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
         mSubScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
+        mExtendCamera = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
         int roomInt = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL.ordinal());
         mRoomType = UCloudRtcSdkRoomType.valueOf(roomInt);
         StatusBarUtils.setAndroidNativeLightStatusBar(this,true);
@@ -149,13 +153,21 @@ public class NewSettingActivity extends AppCompatActivity {
 
             }
         });
+        mExtendCameraSwitch = findViewById(R.id.extend_camera_switch);
+        mExtendCameraSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
+            @Override
+            public void onChecked(boolean isChecked) {
+                mExtendCamera = isChecked;
+
+            }
+        });
         mCameraSwitch.setChecked(mEnableCamera);
         mMicSwitch.setChecked(mEnableMic);
         mScreenShareSwitch.setChecked(mEnableScreen);
         mAutoPubSwitch.setChecked(mPublishMode == CommonUtils.AUTO_MODE);
         mAutoSubSwitch.setChecked(mSubScribeMode == CommonUtils.AUTO_MODE);
         mBroadcastSwitch.setChecked(mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE);
-
+        mExtendCameraSwitch.setChecked(mExtendCamera);
     }
 
     @Override
@@ -183,7 +195,13 @@ public class NewSettingActivity extends AppCompatActivity {
     private VideoProfilePopupWindow.OnSpinnerItemClickListener mOnSpinnerItemClickListener = new VideoProfilePopupWindow.OnSpinnerItemClickListener() {
         @Override
         public void onItemClick(int pos) {
-            mSelectPos = pos;
+            if (mExtendCamera && pos < 4) {
+                mSelectPos = 4;
+                ToastUtils.shortShow(NewSettingActivity.this,"外接摄像头目前不支持640*480以下分辨率" );
+            }
+            else {
+                mSelectPos = pos;
+            }
             mConfigTextView.setText(mDefaultConfiguration.get(mSelectPos));
             mSpinnerPopupWindow.dismiss();
         }
@@ -201,6 +219,7 @@ public class NewSettingActivity extends AppCompatActivity {
         editor.putInt(CommonUtils.PUBLISH_MODE, mPublishMode);
         editor.putInt(CommonUtils.SUBSCRIBE_MODE, mSubScribeMode);
         editor.putInt(CommonUtils.SDK_CLASS_TYPE, mRoomType.ordinal());
+        editor.putBoolean(CommonUtils.CAMERA_CAPTURE_MODE, mExtendCamera);
 
         editor.apply();
     }
