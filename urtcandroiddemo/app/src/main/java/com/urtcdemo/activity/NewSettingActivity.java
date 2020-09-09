@@ -10,11 +10,14 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
+import com.urtcdemo.utils.RadioGroupFlow;
 import com.urtcdemo.utils.StatusBarUtils;
 import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
@@ -24,15 +27,20 @@ import com.urtcdemo.view.LSwitch;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 public class NewSettingActivity extends AppCompatActivity {
     private TextView mConfigTextView;
     private int mSelectPos = 1;
     private ArrayAdapter<String> mAdapter;
     private VideoProfilePopupWindow mSpinnerPopupWindow;
+    private RadioGroupFlow mExtendVideoFormatRadioGroup;
+    private RadioButton mNV21Format;
+    private RadioButton mNV12Format;
+    private RadioButton mI420Format;
+    private RadioButton mRGBAFormat;
+    private RadioButton mARGBFormat;
+    private RadioButton mRGB24Format;
+    private RadioButton mRGB565Format;
 
     private ImageButton mBackButton;
 
@@ -57,6 +65,7 @@ public class NewSettingActivity extends AppCompatActivity {
     private boolean mEnableMic;
     private boolean mEnableScreen;
     private boolean mExtendCamera;
+    private int mExtendVideoFormat;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -158,9 +167,52 @@ public class NewSettingActivity extends AppCompatActivity {
             @Override
             public void onChecked(boolean isChecked) {
                 mExtendCamera = isChecked;
-
+                if (!isChecked) {
+                    mExtendVideoFormatRadioGroup.setVisibility(View.GONE);
+                }
+                else {
+                    mExtendVideoFormatRadioGroup.setVisibility(View.VISIBLE);
+                }
             }
         });
+
+        mExtendVideoFormatRadioGroup = findViewById(R.id.extend_video_format_button);
+        mNV21Format = findViewById(R.id.nv21_format);
+        mNV12Format = findViewById(R.id.nv12_format);
+        mI420Format = findViewById(R.id.i420_format);
+        mRGBAFormat = findViewById(R.id.rgba_format);
+        mARGBFormat = findViewById(R.id.argb_format);
+        mRGB24Format = findViewById(R.id.rgb24_format);
+        mRGB565Format = findViewById(R.id.rgb565_format);
+        mExtendVideoFormatRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (group.getCheckedRadioButtonId()) {
+                    case R.id.nv21_format:
+                        mExtendVideoFormat = CommonUtils.nv21_format;
+                        break;
+                    case R.id.nv12_format:
+                        mExtendVideoFormat = CommonUtils.nv12_format;
+                        break;
+                    case R.id.i420_format:
+                        mExtendVideoFormat = CommonUtils.i420_format;
+                        break;
+                    case R.id.rgba_format:
+                        mExtendVideoFormat = CommonUtils.rgba_format;
+                        break;
+                    case R.id.argb_format:
+                        mExtendVideoFormat = CommonUtils.argb_format;
+                        break;
+                    case R.id.rgb24_format:
+                        mExtendVideoFormat = CommonUtils.rgb24_format;
+                        break;
+                    case R.id.rgb565_format:
+                        mExtendVideoFormat = CommonUtils.rgb565_format;
+                        break;
+                }
+            }
+        });
+
         mCameraSwitch.setChecked(mEnableCamera);
         mMicSwitch.setChecked(mEnableMic);
         mScreenShareSwitch.setChecked(mEnableScreen);
@@ -168,22 +220,37 @@ public class NewSettingActivity extends AppCompatActivity {
         mAutoSubSwitch.setChecked(mSubScribeMode == CommonUtils.AUTO_MODE);
         mBroadcastSwitch.setChecked(mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE);
         mExtendCameraSwitch.setChecked(mExtendCamera);
+
+        mExtendVideoFormat = preferences.getInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, CommonUtils.i420_format);
+        switch (mExtendVideoFormat) {
+            case CommonUtils.nv21_format:
+                mNV21Format.setChecked(true);
+                break;
+            case CommonUtils.nv12_format:
+                mNV12Format.setChecked(true);
+                break;
+            case CommonUtils.i420_format:
+                mI420Format.setChecked(true);
+                break;
+            case CommonUtils.rgba_format:
+                mRGBAFormat.setChecked(true);
+                break;
+            case CommonUtils.argb_format:
+                mARGBFormat.setChecked(true);
+                break;
+            case CommonUtils.rgb24_format:
+                mRGB24Format.setChecked(true);
+                break;
+            case CommonUtils.rgb565_format:
+                mRGB565Format.setChecked(true);
+                break;
+        }
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         saveSettings();
-    }
-
-    public static String stringFilter(String str) throws PatternSyntaxException {
-        // 只允许字母和数字
-        // String   regEx  =  "[^a-zA-Z0-9]";
-        // 清除掉所有特殊字符
-        String regEx = "[`~!@#$%^&*()+=|{}':;',//[//].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
-        Pattern p = Pattern.compile(regEx);
-        Matcher m = p.matcher(str);
-        return m.replaceAll("").trim();
     }
 
     private void showPopupWindow() {
@@ -220,6 +287,7 @@ public class NewSettingActivity extends AppCompatActivity {
         editor.putInt(CommonUtils.SUBSCRIBE_MODE, mSubScribeMode);
         editor.putInt(CommonUtils.SDK_CLASS_TYPE, mRoomType.ordinal());
         editor.putBoolean(CommonUtils.CAMERA_CAPTURE_MODE, mExtendCamera);
+        editor.putInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, mExtendVideoFormat);
 
         editor.apply();
     }

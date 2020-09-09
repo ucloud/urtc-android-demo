@@ -382,6 +382,74 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"/>
             </RelativeLayout>
+            <com.urtcdemo.utils.RadioGroupFlow
+                android:id="@+id/extend_video_format_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/extend_camera_control"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginRight="15dp"
+                android:orientation="horizontal"
+                android:paddingStart="0dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="0dp"
+                android:paddingBottom="2dp">
+
+                <RadioButton
+                    android:id="@+id/nv21_format"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="NV21"
+                    android:textColor="@color/color_000_000_000" />
+
+                <RadioButton
+                    android:id="@+id/nv12_format"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="NV12"
+                    android:textColor="@color/color_000_000_000" />
+
+                <RadioButton
+                    android:id="@+id/i420_format"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="I420"
+                    android:textColor="@color/color_000_000_000" />
+
+                <RadioButton
+                    android:id="@+id/rgba_format"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="RGBA"
+                    android:textColor="@color/color_000_000_000" />
+
+                <RadioButton
+                    android:id="@+id/argb_format"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="ARGB"
+                    android:textColor="@color/color_000_000_000" />
+                <RadioButton
+                    android:id="@+id/rgb24_format"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="RGB24"
+                    android:textColor="@color/color_000_000_000" />
+                <RadioButton
+                    android:id="@+id/rgb565_format"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="RGB565"
+                    android:textColor="@color/color_000_000_000" />
+            </com.urtcdemo.utils.RadioGroupFlow>
         </RelativeLayout>
 
     </ScrollView>

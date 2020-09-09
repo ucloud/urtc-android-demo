@@ -18,7 +18,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
@@ -32,12 +31,15 @@ import android.widget.TextView;
 
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMixProfile;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkNetWorkQuality;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordProfile;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
@@ -46,24 +48,16 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
-
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
-//import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordProfile;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataProvider;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataReceiver;
-//import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
-import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
-import com.urtcdemo.service.UCloudRtcForeGroundService;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.UiHelper;
@@ -76,7 +70,6 @@ import com.urtcdemo.view.URTCVideoViewInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.URTCAudioParams;
 import org.webrtc.ucloud.record.MediaRecorderBase;
 import org.webrtc.ucloud.record.URTCRecordManager;
 import org.webrtc.ucloud.record.model.MediaObject;
@@ -98,9 +91,9 @@ import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CO
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
 import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_LOCAL_RECORD;
-import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_MIX;
-import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_MIX_MANUAL;
-import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_REMOTE_RECORD;
+
+//import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
+//import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
 
 
 public class RoomActivity extends AppCompatActivity implements VideoListener {
@@ -320,48 +313,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 
         @Override
         public ByteBuffer provideRGBData(List<Integer> params) {
-            rgbSourceData = mQueue.poll();
-            if(rgbSourceData == null){
-                Log.d(TAG, "provideRGBData: " + null);
-                return null;
-            }else{
-                Log.d(TAG, "provideRGBData: ! = null");
-                params.add(rgbSourceData.getType());
-                params.add(rgbSourceData.getWidth());
-                params.add(rgbSourceData.getHeight());
-                if(cacheBuffer == null){
-                    cacheBuffer = sdkEngine.getNativeOpInterface().
-                            createNativeByteBuffer(2560*720*4);
-                }else{
-                    cacheBuffer.clear();
-                }
-                cacheBuffer.limit(rgbSourceData.getWidth()*rgbSourceData.getHeight()*4);
-                rgbSourceData.getSrcData().copyPixelsToBuffer(cacheBuffer);
-                recycleBitmap(rgbSourceData.getSrcData());
-                rgbSourceData.srcData = null;
-                rgbSourceData = null;
-                Log.d("YUVCapture", "provideRGBData finish" + Thread.currentThread());
-                cacheBuffer.position(0);
-                return cacheBuffer;
-            }
-
-            //NV系列 数据处理
-//            nvSourceData = mQueueNV.poll();
-//            if(nvSourceData == null){
-//                return null;
-//            }else{
-//                params.add(nvSourceData.getType());
-//                params.add(nvSourceData.getWidth());
-//                params.add(nvSourceData.getHeight());
-//                if(cacheBuffer == null){
-//                    cacheBuffer = sdkEngine.getNativeOpInterface().
-//                            createNativeByteBuffer(4096*2160*4);
-//                }else{
-//                    cacheBuffer.clear();
-//                }
-//                cacheBuffer.put(nvSourceData.getSrcData());
-//                return cacheBuffer;
-//            }
+            return null;
         }
 
         public void releaseBuffer(){

@@ -5,12 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.ImageFormat;
-import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
-import android.graphics.YuvImage;
 import android.hardware.usb.UsbDevice;
 import android.os.Build;
 import android.os.Bundle;
@@ -74,7 +70,6 @@ import com.urtcdemo.view.URTCVideoViewInfo;
 
 import org.webrtc.ucloud.record.URTCRecordManager;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -134,6 +129,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private int screenWidth;
     private int screenHeight;
     private boolean mExtendCameraCapture;
+    private int mExtendVideoFormat;
+    private int mUVCCameraFormat;
+    private int mURTCVideoFormat;
 
     UCloudRtcSdkEngine sdkEngine = null;
     private UCloudRtcSdkRoomType mClass;
@@ -185,7 +183,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private final Object mSync = new Object();
     private boolean isActive, isPreview;
     //外部摄像数据读取
-    private ArrayBlockingQueue<RGBSourceData> mQueue = new ArrayBlockingQueue(8);
+    private ArrayBlockingQueue<ByteBuffer> mQueueByteBuffer = new ArrayBlockingQueue(8);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -267,6 +265,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
         mScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
         mExtendCameraCapture = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
+        mExtendVideoFormat = preferences.getInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, CommonUtils.i420_format);
+        updateVideoFormat(mExtendVideoFormat);
         mSteamList = new ArrayList<>();
 
         //房间号
@@ -1417,23 +1417,18 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
         mVideoAdapter.setRemoveRemoteStreamReceiver(null);
         if (mUCloudRTCDataProvider != null) {
-            mUCloudRTCDataProvider.releaseBuffer();
             mUCloudRTCDataProvider = null;
         }
         if (mUCloudRTCDataReceiver != null) {
-            mUCloudRTCDataReceiver.releaseBuffer();
             mUCloudRTCDataReceiver = null;
         }
         if(UCloudRtcSdkEnv.getCaptureMode() == UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND ) {
             //这里回收一遍
-            while(mQueue.size() != 0 ){
-                RGBSourceData rgbSourceData = mQueue.poll();
-                if(rgbSourceData != null){
-                    recycleBitmap(rgbSourceData.getSrcData());
-                    rgbSourceData.srcData = null;
-                    rgbSourceData = null;
+            while(mQueueByteBuffer.size() != 0 ){
+                ByteBuffer videoData = mQueueByteBuffer.poll();
+                if(videoData != null){
+                    videoData = null;
                 }
-
             }
         }
     }
@@ -1696,40 +1691,39 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         camera.setFrameCallback(new IFrameCallback() {
             @Override
             public void onFrame(ByteBuffer frame) {
-                byte[] mFrame = new byte[frame.remaining()];
-                frame.get(mFrame, 0, mFrame.length);
-                createFrame(mFrame);
+                //byte[] mFrame = new byte[frame.remaining()];
+                //frame.get(mFrame, 0, mFrame.length);
+                //createFrame(mFrame);
+                createFrameByteBuffer(frame);
             }
-        },UVCCamera.PIXEL_FORMAT_YUV);
+        },mUVCCameraFormat);
         return camera;
     }
 
     //外置数据输入监听
     private UCloudRTCDataProvider mUCloudRTCDataProvider = new UCloudRTCDataProvider() {
         private ByteBuffer cacheBuffer;
-        private RGBSourceData rgbSourceData;
+        private ByteBuffer videoSourceData;
+
         @Override
         public ByteBuffer provideRGBData(List<Integer> params) {
-            rgbSourceData = mQueue.poll();
-            if(rgbSourceData == null){
+            videoSourceData = mQueueByteBuffer.poll();
+            if(videoSourceData == null){
                 //Log.d("UCloudRTCLiveActivity", "provideRGBData: " + null);
                 return null;
             }else{
                 //Log.d("UCloudRTCLiveActivity", "provideRGBData: ! = null");
-                params.add(rgbSourceData.getType());
-                params.add(rgbSourceData.getWidth());
-                params.add(rgbSourceData.getHeight());
+                params.add(mURTCVideoFormat);
+                params.add(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth());
+                params.add(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight());
                 if(cacheBuffer == null){
                     cacheBuffer = sdkEngine.getNativeOpInterface().
                             createNativeByteBuffer(1280*720*4);
                 }else{
                     cacheBuffer.clear();
                 }
-                cacheBuffer.limit(rgbSourceData.getWidth()*rgbSourceData.getHeight()*4);
-                rgbSourceData.getSrcData().copyPixelsToBuffer(cacheBuffer);
-                recycleBitmap(rgbSourceData.getSrcData());
-                rgbSourceData.srcData = null;
-                rgbSourceData = null;
+                cacheBuffer = videoSourceData;
+                videoSourceData = null;
                 //Log.d("UCloudRTCLiveActivity", "provideRGBData finish" + Thread.currentThread());
                 cacheBuffer.position(0);
                 return cacheBuffer;
@@ -1738,17 +1732,60 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void releaseBuffer() {
-            if(rgbSourceData != null && !rgbSourceData.getSrcData().isRecycled()){
-                rgbSourceData.getSrcData().recycle();
-                rgbSourceData.srcData = null;
-                rgbSourceData = null;
+            if(videoSourceData != null){
+                videoSourceData = null;
             }
             if(cacheBuffer != null){
                 sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cacheBuffer);
+                cacheBuffer = null;
             }
         }
     };
 
+    private static ByteBuffer copyFromByteBuffer(ByteBuffer original) {
+        ByteBuffer clone = ByteBuffer.allocate(original.capacity());
+        original.rewind();//copy from the beginning
+        clone.put(original);
+        original.rewind();
+        clone.flip();
+        return clone;
+    }
+
+    private static ByteBuffer deepCopy( ByteBuffer orig )
+    {
+        int pos = orig.position(), lim = orig.limit();
+        try
+        {
+            orig.position(0).limit(orig.capacity()); // set range to entire buffer
+            ByteBuffer toReturn = deepCopyVisible(orig); // deep copy range
+            toReturn.position(pos).limit(lim); // set range to original
+            return toReturn;
+        }
+        finally // do in finally in case something goes wrong we don't bork the orig
+        {
+            orig.position(pos).limit(lim); // restore original
+        }
+    }
+    private static ByteBuffer deepCopyVisible( ByteBuffer orig )
+    {
+        int pos = orig.position();
+        try
+        {
+            ByteBuffer toReturn;
+            // try to maintain implementation to keep performance
+            if( orig.isDirect() )
+                toReturn = ByteBuffer.allocateDirect(orig.remaining());
+            else
+                toReturn = ByteBuffer.allocate(orig.remaining());
+            toReturn.put(orig);
+            toReturn.order(orig.order());
+            return (ByteBuffer) toReturn.position(0);
+        }
+        finally
+        {
+            orig.position(pos);
+        }
+    }
     //摄像数据输出监听
     private UCloudRTCDataReceiver mUCloudRTCDataReceiver = new UCloudRTCDataReceiver() {
         //private int limit = 0;
@@ -1808,29 +1845,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     }
 
-    private void createFrame(byte[] frame){
+    private void createFrameByteBuffer(ByteBuffer frame){
         try {
-            RGBSourceData sourceData;
-            Bitmap bitmap = null;
-            int type;
             if(frame != null){
-                YuvImage yuvimage = new YuvImage(frame, ImageFormat.YUY2,
-                        UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth(),
-                        UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight(), null);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                yuvimage.compressToJpeg(new Rect(0, 0,
-                         UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth(), UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight()),
-                        80, baos);  //这里 80 是图片质量，取值范围 0-100，100为品质最高
-                byte[] jdata = baos.toByteArray();//这时候 bmp 就不为 null 了
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                bitmap = BitmapFactory.decodeByteArray(jdata,0,jdata.length,options);
-                type = UCloudRTCDataProvider.RGBA_TO_I420;
-                if(bitmap != null){
-                    sourceData = new RGBSourceData(bitmap,bitmap.getWidth(),bitmap.getHeight(),type);
-                    //add rgbdata
-                    mQueue.put(sourceData);
-                }
+                //add videoSource
+                mQueueByteBuffer.put(frame);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -1854,45 +1873,27 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     }
 
-    class RGBSourceData{
-        Bitmap srcData;
-        int width;
-        int height;
-        int type;
-
-        public RGBSourceData(Bitmap srcData, int width, int height,int type) {
-            this.srcData = srcData;
-            this.width = width;
-            this.height = height;
-            this.type = type;
-        }
-
-        public Bitmap getSrcData() {
-            return srcData;
-        }
-
-        public void setSrcData(Bitmap srcData) {
-            this.srcData = srcData;
-        }
-
-        public int getWidth() {
-            return width;
-        }
-
-        public void setWidth(int width) {
-            this.width = width;
-        }
-
-        public int getHeight() {
-            return height;
-        }
-
-        public void setHeight(int height) {
-            this.height = height;
-        }
-
-        public int getType() {
-            return type;
+    private void updateVideoFormat(int videoFormat){
+        switch (videoFormat) {
+            //UVCCamera和RTC底层的uv次序相反，需调查原因，目前demo程序与urtc sdk保持一致
+            case CommonUtils.nv21_format:
+                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_YUV420SP;
+                mURTCVideoFormat = UCloudRTCDataProvider.NV21;
+                break;
+            case CommonUtils.nv12_format:
+                break;
+            case CommonUtils.i420_format:
+                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_YV12;
+                mURTCVideoFormat = UCloudRTCDataProvider.I420;
+                break;
+            case CommonUtils.rgba_format:
+                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_RGBX;
+                mURTCVideoFormat = UCloudRTCDataProvider.RGBA_TO_I420;
+                break;
+            case CommonUtils.argb_format:
+            case CommonUtils.rgb24_format:
+            case CommonUtils.rgb565_format:
+                break;
         }
     }
 }
