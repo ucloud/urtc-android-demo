@@ -1691,9 +1691,6 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         camera.setFrameCallback(new IFrameCallback() {
             @Override
             public void onFrame(ByteBuffer frame) {
-                //byte[] mFrame = new byte[frame.remaining()];
-                //frame.get(mFrame, 0, mFrame.length);
-                //createFrame(mFrame);
                 createFrameByteBuffer(frame);
             }
         },mUVCCameraFormat);
@@ -1708,18 +1705,18 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         @Override
         public ByteBuffer provideRGBData(List<Integer> params) {
             videoSourceData = mQueueByteBuffer.poll();
-            if(videoSourceData == null){
+            if (videoSourceData == null) {
                 //Log.d("UCloudRTCLiveActivity", "provideRGBData: " + null);
                 return null;
-            }else{
+            } else {
                 //Log.d("UCloudRTCLiveActivity", "provideRGBData: ! = null");
                 params.add(mURTCVideoFormat);
                 params.add(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth());
                 params.add(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight());
-                if(cacheBuffer == null){
+                if (cacheBuffer == null) {
                     cacheBuffer = sdkEngine.getNativeOpInterface().
-                            createNativeByteBuffer(1280*720*4);
-                }else{
+                            createNativeByteBuffer(1280 * 720 * 4);
+                } else {
                     cacheBuffer.clear();
                 }
                 cacheBuffer = videoSourceData;
@@ -1742,50 +1739,6 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     };
 
-    private static ByteBuffer copyFromByteBuffer(ByteBuffer original) {
-        ByteBuffer clone = ByteBuffer.allocate(original.capacity());
-        original.rewind();//copy from the beginning
-        clone.put(original);
-        original.rewind();
-        clone.flip();
-        return clone;
-    }
-
-    private static ByteBuffer deepCopy( ByteBuffer orig )
-    {
-        int pos = orig.position(), lim = orig.limit();
-        try
-        {
-            orig.position(0).limit(orig.capacity()); // set range to entire buffer
-            ByteBuffer toReturn = deepCopyVisible(orig); // deep copy range
-            toReturn.position(pos).limit(lim); // set range to original
-            return toReturn;
-        }
-        finally // do in finally in case something goes wrong we don't bork the orig
-        {
-            orig.position(pos).limit(lim); // restore original
-        }
-    }
-    private static ByteBuffer deepCopyVisible( ByteBuffer orig )
-    {
-        int pos = orig.position();
-        try
-        {
-            ByteBuffer toReturn;
-            // try to maintain implementation to keep performance
-            if( orig.isDirect() )
-                toReturn = ByteBuffer.allocateDirect(orig.remaining());
-            else
-                toReturn = ByteBuffer.allocate(orig.remaining());
-            toReturn.put(orig);
-            toReturn.order(orig.order());
-            return (ByteBuffer) toReturn.position(0);
-        }
-        finally
-        {
-            orig.position(pos);
-        }
-    }
     //摄像数据输出监听
     private UCloudRTCDataReceiver mUCloudRTCDataReceiver = new UCloudRTCDataReceiver() {
         //private int limit = 0;
@@ -1839,12 +1792,6 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     };
 
-    private void recycleBitmap(Bitmap bitmap){
-        if(bitmap != null && !bitmap.isRecycled()){
-            bitmap.recycle();
-        }
-    }
-
     private void createFrameByteBuffer(ByteBuffer frame){
         try {
             if(frame != null){
@@ -1875,15 +1822,16 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
     private void updateVideoFormat(int videoFormat){
         switch (videoFormat) {
-            //UVCCamera和RTC底层的uv次序相反，需调查原因，目前demo程序与urtc sdk保持一致
             case CommonUtils.nv21_format:
-                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_YUV420SP;
+                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_NV21;
                 mURTCVideoFormat = UCloudRTCDataProvider.NV21;
                 break;
             case CommonUtils.nv12_format:
+                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_YUV420SP;
+                mURTCVideoFormat = UCloudRTCDataProvider.NV12;
                 break;
             case CommonUtils.i420_format:
-                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_YV12;
+                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_I420;
                 mURTCVideoFormat = UCloudRTCDataProvider.I420;
                 break;
             case CommonUtils.rgba_format:
@@ -1891,8 +1839,18 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 mURTCVideoFormat = UCloudRTCDataProvider.RGBA_TO_I420;
                 break;
             case CommonUtils.argb_format:
+                //UVCCamera不支持输出argb格式，测试用rgbx格式，输出时颜色会有偏差
+                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_ARGB;
+                mURTCVideoFormat = UCloudRTCDataProvider.ARGB_TO_I420;
+                break;
             case CommonUtils.rgb24_format:
+                //UVCCamera的RGB888与libyuv的数据有大小端区别，所以UVCCamera输出使用BGR888,保证颜色正确
+                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_BGR888;
+                mURTCVideoFormat = UCloudRTCDataProvider.RGB24_TO_I420;
+                break;
             case CommonUtils.rgb565_format:
+                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_RGB565;
+                mURTCVideoFormat = UCloudRTCDataProvider.RGB565_TO_I420;
                 break;
         }
     }
