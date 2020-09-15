@@ -47,8 +47,8 @@
 
                         <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
                             android:id="@+id/TestRemoteView"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
+                            android:layout_width="200dp"
+                            android:layout_height="150dp"/>
 <!--                        <TextureView-->
 <!--                            android:layout_width="match_parent"-->
 <!--                            android:layout_height="match_parent"-->
@@ -289,6 +289,30 @@
                         android:layout_width="wrap_content"
                         android:layout_height="48dp"
                         android:text="hdmionly"
+                        android:gravity="center"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:textColor="@color/colorWhite"></TextView>
+
+                    <TextView
+                        android:layout_marginLeft="20dp"
+                        android:id="@+id/headset"
+                        android:background="@drawable/oval_start_record_background"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:text="headset"
+                        android:gravity="center"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:textColor="@color/colorWhite"></TextView>
+
+                    <TextView
+                        android:layout_marginLeft="20dp"
+                        android:id="@+id/earreturn"
+                        android:background="@drawable/oval_start_record_background"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:text="earreturn"
                         android:gravity="center"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"

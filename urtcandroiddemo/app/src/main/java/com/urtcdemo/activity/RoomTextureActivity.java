@@ -26,8 +26,10 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.ucloudrtclib.common.URTCLogUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
@@ -114,6 +116,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
     ImageButton mMuteMic = null;
     ImageButton mLoudSpkeader = null;
     ImageButton mMuteCam = null;
+    TextView mSwitchBtn = null;
     TextView mOpBtn = null;
     CheckBox  mCheckBoxMirror = null;
     private SteamScribePopupWindow mSpinnerPopupWindowScribe;
@@ -142,6 +145,11 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
     private boolean mLocalRecordStart = false;
     private boolean mLocalResample = false;
     private TextureView mTestTextureView;
+    private List<UCloudRtcSdkStreamInfo> remoteStreamInfos = new ArrayList<>();
+    private List<View> remoteRenderViews = new ArrayList<>();
+    private boolean swapSurface = false;
+    private int currentIndex = -1;
+
     /**
      * SDK视频录制对象
      */
@@ -349,7 +357,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                             if (!sdkEngine.isAudioOnlyMode()) {
 //                                localrenderview.setBackgroundColor(Color.TRANSPARENT);
                                 sdkEngine.startPreview(info.getMediaType(),
-                                        localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, new UCloudRTCFirstFrameRendered() {
+                                        localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, new UCloudRTCFirstFrameRendered() {
                                             @Override
                                             public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
                                                 Log.d(TAG, "onLocalFirstFrameRender: " + "view: "+ view);
@@ -511,6 +519,8 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
 //                            textureView.setTag(info);
 //                            textureView.setId(R.id.video_view);
                         }
+                        Log.d(TAG, " subscribe info: " + info);
+                        remoteStreamInfos.add(info);
                         vinfo.setmUid(info.getUId());
                         vinfo.setmMediatype(info.getMediaType());
                         vinfo.setmEanbleVideo(info.isHasVideo());
@@ -898,7 +908,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
-        mVideoAdapter = new RemoteHasViewVideoAdapter(this,sdkEngine);
+        mVideoAdapter = new RemoteHasViewVideoAdapter(this,sdkEngine,remoteRenderViews);
         mRemoteGridView.setLayoutManager(gridLayoutManager);
         mRemoteGridView.getItemAnimator().setAddDuration(0);
         mRemoteGridView.setAdapter(mVideoAdapter);
@@ -907,6 +917,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         mRoomToken = getIntent().getStringExtra("token");
         mAppid = getIntent().getStringExtra("app_id");
         mHangup = findViewById(R.id.button_call_disconnect);
+        mSwitchBtn = findViewById(R.id.swap);
         mSwitchcam = findViewById(R.id.button_call_switch_camera);
         mMuteMic = findViewById(R.id.button_call_toggle_mic);
         mLoudSpkeader = findViewById(R.id.button_call_loundspeaker);
@@ -1054,6 +1065,29 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
             @Override
             protected void onFastClick() {
 
+            }
+        });
+        mSwitchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!swapSurface){
+                    if(currentIndex != -1){
+                        sdkEngine.stopRemoteView(remoteStreamInfos.get(currentIndex));
+                        sdkEngine.startRemoteView(remoteStreamInfos.get(currentIndex),remoteRenderViews.get(currentIndex) , UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                    }
+                    currentIndex = 0;
+                    sdkEngine.stopRemoteView(remoteStreamInfos.get(currentIndex));
+                    sdkEngine.startRemoteView(remoteStreamInfos.get(currentIndex), mTestTextureView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                }else{
+                    URTCLogUtils.d(TAG, "swapSurface = true");
+                    sdkEngine.stopRemoteView(remoteStreamInfos.get(currentIndex));
+                    sdkEngine.startRemoteView(remoteStreamInfos.get(currentIndex),remoteRenderViews.get(currentIndex) , UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                    currentIndex = 1;
+                    sdkEngine.stopRemoteView(remoteStreamInfos.get(currentIndex));
+                    sdkEngine.startRemoteView(remoteStreamInfos.get(currentIndex), mTestTextureView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+
+                }
+                swapSurface = !swapSurface;
             }
         });
         mSteamList = new ArrayList<>();
@@ -1434,6 +1468,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
 //        localrenderview.release();
         clearGridItem();
         mVideoAdapter.setRemoveRemoteStreamReceiver(null);
+        mVideoAdapter.releaseReference();
         UCloudRtcSdkEngine.destory();
         System.gc();
     }

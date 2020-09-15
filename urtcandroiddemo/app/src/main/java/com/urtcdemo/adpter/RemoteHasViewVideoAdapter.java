@@ -5,9 +5,11 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
@@ -29,16 +31,22 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
     private ArrayList<String> medialist = new ArrayList<>();
     protected final LayoutInflater mInflater;
     private Context mContext;
+    private Activity host;
     private List<ViewHolder> mCacheHolder;
     private RemoveRemoteStreamReceiver mRemoveRemoteStreamReceiver;
     private UCloudRtcSdkEngine mSdkEngine;
+    private List<View> mRenderViews;
 
 
-    public RemoteHasViewVideoAdapter(Context context, UCloudRtcSdkEngine sdkEngine) {
+    public RemoteHasViewVideoAdapter(Context context, UCloudRtcSdkEngine sdkEngine, List<View> remoteViewLists) {
         mContext = context;
+        if(context instanceof Activity){
+            mContext = (Activity)context;
+        }
         mSdkEngine = sdkEngine;
         mInflater = ((Activity) context).getLayoutInflater();
         mCacheHolder = new ArrayList<>();
+        mRenderViews = remoteViewLists;
     }
 
     @Override
@@ -56,6 +64,12 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         return holder;
     }
 
+
+    @Override
+    public void onViewRecycled(ViewHolder holder) {
+        super.onViewRecycled(holder);
+        mRenderViews.remove(holder.itemView.findViewById(R.id.texture_view));
+    }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
@@ -83,6 +97,9 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
             if (videoView instanceof UCloudRtcSdkSurfaceVideoView)
                 ((UCloudRtcSdkSurfaceVideoView) videoView).setZOrderMediaOverlay(true);
             videoView.setTag(R.id.index, viewInfo);
+            if(mRenderViews != null && !mRenderViews.contains(mRenderViews)){
+                mRenderViews.add(videoView);
+            }
             videoView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -111,7 +128,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 
 
                     //view render mode change
-                    mSdkEngine.setRenderViewMode(false, viewInfo.getStreamInfo(), UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_FILL);
+//                    mSdkEngine.setRenderViewMode(false, viewInfo.getStreamInfo(), UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_FILL);
                 }
             });
             mSdkEngine.startRemoteView(viewInfo.getStreamInfo(), videoView, null, new UCloudRTCFirstFrameRendered(){
@@ -233,6 +250,12 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                 holderView.removeAllViews();
             }
             mCacheHolder.clear();
+        }
+    }
+
+    public void releaseReference(){
+        if(host != null){
+            host = null;
         }
     }
 

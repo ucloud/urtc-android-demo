@@ -19,6 +19,13 @@
                 android:id="@+id/local_texture_view"
                 android:layout_width="500dp"
                 android:layout_height="match_parent" />
+
+            <TextureView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:id="@+id/texture_test">
+
+            </TextureView>
             <ProgressBar
                 android:id="@+id/processlocal"
                 style="@android:style/Widget.ProgressBar.Horizontal"
@@ -33,7 +40,7 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/remoteGridView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
             android:layout_marginLeft="10dp"
@@ -43,8 +50,7 @@
         <TextureView
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:id="@+id/test_textureview"
-            android:layout_gravity="right|center_vertical" />
+            android:id="@+id/test_textureview" />
 
         <FrameLayout
             android:id="@+id/call_fragment_container"
@@ -86,6 +92,18 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="start"
+                        android:gravity="center"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:textColor="@color/colorWhite"></TextView>
+
+                    <TextView
+                        android:layout_marginLeft="20dp"
+                        android:id="@+id/swap"
+                        android:background="@drawable/oval_start_record_background"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:text="swap"
                         android:gravity="center"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"

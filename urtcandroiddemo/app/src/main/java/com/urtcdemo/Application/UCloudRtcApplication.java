@@ -65,6 +65,7 @@ public class UCloudRtcApplication extends Application {
         UCloudRtcSdkEnv.setWriteToLogCat(true);
         UCloudRtcSdkEnv.setLogReport(true);
         UCloudRtcSdkEnv.setEncodeMode(UCloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);
+        UCloudRtcSdkEnv.setHDMIRenderByTexture(true);
         UCloudRtcSdkEnv.setMediaCodecBitRateMode(MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR);
         UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo);
         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
@@ -83,9 +84,8 @@ public class UCloudRtcApplication extends Application {
         DisplayMetrics outMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(outMetrics);
        // CommonUtils.mItemWidth = (outMetrics.widthPixels - UiHelper.dipToPx(this, 15)) / 6;
-        //CommonUtils.mItemWidth = (UiHelper.dipToPx(this, 80)) ;
-        CommonUtils.mItemWidth = outMetrics.widthPixels  / 3;
-        CommonUtils.mItemHeight = CommonUtils.mItemWidth;
+        CommonUtils.mItemWidth = (UiHelper.dipToPx(this, 80)) ;
+//        CommonUtils.mItemWidth = outMetrics.widthPixels  / 3;
         CommonUtils.mItemHeight = CommonUtils.mItemWidth;
         CrashReport.initCrashReport(getApplicationContext(), "9a51ae062a", true);
 //        BlockCanary.install(this, new AppContext()).start();
