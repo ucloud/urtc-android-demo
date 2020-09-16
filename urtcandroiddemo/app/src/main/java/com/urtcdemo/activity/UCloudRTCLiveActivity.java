@@ -119,6 +119,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private boolean mLocalViewFullScreen = false;
     private boolean mRemoteVideoMute;
     private boolean mRemoteAudioMute;
+    private boolean mIsPreview = false;
     @CommonUtils.PubScribeMode
     private int mPublishMode;
     @CommonUtils.PubScribeMode
@@ -167,11 +168,14 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private ImageView mImgLocalRecord;
     private TextView mTextLocalRecord;
     private ImageView mImgScreenshot;
+    private TextView mTextScreenshot;
     private ImageView mImgRemoteRecord;
     private TextView mTextRemoteRecord;
     private ImageView mImgManualPub;
     private TextView mTextManualPub;
     private TextView mTextRoomId;
+    private ImageView mImgPreview;
+    private TextView mTextPreview;
     private TextView mTextResolution;
     private VideoProfilePopupWindow mResolutionPopupWindow;
     //音量图片
@@ -244,6 +248,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mImgLocalRecord = findViewById(R.id.local_record_pic);
         mTextLocalRecord = findViewById(R.id.local_record_text);
         mImgScreenshot = findViewById(R.id.screenshot_pic);
+        mTextScreenshot = findViewById(R.id.screenshot_text);
         mImgRemoteRecord = findViewById(R.id.remote_record_pic);
         mTextRemoteRecord = findViewById(R.id.remote_record_text);
         mImgManualPub = findViewById(R.id.manual_publish_pic);
@@ -251,6 +256,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mImgSoundVolume = findViewById(R.id.sound_volume_img);
         mImgMicSts = findViewById(R.id.mic_status_img);
         mTextResolution = findViewById(R.id.resolution_text);
+        mImgPreview = findViewById(R.id.preview_pic);
+        mTextPreview = findViewById(R.id.preview_text);
 
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
@@ -325,21 +332,24 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             UCloudRtcSdkEnv.setCaptureMode(
                     UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
         }
-
         if (mPublishMode == CommonUtils.AUTO_MODE) {
             mImgManualPub.setVisibility(View.GONE);
             mTextManualPub.setVisibility(View.GONE);
-        }
-        else {
+            mImgPreview.setVisibility(View.GONE);
+            mTextPreview.setVisibility(View.GONE);
+        } else {
+            //未发布时，按钮隐藏
             mImgManualPub.setVisibility(View.VISIBLE);
             mTextManualPub.setVisibility(View.VISIBLE);
+            setIconStats(false);
         }
+
         mImgBtnMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mDrawer.isDrawerOpen(Gravity.RIGHT)){
+                if (mDrawer.isDrawerOpen(Gravity.RIGHT)) {
                     mDrawer.closeDrawer(Gravity.RIGHT);
-                }else{
+                } else {
                     mDrawer.openDrawer(Gravity.RIGHT);
                 }
             }
@@ -469,6 +479,23 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 }
                 else {
                     sdkEngine.unPublish(mPublishMediaType);
+                }
+            }
+        });
+
+        //预览控制
+        mImgPreview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setPreview(!mIsPreview);
+                mIsPreview = !mIsPreview;
+                if (mIsPreview) {
+                    mTextPreview.setText(R.string.stop_preview);
+                    mLocalVideoView.setVisibility(View.VISIBLE);
+                }
+                else {
+                    mTextPreview.setText(R.string.start_preview);
+                    mLocalVideoView.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -651,23 +678,28 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                                 //mLocalVideoView.init(false);
                                 // Surfaceview打开
                                 //mLocalVideoView.setBackgroundColor(Color.TRANSPARENT);
-                                mLocalVideoView.setVisibility(View.VISIBLE);
+                                //mLocalVideoView.setVisibility(View.VISIBLE);
                                 localViewWidth = mLocalVideoView.getMeasuredWidth();
                                 localViewHeight = mLocalVideoView.getMeasuredHeight();
-                                if (mExtendCameraCapture) {
-                                    sdkEngine.startPreview(info.getMediaType(),
-                                            mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+                                if (!mIsPreview) {
+                                    if (mExtendCameraCapture) {
+                                        sdkEngine.startPreview(info.getMediaType(),
+                                                mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+                                    } else {
+                                        sdkEngine.startPreview(info.getMediaType(),
+                                                mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                                    }
+                                    if (mPublishMode != CommonUtils.AUTO_MODE) {
+                                        setIconStats(true);
+                                    }
                                 }
                                 else {
-                                    sdkEngine.startPreview(info.getMediaType(),
-                                            mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                                    setIconStats(true);
                                 }
-
                                 mLocalStreamInfo = info;
                                 mLocalVideoView.setTag(mLocalStreamInfo);
                                 mLocalVideoView.setOnClickListener(mToggleScreenOnClickListener);
                             }
-
                         }
                         else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN.ordinal()) {
                             if (mScreenEnable && !mCameraEnable && !mMicEnable) {
@@ -698,6 +730,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                             if (mLocalVideoView != null) {
 //                                localrenderview.refresh();
                             }
+                            setIconStats(false);
+                            setPreview(false);
+                            mIsPreview = false;
+                            mTextPreview.setText(R.string.start_preview);
+                            mLocalVideoView.setVisibility(View.INVISIBLE);
                         } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
                             if (mScreenEnable && !mCameraEnable && !mMicEnable) {
 //                                if (localrenderview != null) {
@@ -1852,6 +1889,57 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_RGB565;
                 mURTCVideoFormat = UCloudRTCDataProvider.RGB565_TO_I420;
                 break;
+        }
+    }
+
+    private void setPreview(boolean onOff) {
+        if (onOff) {
+            if (mExtendCameraCapture) {
+                sdkEngine.startPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO,
+                        mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+            } else {
+                sdkEngine.startPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO,
+                        mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+            }
+        }
+        else {
+            sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+        }
+    }
+
+    private void setIconStats(boolean visible) {
+        if (!visible) {
+            //未发布时，按钮隐藏
+            mImgPreview.setVisibility(View.VISIBLE);
+            mTextPreview.setVisibility(View.VISIBLE);
+            mImgMix.setVisibility(View.GONE);
+            mTextMix.setVisibility(View.GONE);
+            mImgLocalRecord.setVisibility(View.GONE);
+            mTextLocalRecord.setVisibility(View.GONE);
+            mImgScreenshot.setVisibility(View.GONE);
+            mTextScreenshot.setVisibility(View.GONE);
+            mImgRemoteRecord.setVisibility(View.GONE);
+            mTextRemoteRecord.setVisibility(View.GONE);
+            mImgBtnMuteMic.setVisibility(View.INVISIBLE);
+            mImgBtnMuteVideo.setVisibility(View.INVISIBLE);
+            mImgBtnMirror.setVisibility(View.INVISIBLE);
+            mTextResolution.setVisibility(View.INVISIBLE);
+        }
+        else {
+            mImgBtnMuteMic.setVisibility(View.VISIBLE);
+            mImgBtnMuteVideo.setVisibility(View.VISIBLE);
+            mTextResolution.setVisibility(View.VISIBLE);
+            mImgBtnMirror.setVisibility(View.VISIBLE);
+            mImgMix.setVisibility(View.VISIBLE);
+            mTextMix.setVisibility(View.VISIBLE);
+            mImgLocalRecord.setVisibility(View.VISIBLE);
+            mTextLocalRecord.setVisibility(View.VISIBLE);
+            mImgScreenshot.setVisibility(View.VISIBLE);
+            mTextScreenshot.setVisibility(View.VISIBLE);
+            mImgRemoteRecord.setVisibility(View.VISIBLE);
+            mTextRemoteRecord.setVisibility(View.VISIBLE);
+            mImgPreview.setVisibility(View.INVISIBLE);
+            mTextPreview.setVisibility(View.INVISIBLE);
         }
     }
 }

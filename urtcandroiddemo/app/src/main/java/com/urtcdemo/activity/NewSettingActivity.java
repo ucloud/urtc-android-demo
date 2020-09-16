@@ -263,7 +263,7 @@ public class NewSettingActivity extends AppCompatActivity {
         @Override
         public void onItemClick(int pos) {
             if (mExtendCamera && pos < 4) {
-                mSelectPos = 4;
+                mSelectPos = 5;
                 ToastUtils.shortShow(NewSettingActivity.this,"外接摄像头目前不支持640*480以下分辨率" );
             }
             else {
@@ -279,7 +279,12 @@ public class NewSettingActivity extends AppCompatActivity {
                 Context.MODE_PRIVATE).edit();
 
         editor.putString(CommonUtils.APPID_KEY, mAppid);
-        editor.putInt(CommonUtils.videoprofile, mSelectPos);
+        if (mExtendCamera && mSelectPos < 4) {
+            editor.putInt(CommonUtils.videoprofile, 5);
+        }
+        else {
+            editor.putInt(CommonUtils.videoprofile, mSelectPos);
+        }
         editor.putBoolean(CommonUtils.CAMERA_ENABLE, mEnableCamera);
         editor.putBoolean(CommonUtils.MIC_ENABLE, mEnableMic);
         editor.putBoolean(CommonUtils.SCREEN_ENABLE, mEnableScreen);

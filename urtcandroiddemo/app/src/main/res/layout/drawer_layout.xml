@@ -131,6 +131,24 @@
                 android:textSize="12sp"
                 android:gravity="center"
                 android:maxLines="1"/>
+            <ImageView
+                android:id="@+id/preview_pic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/lsq_color_transparent"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:src="@mipmap/preview" />
+            <TextView
+                android:id="@+id/preview_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/start_preview"
+                android:textColor="@color/lsq_color_white"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:maxLines="1"/>
 <!--            <View
                 android:layout_height="1dp"
                 android:layout_width="match_parent"
