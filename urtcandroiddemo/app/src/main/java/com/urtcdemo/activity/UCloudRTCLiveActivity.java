@@ -678,7 +678,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                                 //mLocalVideoView.init(false);
                                 // Surfaceview打开
                                 //mLocalVideoView.setBackgroundColor(Color.TRANSPARENT);
-                                //mLocalVideoView.setVisibility(View.VISIBLE);
+                                mLocalVideoView.setVisibility(View.VISIBLE);
                                 localViewWidth = mLocalVideoView.getMeasuredWidth();
                                 localViewHeight = mLocalVideoView.getMeasuredHeight();
                                 if (!mIsPreview) {
@@ -1283,14 +1283,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     synchronized (mSync) {
-                        final UVCCamera camera = initUVCCamera(ctrlBlock);
+                        //final UVCCamera camera = initUVCCamera(ctrlBlock);
+                        mUVCCamera = initUVCCamera(ctrlBlock);
                         isActive = true;
                         isPreview = true;
-                        synchronized (mSync) {
-                            if (camera != null) {
-                                mUVCCamera = camera;
-                            }
-                        }
                     }
                 }
             });
@@ -1722,7 +1718,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         // Start preview to external GL texture
         // NOTE : this is necessary for callback passed to [UVCCamera.setFrameCallback]
         // to be triggered afterwards
-        camera.setPreviewTexture(surfaceTexture);
+        //camera.setPreviewTexture(surfaceTexture);
         camera.startPreview();
 
         camera.setFrameCallback(new IFrameCallback() {
