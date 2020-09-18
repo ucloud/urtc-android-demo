@@ -79,6 +79,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
@@ -1436,6 +1437,23 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mVideoAdapter.notifyDataSetChanged();
     }
     private void releaseExtendCamera() {
+/*        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (mSync) {
+                    isActive = isPreview = false;
+                    if (mUVCCamera != null) {
+                        mUVCCamera.stopPreview();
+                        mUVCCamera.close();
+                        mUVCCamera = null;
+                    }
+                    if (mUSBMonitor != null) {
+                        mUSBMonitor.destroy();
+                        mUSBMonitor = null;
+                    }
+                }
+            }
+        });*/
         synchronized (mSync) {
             isActive = isPreview = false;
             if (mUVCCamera != null) {
@@ -1829,7 +1847,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         try {
             if(frame != null){
                 //add videoSource
-                mQueueByteBuffer.put(frame);
+                mQueueByteBuffer.offer(frame, 1, TimeUnit.SECONDS);
             }
         }catch (Exception e){
             e.printStackTrace();
