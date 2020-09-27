@@ -357,7 +357,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                             if (!sdkEngine.isAudioOnlyMode()) {
 //                                localrenderview.setBackgroundColor(Color.TRANSPARENT);
                                 sdkEngine.startPreview(info.getMediaType(),
-                                        localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, new UCloudRTCFirstFrameRendered() {
+                                        localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, new UCloudRTCFirstFrameRendered() {
                                             @Override
                                             public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
                                                 Log.d(TAG, "onLocalFirstFrameRender: " + "view: "+ view);

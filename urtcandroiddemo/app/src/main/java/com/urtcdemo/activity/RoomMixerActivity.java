@@ -209,6 +209,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private List<UCloudRtcRenderView> remoteRenderViews = new ArrayList<>();
     private int currentIndex = -1;
 
+
     /**
      * SDK视频录制对象
      */
@@ -1497,14 +1498,16 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mEarReturnBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!driverEarReturn) {
-                    sdkEngine.enableEarBack(true);
-                    mEarReturnBtn.setText("EarBackOff");
-                }else{
-                    sdkEngine.enableEarBack(false);
-                    mEarReturnBtn.setText("EarBackOn");
-                }
-                driverEarReturn = !driverEarReturn;
+//                if(!driverEarReturn) {
+//                    sdkEngine.enableEarBack(true);
+//                    mEarReturnBtn.setText("EarBackOff");
+//                }else{
+//                    sdkEngine.enableEarBack(false);
+//                    mEarReturnBtn.setText("EarBackOn");
+//                }
+//                driverEarReturn = !driverEarReturn;
+                sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+                sdkEngine.changeVideoChannel();
             }
         });
 
