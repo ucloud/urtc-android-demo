@@ -11,14 +11,13 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatSeekBar;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatSeekBar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
@@ -60,10 +59,8 @@ import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataReceiver;
 //import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
-import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
-import com.urtcdemo.service.UCloudRtcForeGroundService;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.UiHelper;
@@ -76,7 +73,6 @@ import com.urtcdemo.view.URTCVideoViewInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.URTCAudioParams;
 import org.webrtc.ucloud.record.MediaRecorderBase;
 import org.webrtc.ucloud.record.URTCRecordManager;
 import org.webrtc.ucloud.record.model.MediaObject;
@@ -98,9 +94,6 @@ import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CO
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
 import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_LOCAL_RECORD;
-import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_MIX;
-import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_MIX_MANUAL;
-import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_REMOTE_RECORD;
 
 
 public class RoomActivity extends AppCompatActivity implements VideoListener {
@@ -1139,6 +1132,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
+        public void onLogOffUsers(int code, String msg) {
+
+        }
+
+        @Override
         public void onMsgNotify(int code, String msg) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -1146,6 +1144,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                     Log.d(TAG, "onMsgNotify: code: " + code + "msg: " + msg);
                 }
             });
+        }
+
+        @Override
+        public void onLogOffNotify(int cmdType, String userId) {
+
         }
 
         @Override

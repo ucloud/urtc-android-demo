@@ -4,18 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -1002,6 +1001,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
         }
 
         @Override
+        public void onLogOffUsers(int code, String msg) {
+
+        }
+
+        @Override
         public void onMsgNotify(int code, String msg) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -1009,6 +1013,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity implements TextureV
                     Log.d(TAG, "onMsgNotify: code: " + code + "msg: " + msg);
                 }
             });
+        }
+
+        @Override
+        public void onLogOffNotify(int cmdType, String userId) {
+
         }
 
         @Override

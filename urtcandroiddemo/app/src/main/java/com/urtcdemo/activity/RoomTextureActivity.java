@@ -10,10 +10,10 @@ import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
@@ -53,7 +53,6 @@ import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRtcAudioResample;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteHasViewVideoAdapter;
-import com.urtcdemo.service.UCloudRtcForeGroundService;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.UiHelper;
@@ -78,7 +77,6 @@ import java.util.Timer;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
-import static com.urtcdemo.activity.RoomTextureActivity.BtnOp.OP_LOCAL_RECORD;
 import static com.urtcdemo.activity.RoomTextureActivity.BtnOp.OP_MIX;
 
 
@@ -797,6 +795,11 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
+        public void onLogOffUsers(int code, String msg) {
+
+        }
+
+        @Override
         public void onMsgNotify(int code, String msg) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -804,6 +807,11 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                     Log.d(TAG, "onMsgNotify: code: " + code + "msg: " + msg);
                 }
             });
+        }
+
+        @Override
+        public void onLogOffNotify(int cmdType, String userId) {
+
         }
 
         @Override

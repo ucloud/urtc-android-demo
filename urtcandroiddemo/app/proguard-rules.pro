@@ -51,7 +51,7 @@
 
 # 保留四大组件，自定义的Application等这些类不被混淆
 -keep public class * extends android.app.Activity
--keep public class * extends android.app.Appliction
+-keep public class * extends android.app.Application
 -keep public class * extends android.app.Service
 -keep public class * extends android.content.BroadcastReceiver
 -keep public class * extends android.content.ContentProvider
@@ -84,8 +84,18 @@
 }
 
 #保留Keep注解的类名和方法
--keep,allowobfuscation @interface android.support.annotation.Keep
--keep @android.support.annotation.Keep class *
--keepclassmembers class * {
-    @android.support.annotation.Keep *;
-}
+#-keep,allowobfuscation @interface android.support.annotation.Keep
+#-keep @android.support.annotation.Keep class *
+#-keepclassmembers class * {
+#    @android.support.annotation.Keep *;
+#}
+
+-keep class com.google.android.material.** {*;}
+-keep class androidx.** {*;}
+-keep public class * extends androidx.**
+-keep interface androidx.** {*;}
+-dontwarn com.google.android.material.**
+-dontnote com.google.android.material.**
+-dontwarn androidx.**
+
+

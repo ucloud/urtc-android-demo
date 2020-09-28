@@ -1,6 +1,6 @@
 package com.urtcdemo.utils;
 
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 public class CommonUtils {
     public static int mItemWidth;
