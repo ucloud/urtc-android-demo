@@ -30,7 +30,6 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.ucloudrtclib.common.URTCLogUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRTCCameraDataTransport;
@@ -566,7 +565,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    URTCLogUtils.d(TAG,"onJoinRoomResult");
+                    Log.d(TAG,"onJoinRoomResult");
                     if (code == 0) {
                         sdkEngine.renderRemoteMixStream(mRemoteRenderView);
                         ToastUtils.shortShow(RoomMixerActivity.this, " 加入房间成功");
@@ -1879,7 +1878,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                 } else {
                     if(mCaptureMode == CommonUtils.screen_capture_mode || mCaptureMode == CommonUtils.multi_capture_mode){
                         if(!changeRTSPFlag){
-                            String rtspurl = preferences.getString(CommonUtils.RTSP_URL_KEY, "rtsp://192.168.161.148:554/ch1");
+                            String rtspurl = preferences.getString(CommonUtils.RTSP_URL_KEY, "rtsp://192.168.161.148:554/ch2");
                             UcloudRtcCameraMixConfig.RTSP_URL = rtspurl;
                             sdkEngine.changeRTSPUrl();
                             ToastUtils.shortShow(RoomMixerActivity.this,UcloudRtcCameraMixConfig.RTSP_URL);
@@ -2136,7 +2135,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                     sdkEngine.stopRemoteView(remoteStreamInfos.get(currentIndex));
                     sdkEngine.startRemoteView(remoteStreamInfos.get(currentIndex), mTestRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                 }else{
-                    URTCLogUtils.d(TAG, "swapSurface = true");
+                    Log.d(TAG, "swapSurface = true");
                     sdkEngine.stopRemoteView(remoteStreamInfos.get(currentIndex));
                     sdkEngine.startRemoteView(remoteStreamInfos.get(currentIndex),remoteRenderViews.get(currentIndex) , UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                     currentIndex = 1;
