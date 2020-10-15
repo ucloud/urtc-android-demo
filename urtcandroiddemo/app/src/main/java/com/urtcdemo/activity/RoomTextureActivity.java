@@ -1110,38 +1110,38 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                     switch (mCaptureMode) {
                         //音频
                         case CommonUtils.audio_capture_mode:
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true,false).getErrorCode());
                             break;
                         //视频
                         case CommonUtils.camera_capture_mode:
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true,false).getErrorCode());
                             break;
                         //屏幕捕捉
                         case CommonUtils.screen_capture_mode:
                             if (isScreenCaptureSupport) {
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false,false).getErrorCode());
                             } else {
                                 errorMessage.append("设备不支持屏幕捕捉\n");
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true,false).getErrorCode());
                             }
                             break;
                         //音频+屏幕捕捉
                         case CommonUtils.screen_Audio_mode:
                             if (isScreenCaptureSupport) {
                                 //推一路桌面一路音频,桌面流不需要带音频
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, false, false).getErrorCode());
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, false, false,false).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true,false).getErrorCode());
                             } else {
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true,false).getErrorCode());
                             }
                             break;
                         //视频+屏幕捕捉
                         case CommonUtils.multi_capture_mode:
                             if (isScreenCaptureSupport) {
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false,false).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true,false).getErrorCode());
                             } else {
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true,false).getErrorCode());
                             }
                             break;
                     }

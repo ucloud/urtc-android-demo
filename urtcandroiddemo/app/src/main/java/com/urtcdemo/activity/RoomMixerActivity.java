@@ -201,8 +201,10 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private boolean turnHdmiOnlyVoiceOff = false;
     private boolean turnHeadSetOff = false;
     private boolean driverEarReturn = false;
+    private boolean mixSourceWithRtsp = false;
     private ViewGroup mViewGroup;
     private String RTSP_BACKUP_URL = "rtsp://192.168.161.148:554/ch3";
+    private String RTSP_BACKUP_UR_MIXED = "rtsp://192.168.165.121:554/ch3";
 //    private String RTSP_BACKUP_URL = "rtsp://192.168.1.200/ch1";
     private List<UCloudRtcSdkStreamInfo> remoteStreamInfos = new ArrayList<>();
     private List<UCloudRtcRenderView> remoteRenderViews = new ArrayList<>();
@@ -639,9 +641,10 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                 localrenderview.setVisibility(View.VISIBLE);
 //                                localrenderview.setBackgroundColor(Color.TRANSPARENT);
 //                                localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
-                                sdkEngine.startPreview(info.getMediaType(),
-                                        localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
-
+                                if(!info.isWithRtsp()){
+                                    sdkEngine.startPreview(info.getMediaType(),
+                                            localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                                }
 //                                sdkEngine.startPreview(info.getMediaType(),
 //                                        mRemoteRenderView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
 //                                UCloudRtcRenderView renderView = new UCloudRtcRenderView(RoomActivity.this);
@@ -741,7 +744,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                     if (!mUserid.equals(info.getUId())) {
                         mSteamList.add(info);
                         if (!sdkEngine.isAutoSubscribe()) {
-                            sdkEngine.subscribe(info);
+//                            sdkEngine.subscribe(info);
                         } else {
                             mSpinnerPopupWindowScribe.notifyUpdate();
                             refreshStreamInfoText();
@@ -1497,16 +1500,18 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mEarReturnBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if(!driverEarReturn) {
+                if(!driverEarReturn) {
 //                    sdkEngine.enableEarBack(true);
 //                    mEarReturnBtn.setText("EarBackOff");
-//                }else{
+                    sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+                    UcloudRtcCameraMixConfig.RTSP_URL_MIX = CommonUtils.RTST_URL_MIXED;
+                    sdkEngine.hackVideoChannel();
+                }else{
 //                    sdkEngine.enableEarBack(false);
 //                    mEarReturnBtn.setText("EarBackOn");
-//                }
-//                driverEarReturn = !driverEarReturn;
-                sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
-                sdkEngine.changeVideoChannel();
+                    sdkEngine.recoverVideoChannel();
+                }
+                driverEarReturn = !driverEarReturn;
             }
         });
 
@@ -1788,6 +1793,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             }
         });
         mPublish = findViewById(R.id.button_call_pub);
+        UcloudRtcCameraMixConfig.RTSP_URL = CommonUtils.RTST_URL;
+        UcloudRtcCameraMixConfig.RTSP_URL_MIX = CommonUtils.RTST_URL_MIXED;
         mPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1798,11 +1805,11 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                     switch (mCaptureMode) {
                         //音频
                         case CommonUtils.audio_capture_mode:
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true,false,mixSourceWithRtsp).getErrorCode());
                             break;
                         //视频
                         case CommonUtils.camera_capture_mode:
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true,false).getErrorCode());
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true,false,mixSourceWithRtsp).getErrorCode());
                             break;
                         //屏幕捕捉
                         case CommonUtils.screen_capture_mode:
@@ -1812,46 +1819,46 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                     UcloudRtcCameraMixConfig.RTSP_URL = rtspurl;
                                     Log.d(TAG,"publish screen rtsp "+ UcloudRtcCameraMixConfig.RTSP_URL);
                                     ToastUtils.shortShow(RoomMixerActivity.this,"publish screen "+ UcloudRtcCameraMixConfig.RTSP_URL);
-                                    results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true).getErrorCode());
+                                    results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true,false,false).getErrorCode());
                                 }else{
                                     UcloudRtcCameraMixConfig.RTSP_URL = RTSP_BACKUP_URL;
                                     Log.d(TAG,"publish screen rtsp "+ UcloudRtcCameraMixConfig.RTSP_URL);
                                     ToastUtils.shortShow(RoomMixerActivity.this,"publish screen "+ UcloudRtcCameraMixConfig.RTSP_URL);
-                                    results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true).getErrorCode());
+                                    results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true,false,false).getErrorCode());
                                 }
                                 changeRTSPFlag = !changeRTSPFlag;
 
                             } else {
                                 errorMessage.append("设备不支持屏幕捕捉\n");
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
                             }
                             break;
                         //音频+屏幕捕捉
                         case CommonUtils.screen_Audio_mode:
                             if (isScreenCaptureSupport) {
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, false, false).getErrorCode());
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false,false,false).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true,false,false).getErrorCode());
                             } else {
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, false, true,false,false).getErrorCode());
                             }
                             break;
                         //视频+屏幕捕捉
                         case CommonUtils.multi_capture_mode:
                             if (isScreenCaptureSupport) {
-                                if(!changeRTSPFlag){
-                                    Log.d(TAG,"publish multi screen rtsp "+ UcloudRtcCameraMixConfig.RTSP_URL);
-                                    ToastUtils.shortShow(RoomMixerActivity.this," publish multi screen rtsp " + UcloudRtcCameraMixConfig.RTSP_URL);
-                                    results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true).getErrorCode());
-                                }else{
-                                    UcloudRtcCameraMixConfig.RTSP_URL = RTSP_BACKUP_URL;
-                                    Log.d(TAG,"publish multi screen rtsp "+ UcloudRtcCameraMixConfig.RTSP_URL);
-                                    ToastUtils.shortShow(RoomMixerActivity.this," publish multi screen rtsp " + UcloudRtcCameraMixConfig.RTSP_URL);
-                                    results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true).getErrorCode());
-                                }
-                                changeRTSPFlag = !changeRTSPFlag;
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+//                                if(!changeRTSPFlag){
+//                                    Log.d(TAG,"publish multi screen rtsp "+ UcloudRtcCameraMixConfig.RTSP_URL);
+//                                    ToastUtils.shortShow(RoomMixerActivity.this," publish multi screen rtsp " + UcloudRtcCameraMixConfig.RTSP_URL);
+//                                    results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true).getErrorCode());
+//                                }else{
+//                                    UcloudRtcCameraMixConfig.RTSP_URL = RTSP_BACKUP_URL;
+//                                    Log.d(TAG,"publish multi screen rtsp "+ UcloudRtcCameraMixConfig.RTSP_URL);
+//                                    ToastUtils.shortShow(RoomMixerActivity.this," publish multi screen rtsp " + UcloudRtcCameraMixConfig.RTSP_URL);
+//                                    results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true).getErrorCode());
+//                                }
+//                                changeRTSPFlag = !changeRTSPFlag;
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true,false,mixSourceWithRtsp).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, true,false,false).getErrorCode());
                             } else {
-                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
+                                results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true,false,mixSourceWithRtsp).getErrorCode());
                             }
                             break;
                     }
@@ -1876,19 +1883,33 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 //                        ToastUtils.shortShow(RoomMixerActivity.this, "发布");
                     }
                 } else {
-                    if(mCaptureMode == CommonUtils.screen_capture_mode || mCaptureMode == CommonUtils.multi_capture_mode){
+//                    if(mCaptureMode == CommonUtils.screen_capture_mode || mCaptureMode == CommonUtils.multi_capture_mode){
+//                        if(!changeRTSPFlag){
+//                            String rtspurl = preferences.getString(CommonUtils.RTSP_URL_KEY, "rtsp://192.168.161.148:554/ch2");
+//                            UcloudRtcCameraMixConfig.RTSP_URL = rtspurl;
+//                            sdkEngine.changeRTSPUrl();
+//                            ToastUtils.shortShow(RoomMixerActivity.this,UcloudRtcCameraMixConfig.RTSP_URL);
+//                        }else{
+//                            UcloudRtcCameraMixConfig.RTSP_URL = RTSP_BACKUP_URL;
+//                            sdkEngine.changeRTSPUrl();
+//                            ToastUtils.shortShow(RoomMixerActivity.this,UcloudRtcCameraMixConfig.RTSP_URL);
+//                        }
+
                         if(!changeRTSPFlag){
-                            String rtspurl = preferences.getString(CommonUtils.RTSP_URL_KEY, "rtsp://192.168.161.148:554/ch2");
-                            UcloudRtcCameraMixConfig.RTSP_URL = rtspurl;
+                            UcloudRtcCameraMixConfig.RTSP_URL_MIX = CommonUtils.RTST_URL;
+                            sdkEngine.changeRTSPUrlMixed();
+                            UcloudRtcCameraMixConfig.RTSP_URL = CommonUtils.RTST_URL_MIXED;
                             sdkEngine.changeRTSPUrl();
-                            ToastUtils.shortShow(RoomMixerActivity.this,UcloudRtcCameraMixConfig.RTSP_URL);
+                            ToastUtils.shortShow(RoomMixerActivity.this,UcloudRtcCameraMixConfig.RTSP_URL_MIX);
                         }else{
-                            UcloudRtcCameraMixConfig.RTSP_URL = RTSP_BACKUP_URL;
+                            UcloudRtcCameraMixConfig.RTSP_URL_MIX = CommonUtils.RTST_URL_MIXED;
+                            sdkEngine.changeRTSPUrlMixed();
+                            UcloudRtcCameraMixConfig.RTSP_URL = CommonUtils.RTST_URL;
                             sdkEngine.changeRTSPUrl();
-                            ToastUtils.shortShow(RoomMixerActivity.this,UcloudRtcCameraMixConfig.RTSP_URL);
+                            ToastUtils.shortShow(RoomMixerActivity.this,UcloudRtcCameraMixConfig.RTSP_URL_MIX);
                         }
                         changeRTSPFlag = !changeRTSPFlag;
-                    }
+//                    }
 //                    if(preview){
 ////                        sdkEngine.stopPreview(mPublishMediaType);
 ////                        sdkEngine.stopPreview(mPublishMediaType,localrenderview);
