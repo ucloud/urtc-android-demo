@@ -1341,6 +1341,18 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             Log.d(TAG, "onHDMIResume notify in app");
             ToastUtils.shortShow(RoomMixerActivity.this, " HDMI onHDMIResume " );
         }
+
+        @Override
+        public void onChangeMixSource(boolean isRtsp) {
+            Log.d(TAG,"onChangeMixSource " + isRtsp);
+            if(isRtsp){
+
+                sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+            }else{
+                sdkEngine.startPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO,
+                        localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+            }
+        }
     };
     private int mSelectPos;
 
@@ -1503,7 +1515,6 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                 if(!driverEarReturn) {
 //                    sdkEngine.enableEarBack(true);
 //                    mEarReturnBtn.setText("EarBackOff");
-                    sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
                     UcloudRtcCameraMixConfig.RTSP_URL_MIX = CommonUtils.RTST_URL_MIXED;
                     sdkEngine.hackVideoChannel();
                 }else{

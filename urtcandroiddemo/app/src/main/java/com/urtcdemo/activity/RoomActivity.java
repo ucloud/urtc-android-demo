@@ -1196,6 +1196,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         public void onHDMIResume() {
 
         }
+
+        @Override
+        public void onChangeMixSource(boolean isRtsp) {
+
+        }
     };
     private int mSelectPos;
 

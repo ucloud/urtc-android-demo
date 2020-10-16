@@ -868,6 +868,11 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         public void onHDMIResume() {
 
         }
+
+        @Override
+        public void onChangeMixSource(boolean isRtsp) {
+
+        }
     };
     private int mSelectPos;
 
