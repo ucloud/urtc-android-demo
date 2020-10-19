@@ -280,7 +280,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         //房间号
         mTextRoomId = findViewById(R.id.roomid_text);
         mTextRoomId.setText("RoomID:" + mRoomid);
-
+        mMirror = UCloudRtcSdkEnv.isFrontCameraMirror();
+        mImgBtnMirror.setImageResource(mMirror ? R.mipmap.mirror_on :
+                R.mipmap.mirror);
         //分辨率选择菜单
         String[] resolutions = getResources().getStringArray(R.array.videoResolutions);
         mResolutionOption.addAll(Arrays.asList(resolutions));
