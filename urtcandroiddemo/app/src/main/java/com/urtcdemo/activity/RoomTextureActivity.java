@@ -797,6 +797,11 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
+        public void onLogOffUsers(int code, String msg) {
+
+        }
+
+        @Override
         public void onMsgNotify(int code, String msg) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -804,6 +809,11 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                     Log.d(TAG, "onMsgNotify: code: " + code + "msg: " + msg);
                 }
             });
+        }
+
+        @Override
+        public void onLogOffNotify(int cmdType, String userId) {
+
         }
 
         @Override

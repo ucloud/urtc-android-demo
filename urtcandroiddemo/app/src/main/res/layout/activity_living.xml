@@ -34,6 +34,18 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"/>
 
+            <TextView
+                android:id="@+id/roomid_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:text="RoomID"
+                android:textColor="@color/lsq_color_white"
+                android:textSize="14sp"
+                android:layout_marginLeft="80dp"
+                android:layout_gravity="left|center_vertical"/>
+
             <Chronometer
                 android:id="@+id/timer"
                 android:layout_width="wrap_content"
@@ -41,6 +53,17 @@
                 android:format="%s"
                 android:textColor="@color/colorWhite"
                 android:layout_gravity="center_horizontal|center_vertical" />
+
+            <TextView
+                android:id="@+id/resolution_text"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/lsq_color_white"
+                android:text="分辨率"
+                android:gravity="center"
+                android:layout_marginRight="75dp"
+                android:background="@drawable/textview_border"
+                android:layout_gravity="right|center_vertical"/>
 
             <ImageButton
                 android:id="@+id/img_btn_more"

@@ -224,6 +224,9 @@
     <string name="scribe_auto">自动订阅</string>
     <string name="scribe_manual">手动订阅</string>
 
+    <string name="start_preview">开始预览</string>
+    <string name="stop_preview">停止预览</string>
+
     <string name="role_pub">上行</string>
     <string name="role_scribe">下行</string>
     <string name="role_both">全部</string>
@@ -239,7 +242,7 @@
     <string name="muti_track">视频通话 + 屏幕共享</string>
 
     <string name="server_address">服务器地址:</string>
-    <string name="start_meeting">进入房间</string>
+    <string name="start_meeting">加入房间</string>
     <string name="export_log">导出日志</string>
     <string name="connect">连接会议</string>
     <string name="disconnect">断开会议</string>
@@ -274,4 +277,5 @@
     <string name="stop_record">停止录制</string>
     <string name="screenshot">截图</string>
     <string name="pub_cancel">取消发布</string>
+    <string name="extend_camera">外接扩展摄像</string>
 </resources>

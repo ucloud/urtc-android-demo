@@ -102,6 +102,7 @@ public class ConnectActivity extends AppCompatActivity {
         mTextSDKVersion.setText(getString(R.string.app_name) + "\n" + UCloudRtcSdkEngine.getSdkVersion());
         connectButton = findViewById(R.id.connect_button);
         exportButton = findViewById(R.id.log_output_button);
+        exportButton.setVisibility(View.GONE);
         StatusBarUtils.setAndroidNativeLightStatusBar(this,true);
 
         connectButton.setOnClickListener(new View.OnClickListener() {

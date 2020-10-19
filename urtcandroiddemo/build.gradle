@@ -24,10 +24,41 @@ allprojects {
         jcenter()
         //maven { url "https://raw.githubusercontent.com/ucloud/urtc-android-demo/master" }
         //jcenter无法下载时，添加以下地址
-        maven { url 'https://dl.bintray.com/lukesong07/maven' }
+        //maven { url 'https://dl.bintray.com/lukesong07/maven' }
+        //uvccamera common lib
+        maven { url 'https://raw.githubusercontent.com/saki4510t/libcommon/master/repository/' }
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    minSdkVersion = 16
+    targetSdkVersion = 26
+    compileSdkVersion = 26
+    buildToolsVersion ="27.0.3"
+    versionName = "1.8.0"
+    //Dependencies
+    supportLibraryVersion = "27.0.0"
+
+    var = [
+
+            SupportV7 : "com.android.support:appcompat-v7:$supportLibraryVersion",
+            SupportV4 : "com.android.support:support-v4:$supportLibraryVersion",
+            SupportRecyclerviewV7 : "com.android.support:recyclerview-v7:$supportLibraryVersion"
+    ]
+}
+
+subprojects {
+    project.configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'com.android.support'
+            && !details.requested.name.contains('multidex') ) {
+                //统一版本号
+                details.useVersion "27.0.0"
+            }
+        }
+    }
 }
