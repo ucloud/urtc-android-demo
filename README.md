@@ -80,7 +80,7 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
 # 5 快速使用
 ## 5.1 初始化
 ### 5.1.1 引擎环境初始化
-主要配置android context  sdkmode以及AppID ，测试用的SEC_KEY,日志等级
+主要配置android context  sdkmode以及AppID ，测试用的SEC_KEY(即为AppKey),日志等级
 ~~~
 public class UCloudRtcApplication extends Application {
     @Override
