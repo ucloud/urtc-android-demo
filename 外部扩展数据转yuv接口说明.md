@@ -48,114 +48,173 @@ public interface UcloudRTCDataProvider {
 
 
 
-调用范例，具体内容请参考demo源码内RoomActivity，需要根据自己的实际情况来，范例只是做个参考
+调用范例，1.8.0版本后已经支持本地外接USB摄像头，具体内容请参考demo源码内UCloudRTCLiveActivity，需要根据自己的实际情况来，范例只是做个参考
+范例的本地USB输入视频格式是RGB565，另外还支持n12,n21,I420等常用视频数据格式。
 ```
- 
-
-//生产者消费者队列
- private ArrayBlockingQueue<RGBSourceData> mQueue = new ArrayBlockingQueue(2);
-
-//生产者往队列中push数据
-       Runnable imgTask = new Runnable() {
-            @Override
-            public void run() {
-                    while(startCreateImg){
-                        try{
-//                        synchronized (mUCloudRTCDataProvider){
-//                            if(mQueue.size() != 0){
-//                                mUCloudRTCDataProvider.wait();
-//                            }
-//                            if(mQueue.size() == 0){
-                            RGBSourceData sourceData;
-                            Bitmap bitmap = null;
-                            int type;
-                            if(mPictureFlag < 25){
-                                BitmapFactory.Options options = new BitmapFactory.Options();
-                                options.inPreferredConfig = Bitmap.Config.RGB_565;
-                                bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.timg2,options);
-                                type = UcloudRTCDataProvider.RGB565_TO_I420;
+    //扩展USB摄像头方式
+    UCloudRtcSdkEnv.setCaptureMode(UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND);
+    //把接口实现提供给sdk
+    UCloudRtcSdkEngine.onRGBCaptureResult(mUCloudRTCDataProvider);    
+    //生产者消费者队列用于缓存外部摄像数据
+    private ArrayBlockingQueue<ByteBuffer> mQueueByteBuffer = new ArrayBlockingQueue(8);
+    
+    //USB摄像头状态监控
+    mUSBMonitor = new USBMonitor(this, mOnDeviceConnectListener);
+    //回调接口实现
+    private final USBMonitor.OnDeviceConnectListener mOnDeviceConnectListener = new USBMonitor.OnDeviceConnectListener() {
+        @Override
+        public void onAttach(final UsbDevice device) {
+            Log.v(TAG, "onAttach:");
+            ToastUtils.shortShow(UCloudRTCLiveActivity.this, "USB摄像头已连接");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (mSync) {
+                        if (mUSBMonitor != null ) {
+                            if (mUSBMonitor.getDeviceCount() > 0) {
+                                mUSBMonitor.requestPermission(device);
                             }
-                            else{
-                                BitmapFactory.Options options = new BitmapFactory.Options();
-                                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                                bitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.img3,options);
-                                type = UcloudRTCDataProvider.RGBA_TO_I420;
-                            }
-
-                            if(++mPictureFlag >50)
-                                mPictureFlag = 0;
-                            if(bitmap != null){
-                                sourceData = new RGBSourceData(bitmap,bitmap.getWidth(),bitmap.getHeight(),type);
-                                mQueue.put(sourceData);
-                                Log.d(TAG, "create bitmap: " + bitmap + "count :" + memoryCount.incrementAndGet());
-                            }
-//                            }
-//                        }
-
-                        }catch (Exception e){
-                            e.printStackTrace();
                         }
                     }
-                    //这里在回收一遍 防止队列不阻塞了在destroy以后又产生了bitmap没回收
-                    while(mQueue.size() != 0 ){
-                        RGBSourceData rgbSourceData = mQueue.poll();
-                        if(rgbSourceData != null){
-                            recycleBitmap(rgbSourceData.getSrcData());
-                        }
-                    }
+                }
+            });
+        }
+
+        @Override
+        public void onConnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock, final boolean createNew) {
+            Log.v(TAG, "onConnect:");
+            synchronized (mSync) {
+                if (mUVCCamera != null) {
+                    mUVCCamera.destroy();
+                }
+                isActive = isPreview = false;
             }
-        };
-
-      if(UCloudRtcSdkEnv.getCaptureMode() == UcloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND &&
-                (mRole == UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH ||
-                        mRole == UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_PUB)){
-            mCreateImgThread = new Thread(imgTask);
-            mCreateImgThread.start();
-            //把接口实现提供给sdk
-            UCloudRtcSdkEngine.onRGBCaptureResult(mUCloudRTCDataProvider);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (mSync) {
+                        //final UVCCamera camera = initUVCCamera(ctrlBlock);
+                        mUVCCamera = initUVCCamera(ctrlBlock);
+                        isActive = true;
+                        isPreview = true;
+                    }
+                }
+            });
         }
-            
+
+        @Override
+        public void onDisconnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock) {
+            Log.v(TAG, "onDisconnect:");
+            // XXX you should check whether the comming device equal to camera device that currently using
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (mSync) {
+                        if (mUVCCamera != null) {
+                            mUVCCamera.stopPreview();
+                            mUVCCamera.close();
+                            mUVCCamera.destroy();
+/*                            if (mPreviewSurface != null) {
+                                mPreviewSurface.release();
+                                mPreviewSurface = null;
+                            }*/
+                            isActive = isPreview = false;
+                        }
+                    }
+                }
+            });
         }
 
-```
+        @Override
+        public void onDetach(final UsbDevice device) {
+            Log.v(TAG, "onDetach:");
+            ToastUtils.shortShow(UCloudRTCLiveActivity.this, "USB摄像头被移除");
+        }
 
+        @Override
+        public void onCancel(final UsbDevice device) {
+        }
+    };
+    
+    //初始化摄像头，此方法仅适用于普通USB外接摄像头
+    private UVCCamera initUVCCamera(USBMonitor.UsbControlBlock ctrlBlock) {
+        Log.d(TAG, "initUVCCamera-----mVideoProfileSelect:" + mVideoProfileSelect + " width:" + UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth()
+                + " height:" + UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight());
+        final UVCCamera camera = new UVCCamera();
+        camera.open(ctrlBlock);
+        camera.setPreviewSize(
+                UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth(),
+                UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight(),
+                UVCCamera.FRAME_FORMAT_YUYV
+        );
 
+        SurfaceTexture surfaceTexture = mLocalVideoView.getSurfaceTexture();
+        // Start preview to external GL texture
+        // NOTE : this is necessary for callback passed to [UVCCamera.setFrameCallback]
+        // to be triggered afterwards
+        camera.startPreview();
 
-```
- 		//sdk作为消费者消费数据
-    private UcloudRTCDataProvider mUCloudRTCDataProvider = new UcloudRTCDataProvider() {
+        camera.setFrameCallback(new IFrameCallback() {
+            @Override
+            public void onFrame(ByteBuffer frame) {
+                createFrameByteBuffer(frame); // 视频数据帧保存到缓存队列
+            }
+        },UVCCamera.PIXEL_FORMAT_RGB565);// UVCCamera视频输入格式
+        return camera;
+    }
+...    
+    //生产者往队列中push数据的方法
+    private void createFrameByteBuffer(ByteBuffer frame){
+        try {
+            if(frame != null){
+                //add videoSource
+                mQueueByteBuffer.offer(frame, 1, TimeUnit.SECONDS);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+    //外置数据输入监听，sdk作为消费者消费数据
+    private UCloudRTCDataProvider mUCloudRTCDataProvider = new UCloudRTCDataProvider() {
         private ByteBuffer cacheBuffer;
-        private RGBSourceData rgbSourceData;
+        private ByteBuffer videoSourceData;
 
         @Override
         public ByteBuffer provideRGBData(List<Integer> params) {
-            rgbSourceData = mQueue.poll();
-            if(rgbSourceData == null){
-//                mUCloudRTCDataProvider.notify();
+            videoSourceData = mQueueByteBuffer.poll();
+            if (videoSourceData == null) {
+                //Log.d("UCloudRTCLiveActivity", "provideRGBData: " + null);
                 return null;
-            }else{
-                params.add(rgbSourceData.getType());
-                params.add(rgbSourceData.getWidth());
-                params.add(rgbSourceData.getHeight());
-                if(cacheBuffer == null){
+            } else {
+                //Log.d("UCloudRTCLiveActivity", "provideRGBData: ! = null");
+                // 视频数据格式
+                params.add(UCloudRTCDataProvider.RGB565_TO_I420); // RGB565转I420
+                // 视频宽度
+                params.add(640);
+                // 视频高度
+                params.add(480);
+                if (cacheBuffer == null) {
                     cacheBuffer = sdkEngine.getNativeOpInterface().
-                            createNativeByteBuffer(4096*2160*4);
-                }else{
+                            createNativeByteBuffer(1280 * 720 * 4);
+                } else {
                     cacheBuffer.clear();
                 }
-                cacheBuffer.limit(rgbSourceData.getWidth()*rgbSourceData.getHeight()*4);
-                rgbSourceData.getSrcData().copyPixelsToBuffer(cacheBuffer);
-                recycleBitmap(rgbSourceData.getSrcData());
+                cacheBuffer = videoSourceData;
+                videoSourceData = null;
+                //Log.d("UCloudRTCLiveActivity", "provideRGBData finish" + Thread.currentThread());
+                cacheBuffer.position(0);
                 return cacheBuffer;
             }
         }
 
-        public void releaseBuffer(){
-            if(rgbSourceData != null && !rgbSourceData.getSrcData().isRecycled()){
-                rgbSourceData.getSrcData().recycle();
+        @Override
+        public void releaseBuffer() {
+            if(videoSourceData != null){
+                videoSourceData = null;
             }
             if(cacheBuffer != null){
                 sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cacheBuffer);
+                cacheBuffer = null;
             }
         }
     };
