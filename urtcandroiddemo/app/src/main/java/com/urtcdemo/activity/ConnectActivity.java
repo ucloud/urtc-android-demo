@@ -88,7 +88,7 @@ public class ConnectActivity extends AppCompatActivity {
         setContentView(R.layout.activity_connect);
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
-        mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID);
+        mAppid = preferences.getString(CommonUtils.APP_ID_TAG, CommonUtils.APP_ID);
         UCloudRtcSdkEnv.setMixSupport(preferences.getBoolean(CommonUtils.SDK_SUPPORT_MIX, false));
         UCloudRtcSdkEnv.setLoop(preferences.getBoolean(CommonUtils.SDK_IS_LOOP, true));
         UCloudRtcSdkEnv.setMixFilePath(preferences.getString(CommonUtils.SDK_MIX_FILE_PATH, getResources().getString(R.string.mix_file_path)));

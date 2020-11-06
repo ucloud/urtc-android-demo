@@ -43,9 +43,9 @@ public class CommonUtils {
     public static final String CAMERA_CAPTURE_MODE = "CAMERA_CAPTURE_MODE";
     public static final String EXTEND_CAMERA_VIDEO_FORMAT = "EXTEND_CAMERA_VIDEO_FORMAT";
 
-    public static final String APPID_KEY = "APPID_KEY";
+    public static final String APP_ID_TAG = "APPID";
     public static final String APP_ID = "URtc-h4r1txxy";
-    public static final String SEC_KEY = "9129304dbf8c5c4bf68d70824462409f";
+    public static final String APP_KEY = "9129304dbf8c5c4bf68d70824462409f";
 
     @IntDef({AUTO_MODE, MANUAL_MODE})
     public @interface  PubScribeMode {}

@@ -66,7 +66,7 @@ public class UCloudRtcApplication extends Application {
         UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo);
         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
         UCloudRtcSdkEnv.setReConnectTimes(60);
-        UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.SEC_KEY);
+        UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.APP_KEY);
         //UCloudRtcSdkEnv.setDeviceChannelType(UCloudRtcSdkChannelType.UCLOUD_RTC_SDK_CHANNEL_TYPE_VOICE);
 //        UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_LANDSCAPE_MODE);
         //私有化部署
