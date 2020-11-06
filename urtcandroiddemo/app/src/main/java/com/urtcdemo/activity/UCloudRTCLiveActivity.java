@@ -16,6 +16,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -1080,9 +1081,18 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     Log.d(TAG, "code : "+ code + "msg: "+ msg + "fileName: " + fileName);
                     if(code == NET_ERR_CODE_OK.ordinal()){
                         Log.d(TAG,"onMixStart: " + fileName);
-                        mIsMixing = true;
-                        mImgMix.setImageResource(R.mipmap.stop);
-                        mTextMix.setText(R.string.mixing);
+                        if(!TextUtils.isEmpty(fileName)){
+                            String videoPath = "http://"+ mBucket + "."+ mRegion +".ufileos.com/" + fileName+".mp4";
+                            Log.d(TAG,"onMixStart record start: "+ videoPath);
+                            mIsRemoteRecording = true;
+                            mImgRemoteRecord.setImageResource(R.mipmap.stop);
+                            mTextRemoteRecord.setText(R.string.remote_recording);
+                        }else{
+                            // ulive cdn watch address: http://rtchls.ugslb.com/rtclive/roomid.flv
+                            mIsMixing = true;
+                            mImgMix.setImageResource(R.mipmap.stop);
+                            mTextMix.setText(R.string.mixing);
+                        }
                         if(mAtomOpStart)
                             mAtomOpStart = false;
                     }
@@ -1100,6 +1110,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         mIsMixing = false;
                         mImgMix.setImageResource(R.mipmap.mix);
                         mTextMix.setText(R.string.start_mix);
+                    }else if(mIsRemoteRecording){
+                        mIsRemoteRecording = false;
+                        mImgRemoteRecord.setImageResource(R.mipmap.remote_record);
+                        mTextRemoteRecord.setText(R.string.start_remote_record);
                     }
                 }
             });
@@ -1598,17 +1612,48 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         if (!mIsRemoteRecording) {
             Log.d(TAG, " start remote record: ");
             mAtomOpStart = true;
-            UCloudRtcSdkRecordProfile recordAudioProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-                    .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_AUDIO)
-                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-                    .build();
-            sdkEngine.startRecord(recordAudioProfile);
+//            UCloudRtcSdkRecordProfile recordAudioProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+//                    .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_AUDIO)
+//                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+//                    .build();
+//            sdkEngine.startRecord(recordAudioProfile);
+            UCloudRtcSdkMixProfile mixProfile = new UCloudRtcSdkMixProfile();
+            //MIX_TYPE_TRANSCODING_PUSH：旁路推流
+            mixProfile.setType(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD);
+            //讲课模式。 LAYOUT_AVERAGE：均分模式，LAYOUT_CUSTOM：自定义模式
+            mixProfile.setLayout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM);
+            //画面分辨率
+            mixProfile.setWidth(1280);
+            mixProfile.setHeight(720);
+            //背景色
+            mixProfile.setBgColor(0, 0, 0);
+            //画面帧率
+            mixProfile.setFrameRate(15);
+            //画面码率
+            mixProfile.setBitrate(1000);
+            //h264视频编码。VIDEO_CODEC_H265：H265
+            mixProfile.setVideoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264);
+            //编码质量
+            mixProfile.setQualityLevel(UCloudRtcSdkMixProfile.QUALITY_H264_CB);
+            //aac音频编码
+            mixProfile.setAudioCodec(UCloudRtcSdkMixProfile.AUDIO_CODEC_AAC);
+            //旁路推流的地址
+            mixProfile.setPushUrl("rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
+            //主讲人id
+            mixProfile.setMainViewUserId(mUserid);
+            //主屏幕播放类型为摄像头
+            mixProfile.setMainViewType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal());
+            //自动添加模式
+            mixProfile.setStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_AUTO);
+            sdkEngine.startMix(mixProfile);
 
         }
         else if (!mAtomOpStart) {
             Log.d(TAG, " stop remote record: ");
             mAtomOpStart = true;
-            sdkEngine.stopRecord();
+//            sdkEngine.stopRecord();
+            sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD,"");
+
         }
     }
 
