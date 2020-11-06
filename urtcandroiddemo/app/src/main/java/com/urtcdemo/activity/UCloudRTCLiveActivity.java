@@ -77,7 +77,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -189,6 +191,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private boolean isActive, isPreview;
     //外部摄像数据读取
     private ArrayBlockingQueue<ByteBuffer> mQueueByteBuffer = new ArrayBlockingQueue(8);
+    private List<UCloudRtcSdkStreamInfo> mRemoteStreamInfos = new ArrayList<UCloudRtcSdkStreamInfo>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -670,6 +673,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     if (code == 0) {
+                        Log.d(TAG, "onLocalPublish " + code + " info: " + info);
                         mImgManualPub.setImageResource(R.mipmap.stop);
                         mTextManualPub.setText(R.string.pub_cancel);
                         mIsPublished = true;
@@ -786,7 +790,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 public void run() {
                     //特殊情况下，譬如客户端在断网情况下离开房间，服务端可能还持有流，并没有超时，客户端就会收到自己的userid,
                     // 如果客户端是固定userid就可以过滤掉，如果不是，等待服务端超时也会删除流
-                    Log.d(TAG, "onRemotePublish: " + info.getUId() + " me : " + mUserid);
+                    Log.d(TAG, "onRemotePublish: info" + info + " me : " + mUserid);
+                    mRemoteStreamInfos.add(info);
                     if(!mUserid.equals(info.getUId())){
                         mSteamList.add(info);
                         if (!sdkEngine.isAutoSubscribe()) {
@@ -805,6 +810,15 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    int removeIndex = -1;
+                    for (int i = 0; i < mRemoteStreamInfos.size(); i++) {
+                        if(mRemoteStreamInfos.get(i).getUId().equals(info.getUId()) && (mRemoteStreamInfos.get(i).getMediaType().equals(info.getMediaType()))){
+                            removeIndex = i;
+                        }
+                    }
+                    if(removeIndex >=0){
+                        mRemoteStreamInfos.remove(removeIndex);
+                    }
                     Log.d(TAG, " onRemoteUnPublish " + info.getMediaType() + " " + info.getUId());
                     ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 用户 " +
                             info.getUId() + " 取消媒体流 " + info.getMediaType());
@@ -1330,9 +1344,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     };
 
     private void switchCamera() {
-        sdkEngine.switchCamera();
-        ToastUtils.shortShow(this, "切换摄像头");
-        mSwitchCamera = !mSwitchCamera;
+        sdkEngine.unSubscribe(mRemoteStreamInfos.get(0));
+//        sdkEngine.switchCamera();
+//        ToastUtils.shortShow(this, "切换摄像头");
+//        mSwitchCamera = !mSwitchCamera;
     }
 
     private boolean muteMic() {
