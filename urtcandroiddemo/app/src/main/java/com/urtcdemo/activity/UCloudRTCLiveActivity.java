@@ -317,6 +317,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
+        sdkEngine.setScreenProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1920_1080);
 
         //分辨率菜单显示
         mTextResolution.setText(mResolutionOption.get(mVideoProfileSelect));
