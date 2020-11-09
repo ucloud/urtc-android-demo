@@ -175,8 +175,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private TextView mTextScreenshot;
     private ImageView mImgRemoteRecord;
     private TextView mTextRemoteRecord;
-    private ImageView mImgManualPub;
-    private TextView mTextManualPub;
+    private ImageView mImgManualPubVideo;
+    private TextView mTextManualPubVideo;
+    private ImageView mImgManualPubScreen;
+    private TextView mTextManualPubScreen;
     private TextView mTextRoomId;
     private ImageView mImgPreview;
     private TextView mTextPreview;
@@ -255,8 +257,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mTextScreenshot = findViewById(R.id.screenshot_text);
         mImgRemoteRecord = findViewById(R.id.remote_record_pic);
         mTextRemoteRecord = findViewById(R.id.remote_record_text);
-        mImgManualPub = findViewById(R.id.manual_publish_pic);
-        mTextManualPub = findViewById(R.id.manual_publish_text);
+        mImgManualPubVideo = findViewById(R.id.manual_publish_pic);
+        mTextManualPubVideo = findViewById(R.id.manual_publish_text);
+        mImgManualPubScreen = findViewById(R.id.manual_publish_screen_pic);
+        mTextManualPubScreen = findViewById(R.id.manual_publish_screen_text);
         mImgSoundVolume = findViewById(R.id.sound_volume_img);
         mImgMicSts = findViewById(R.id.mic_status_img);
         mTextResolution = findViewById(R.id.resolution_text);
@@ -304,6 +308,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
         else {
             sdkEngine.configLocalScreenPublish(false);
+            mImgManualPubScreen.setVisibility(View.GONE);
+            mTextManualPubScreen.setVisibility(View.GONE);
         }
         defaultAudioDevice = sdkEngine.getDefaultAudioDevice();
         if (defaultAudioDevice == UCloudRtcSdkAudioDevice.UCLOUD_RTC_SDK_AUDIODEVICE_SPEAKER) {
@@ -340,17 +346,22 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
         }
         if (mPublishMode == CommonUtils.AUTO_MODE) {
-            //mImgManualPub.setVisibility(View.VISIBLE);
-            //mTextManualPub.setVisibility(View.VISIBLE);
             mImgPreview.setVisibility(View.GONE);
             mTextPreview.setVisibility(View.GONE);
         } else {
-            //未发布时，按钮隐藏
+            //手动发布时，按钮隐藏
             //mImgManualPub.setVisibility(View.VISIBLE);
             //mTextManualPub.setVisibility(View.VISIBLE);
             setIconStats(false);
         }
-
+        if (!mCameraEnable && !mMicEnable) {
+            mImgManualPubVideo.setVisibility(View.GONE);
+            mTextManualPubVideo.setVisibility(View.GONE);
+        }
+        if (!mScreenEnable) {
+            mImgManualPubScreen.setVisibility(View.GONE);
+            mTextManualPubScreen.setVisibility(View.GONE);
+        }
         mImgBtnMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -439,17 +450,60 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             }
         });
 
-        //手动发布
-        mImgManualPub.setOnClickListener(new View.OnClickListener() {
+        //手动发布视频
+        mImgManualPubVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mVideoIsPublished || !mScreenIsPublished) {
+                if (!mVideoIsPublished) {
                     sdkEngine.setStreamRole(UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH);
                     List<Integer> results = new ArrayList<>();
                     StringBuffer errorMessage = new StringBuffer();
                     // 重新刷新配置
                     refreshSettings();
-                    if (mScreenEnable && !mCameraEnable && !mMicEnable && !mScreenIsPublished) {
+                    if ( mCameraEnable || mMicEnable) {
+                        if (!mVideoIsPublished) {
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, mCameraEnable, mMicEnable).getErrorCode());
+                        }
+                    }
+                    else {
+                        errorMessage.append("Camera or Mic is disable!\n");
+                    }
+
+                    List<Integer> errorCodes = new ArrayList<>();
+                    for (Integer result : results) {
+                        if (result != 0)
+                            errorCodes.add(result);
+                    }
+                    if (!errorCodes.isEmpty()) {
+                        for (Integer errorCode : errorCodes) {
+                            if (errorCode != NET_ERR_CODE_OK.ordinal())
+                                errorMessage.append("UCLOUD_RTC_SDK_ERROR_CODE:" + errorCode + "\n");
+                        }
+                    }
+                    if (errorMessage.length() > 0) {
+                        ToastUtils.shortShow(UCloudRTCLiveActivity.this, errorMessage.toString());
+                    }
+                    else {
+                        ToastUtils.shortShow(UCloudRTCLiveActivity.this, "发布");
+                    }
+                }
+                else {
+                    sdkEngine.unPublish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+                }
+            }
+        });
+
+        //手动发布屏幕
+        mImgManualPubScreen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mScreenIsPublished) {
+                    sdkEngine.setStreamRole(UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH);
+                    List<Integer> results = new ArrayList<>();
+                    StringBuffer errorMessage = new StringBuffer();
+                    // 重新刷新配置
+                    refreshSettings();
+                    if (mScreenEnable && !mScreenIsPublished) {
                         if (isScreenCaptureSupport) {
                             results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
                         }
@@ -458,16 +512,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                             //results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
                         }
                     }
-                    else if (mScreenEnable || mCameraEnable || mMicEnable) {
-                        if (mScreenEnable && isScreenCaptureSupport && !mScreenIsPublished) {
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
-                        }
-                        if (!mVideoIsPublished) {
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, mCameraEnable, mMicEnable).getErrorCode());
-                        }
-                    }
                     else {
-                        errorMessage.append("Camera, Mic or Screen is disable!\n");
+                        errorMessage.append("Screen is disable!\n");
                     }
 
                     List<Integer> errorCodes = new ArrayList<>();
@@ -679,11 +725,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     if (code == 0) {
-                        mImgManualPub.setImageResource(R.mipmap.stop);
-                        mTextManualPub.setText(R.string.pub_cancel);
                         int mediatype = info.getMediaType().ordinal();
                         mPublishMediaType = UCloudRtcSdkMediaType.matchValue(mediatype);
                         if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
+                            mImgManualPubVideo.setImageResource(R.mipmap.stop);
+                            mTextManualPubVideo.setText(R.string.pub_cancel_video);
                             if (!sdkEngine.isAudioOnlyMode()) {
                                 // UCloudRtcSdkSurfaceVideoView打开
                                 //mLocalVideoView.init(false);
@@ -702,11 +748,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                                                 mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                                     }
                                     //if (mPublishMode != CommonUtils.AUTO_MODE) {
-                                        setIconStats(true);
+                                       // setIconStats(true);
                                     //}
                                 }
                                 else {
-                                    setIconStats(true);
+                                    //setIconStats(true);
                                 }
                                 mVideoIsPublished = true;
                                 mLocalStreamInfo = info;
@@ -716,11 +762,13 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         }
                         else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN.ordinal()) {
                             mScreenIsPublished = true;
-                            if (mScreenEnable && !mCameraEnable && !mMicEnable) {
+                            mImgManualPubScreen.setImageResource(R.mipmap.stop);
+                            mTextManualPubScreen.setText(R.string.pub_cancel_screen);
+                            if (mScreenEnable) {
                                 //sdkEngine.startPreview(info.getMediaType(), mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
                             }
                         }
-
+                        setIconStats(true);
                     }
                     else {
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this,
@@ -737,30 +785,46 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     if (code == 0) {
-                        mImgManualPub.setImageResource(R.mipmap.publish);
-                        mTextManualPub.setText(R.string.pub_manual);
                         if (info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
+                            if (mPublishMode == CommonUtils.AUTO_MODE) {
+                                mImgManualPubVideo.setVisibility(View.GONE);
+                                mTextManualPubVideo.setVisibility(View.GONE);
+                            }
+                            else {
+                                mImgManualPubVideo.setImageResource(R.mipmap.publish);
+                                mTextManualPubVideo.setText(R.string.pub_video);
+                            }
                             if (mLocalVideoView != null) {
 //                                localrenderview.refresh();
                             }
                             mVideoIsPublished = false;
-                            setIconStats(false);
-                            setPreview(false);
-                            mIsPreview = false;
-                            mTextPreview.setText(R.string.start_preview);
                             mLocalVideoView.setVisibility(View.INVISIBLE);
                         } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
                             mScreenIsPublished = false;
+                            if (mPublishMode == CommonUtils.AUTO_MODE) {
+                                mImgManualPubScreen.setVisibility(View.GONE);
+                                mTextManualPubScreen.setVisibility(View.GONE);
+                            }
+                            else {
+                                mImgManualPubScreen.setImageResource(R.mipmap.publish_screen);
+                                mTextManualPubScreen.setText(R.string.pub_screen);
+                            }
                             if (mScreenEnable && !mCameraEnable && !mMicEnable) {
 //                                if (localrenderview != null) {
 //                                    localrenderview.refresh();
 //                                }
                             }
                         }
-                        ToastUtils.shortShow(UCloudRTCLiveActivity.this, "取消发布视频成功");
+                        if (!mScreenIsPublished && !mVideoIsPublished) {
+                            setIconStats(false);
+                            setPreview(false);
+                            mIsPreview = false;
+                            mTextPreview.setText(R.string.start_preview);
+                        }
+                        ToastUtils.shortShow(UCloudRTCLiveActivity.this, "取消发布成功");
                     }
                     else {
-                        ToastUtils.shortShow(UCloudRTCLiveActivity.this, "取消发布视频失败 "
+                        ToastUtils.shortShow(UCloudRTCLiveActivity.this, "取消发布失败 "
                                 + code + " errmsg " + msg);
                     }
                 }
