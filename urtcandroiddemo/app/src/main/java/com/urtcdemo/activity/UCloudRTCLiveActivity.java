@@ -63,6 +63,7 @@ import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataReceiver;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
+import com.urtcdemo.service.UCloudRtcForeGroundService;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.StatusBarUtils;
 import com.urtcdemo.utils.ToastUtils;
@@ -441,10 +442,13 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 if (!mIsPublished) {
+                    mCameraEnable = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
+                    mMicEnable = preferences.getBoolean(CommonUtils.MIC_ENABLE, CommonUtils.MIC_ON);
+                    mScreenEnable = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
                     sdkEngine.setStreamRole(UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH);
                     List<Integer> results = new ArrayList<>();
                     StringBuffer errorMessage = new StringBuffer();
-                    if (mScreenEnable && !mCameraEnable && !mMicEnable) {
+                    if (mScreenEnable && !mCameraEnable) {
                         if (isScreenCaptureSupport) {
                             results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
                         }
@@ -546,12 +550,12 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
         Log.d(TAG, "on Stop");
         if(mIsPublished){
-//            Intent service = new Intent(this, UCloudRtcForeGroundService.class);
-//            startService(service);
-            sdkEngine.controlAudio(false);
-            if (!mExtendCameraCapture) {
-                sdkEngine.controlLocalVideo(false);
-            }
+            Intent service = new Intent(this, UCloudRtcForeGroundService.class);
+            startService(service);
+//            sdkEngine.controlAudio(false);
+//            if (!mExtendCameraCapture) {
+//                sdkEngine.controlLocalVideo(false);
+//            }
         }
     }
 
@@ -559,12 +563,12 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
-//        Intent service = new Intent(this, UCloudRtcForeGroundService.class);
-//        stopService(service);
-        sdkEngine.controlAudio(true);
-        if (!mExtendCameraCapture) {
-            sdkEngine.controlLocalVideo(true);
-        }
+        Intent service = new Intent(this, UCloudRtcForeGroundService.class);
+        stopService(service);
+//        sdkEngine.controlAudio(true);
+//        if (!mExtendCameraCapture) {
+//            sdkEngine.controlLocalVideo(true);
+//        }
         synchronized (mSync) {
             if (mUSBMonitor != null) {
                 mUSBMonitor.register();
