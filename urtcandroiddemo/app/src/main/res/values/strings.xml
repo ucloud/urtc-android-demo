@@ -219,7 +219,8 @@
     <string name="test_env">测试环境</string>
 
     <string name="pub_auto">自动发布</string>
-    <string name="pub_manual">手动发布</string>
+    <string name="pub_video">发布音视频</string>
+    <string name="pub_screen">发布屏幕</string>
 
     <string name="scribe_auto">自动订阅</string>
     <string name="scribe_manual">手动订阅</string>
@@ -276,6 +277,7 @@
     <string name="remote_recording">远端录制中</string>
     <string name="stop_record">停止录制</string>
     <string name="screenshot">截图</string>
-    <string name="pub_cancel">取消发布</string>
+    <string name="pub_cancel_video">取消音视频发布</string>
+    <string name="pub_cancel_screen">取消屏幕发布</string>
     <string name="extend_camera">外接扩展摄像</string>
 </resources>
