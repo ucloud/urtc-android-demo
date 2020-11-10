@@ -53,7 +53,6 @@ import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRtcAudioResample;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteHasViewVideoAdapter;
-import com.urtcdemo.service.UCloudRtcForeGroundService;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.UiHelper;
@@ -78,7 +77,6 @@ import java.util.Timer;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
-import static com.urtcdemo.activity.RoomTextureActivity.BtnOp.OP_LOCAL_RECORD;
 import static com.urtcdemo.activity.RoomTextureActivity.BtnOp.OP_MIX;
 
 
@@ -347,7 +345,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                         if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
                             if (!sdkEngine.isAudioOnlyMode()) {
 //                                localrenderview.setBackgroundColor(Color.TRANSPARENT);
-                                sdkEngine.startPreview(info.getMediaType(),
+                                sdkEngine.renderLocalView(info,
                                         localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, new UCloudRTCFirstFrameRendered() {
                                             @Override
                                             public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
@@ -887,7 +885,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
-        mVideoAdapter = new RemoteHasViewVideoAdapter(this,sdkEngine);
+        mVideoAdapter = new RemoteHasViewVideoAdapter(this,sdkEngine,null);
         mRemoteGridView.setLayoutManager(gridLayoutManager);
         mRemoteGridView.getItemAnimator().setAddDuration(0);
         mRemoteGridView.setAdapter(mVideoAdapter);

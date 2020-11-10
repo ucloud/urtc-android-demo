@@ -600,12 +600,12 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
         Log.d(TAG, "on Stop");
         if(mVideoIsPublished || mScreenIsPublished){
-//            Intent service = new Intent(this, UCloudRtcForeGroundService.class);
-//            startService(service);
-            sdkEngine.controlAudio(false);
-            if (!mExtendCameraCapture) {
-                sdkEngine.controlLocalVideo(false);
-            }
+            Intent service = new Intent(this, UCloudRtcForeGroundService.class);
+            startService(service);
+//            sdkEngine.controlAudio(false);
+//            if (!mExtendCameraCapture) {
+//                sdkEngine.controlLocalVideo(false);
+//            }
         }
     }
 
@@ -741,10 +741,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                                 localViewHeight = mLocalVideoView.getMeasuredHeight();
                                 if (!mIsPreview) {
                                     if (mExtendCameraCapture) {
-                                        sdkEngine.startPreview(info.getMediaType(),
+                                        sdkEngine.renderLocalView(info,
                                                 mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
                                     } else {
-                                        sdkEngine.startPreview(info.getMediaType(),
+                                        sdkEngine.renderLocalView(info,
                                                 mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                                     }
                                     //if (mPublishMode != CommonUtils.AUTO_MODE) {
@@ -1312,7 +1312,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             if (swaped) {
                 if (mClass == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL) {
                     sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
-                    sdkEngine.startPreview(mLocalStreamInfo.getMediaType(), mLocalVideoView,null,null);
+                    sdkEngine.renderLocalView(mLocalStreamInfo, mLocalVideoView,null,null);
                 } else if (mLocalVideoView.getTag(R.id.swap_info) != null) {
                     UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) mLocalVideoView.getTag(R.id.swap_info);
                     sdkEngine.stopRemoteView(remoteStreamInfo);
@@ -1432,7 +1432,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         sdkEngine.stopRemoteView(remoteStreamInfo);
                         if (mLocalStreamInfo != null) {
                             sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
-                            sdkEngine.startPreview(mLocalStreamInfo.getMediaType(), (UCloudRtcSdkSurfaceVideoView) v,null, null);
+                            sdkEngine.renderLocalView(mLocalStreamInfo, (UCloudRtcSdkSurfaceVideoView) v,null, null);
                             v.setTag(R.id.swap_info, mLocalStreamInfo);
                         }
                         sdkEngine.startRemoteView(remoteStreamInfo, mLocalVideoView,null,null);
@@ -1468,7 +1468,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         sdkEngine.stopRemoteView(remoteStreamInfo);
                         //停止本地视频渲染
                         sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
-                        sdkEngine.startPreview(mLocalStreamInfo.getMediaType(), mLocalVideoView,null,null);
+                        sdkEngine.renderLocalView(mLocalStreamInfo, mLocalVideoView,null,null);
                         sdkEngine.startRemoteView(remoteStreamInfo, (UCloudRtcSdkSurfaceVideoView) v,null,null);
                         ((UCloudRtcSdkSurfaceVideoView) v).refreshRemoteOp(View.VISIBLE);
                         //((UCloudRtcSdkSurfaceVideoView) mLocalVideoView).refreshRemoteOp(View.INVISIBLE);
@@ -2098,11 +2098,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private void setPreview(boolean onOff) {
         if (onOff) {
             if (mExtendCameraCapture) {
-                sdkEngine.startPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO,
+                sdkEngine.startCameraPreview(
                         mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
             } else {
-                sdkEngine.startPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO,
-                        mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                sdkEngine.startCameraPreview(mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
             }
         }
         else {

@@ -492,13 +492,13 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         @Override
         public void onRemoteStreamRemoved(boolean swaped) {
             if (swaped) {
-                if (mClass == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL) {
-                    sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
-                    sdkEngine.startPreview(mLocalStreamInfo.getMediaType(), localrenderview,null,null);
-                } else if (localrenderview.getTag(R.id.swap_info) != null) {
-                    UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) localrenderview.getTag(R.id.swap_info);
-                    sdkEngine.stopRemoteView(remoteStreamInfo);
-                }
+//                if (mClass == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL) {
+//                    sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
+//                    sdkEngine.startPreview(mLocalStreamInfo, localrenderview,null,null);
+//                } else if (localrenderview.getTag(R.id.swap_info) != null) {
+//                    UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) localrenderview.getTag(R.id.swap_info);
+//                    sdkEngine.stopRemoteView(remoteStreamInfo);
+//                }
             }
         }
     };
@@ -619,7 +619,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                                 localrenderview.setVisibility(View.VISIBLE);
                                 localrenderview.setBackgroundColor(Color.TRANSPARENT);
 //                                localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
-                                sdkEngine.startPreview(info.getMediaType(),
+                                sdkEngine.renderLocalView(info,
                                         localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
 
 //                                UCloudRtcRenderView renderView = new UCloudRtcRenderView(RoomActivity.this);
@@ -640,7 +640,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                             //if (mCaptureMode == CommonUtils.screen_capture_mode) {
                             if (mScreenEnable && !mCameraEnable && !mMicEnable) {
 //                                localrenderview.setVisibility(View.VISIBLE);
-                                sdkEngine.startPreview(info.getMediaType(), localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                                sdkEngine.renderLocalView(info, localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
                             }
                         }
 

@@ -31,12 +31,14 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
     private Context mContext;
     private List<ViewHolder> mCacheHolder;
     private RemoveRemoteStreamReceiver mRemoveRemoteStreamReceiver;
+    private SwapInterface mSwapInterface;
     private UCloudRtcSdkEngine mSdkEngine;
 
 
-    public RemoteHasViewVideoAdapter(Context context, UCloudRtcSdkEngine sdkEngine) {
+    public RemoteHasViewVideoAdapter(Context context, UCloudRtcSdkEngine sdkEngine,SwapInterface provider) {
         mContext = context;
         mSdkEngine = sdkEngine;
+        mSwapInterface = provider;
         mInflater = ((Activity) context).getLayoutInflater();
         mCacheHolder = new ArrayList<>();
     }
@@ -80,13 +82,15 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 //            if (parent != null) {
 //                ((FrameLayout) parent).removeView(videoView);
 //            }
-            if (videoView instanceof UCloudRtcSdkSurfaceVideoView)
-                ((UCloudRtcSdkSurfaceVideoView) videoView).setZOrderMediaOverlay(true);
             videoView.setTag(R.id.index, viewInfo);
-            videoView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //screen shot
+            videoView.setTag(viewInfo.getStreamInfo());
+            if(mSwapInterface != null){
+                videoView.setOnClickListener(mSwapInterface.provideSwapListener());
+            }else{
+                videoView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //screen shot
 //                    Log.d(TAG, "onClick: take snapShop: " + viewInfo.getStreamInfo());
 //                    mSdkEngine.takeSnapShot(false,viewInfo.getStreamInfo(), (rgbBuffer, width, height) -> {
 //                        Log.d(TAG, "onReceiveRGBAData: rgbBuffer: " + rgbBuffer + " width: " + width + " height: " + height);
@@ -110,10 +114,11 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 //                    });
 
 
-                    //view render mode change
-                    mSdkEngine.setRenderViewMode(false, viewInfo.getStreamInfo(), UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_FILL);
-                }
-            });
+                        //view render mode change
+//                    mSdkEngine.setRenderViewMode(false, viewInfo.getStreamInfo(), UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_FILL);
+                    }
+                });
+            }
             mSdkEngine.startRemoteView(viewInfo.getStreamInfo(), videoView, null, new UCloudRTCFirstFrameRendered(){
 
                 @Override
@@ -260,5 +265,9 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 
     public interface RemoveRemoteStreamReceiver {
         void onRemoteStreamRemoved(boolean swaped);
+    }
+
+    public interface SwapInterface{
+        View.OnClickListener provideSwapListener();
     }
 }
