@@ -145,8 +145,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private List<UCloudRtcSdkStreamInfo> mSteamList;
     private List<String> mResolutionOption = new ArrayList<>();
     private ArrayAdapter<String> mAdapter;
-    //private UCloudRtcRenderView mLocalVideoView = null; //Surfaceview
-    private TextureView mLocalVideoView = null; //TextureView
+    private UCloudRtcRenderView mLocalVideoView = null; //Surfaceview
     //private UCloudRtcSdkSurfaceVideoView mLocalVideoView = null; //UCloudRtcSdkSurfaceVideoView
     private UCloudRtcSdkSurfaceVideoView mMuteView = null;
     private UCloudRtcSdkMediaType mPublishMediaType;
@@ -230,9 +229,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         mLocalVideoView = findViewById(R.id.localvideoview);
         //Surfaceview 打开注释
-        //mLocalVideoView.init(true);
-        //mLocalVideoView.setZOrderMediaOverlay(false);
-        //mLocalVideoView.setMirror(true);
+        mLocalVideoView.init();
+        mLocalVideoView.setVisibility(View.INVISIBLE);
+//        mLocalVideoView.setZOrderMediaOverlay(false);
+//        mLocalVideoView.setMirror(true);
         mDrawer = findViewById(R.id.drawer_layout);
         mDrawer.setScrimColor(0x00ffffff);
         mDrawerContent = findViewById(R.id.drawer_content);
@@ -734,8 +734,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                                 // UCloudRtcSdkSurfaceVideoView打开
                                 //mLocalVideoView.init(false);
                                 // Surfaceview打开
-                                //mLocalVideoView.setBackgroundColor(Color.TRANSPARENT);
-
+                                mLocalVideoView.setBackgroundColor(Color.TRANSPARENT);
                                 mLocalVideoView.setVisibility(View.VISIBLE);
                                 localViewWidth = mLocalVideoView.getMeasuredWidth();
                                 localViewHeight = mLocalVideoView.getMeasuredHeight();
@@ -1432,7 +1431,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         sdkEngine.stopRemoteView(remoteStreamInfo);
                         if (mLocalStreamInfo != null) {
                             sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
-                            sdkEngine.renderLocalView(mLocalStreamInfo, (UCloudRtcSdkSurfaceVideoView) v,null, null);
+//                            sdkEngine.renderLocalView(mLocalStreamInfo, (UCloudRtcSdkSurfaceVideoView) v,null, null);
                             v.setTag(R.id.swap_info, mLocalStreamInfo);
                         }
                         sdkEngine.startRemoteView(remoteStreamInfo, mLocalVideoView,null,null);

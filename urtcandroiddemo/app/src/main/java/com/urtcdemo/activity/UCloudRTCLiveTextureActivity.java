@@ -213,7 +213,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         screenWidth = displaymetrics.widthPixels;
         screenHeight = displaymetrics.heightPixels;
 
-        setContentView(R.layout.activity_living);
+        setContentView(R.layout.activity_living_texture);
         mVideoProfileSelect = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
         mRemoteGridView = findViewById(R.id.remoteGridView);
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
