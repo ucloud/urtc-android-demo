@@ -222,7 +222,10 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
             gridLayoutManager = new GridLayoutManager(this, COL_SIZE_P);
         }
         mRemoteGridView.setLayoutManager(gridLayoutManager);
+        //点击remoteView交换
         mVideoAdapter = new RemoteHasViewVideoAdapter(this,sdkEngine,this);
+        //点击remoteView截图
+        //mVideoAdapter = new RemoteHasViewVideoAdapter(this,sdkEngine,null);
 //        mVideoAdapter.setRemoveRemoteStreamReceiver(mRemoveRemoteStreamReceiver);
         mRemoteGridView.setAdapter(mVideoAdapter);
 
@@ -1667,6 +1670,13 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         else if(view instanceof UCloudRtcRenderView) {
             ((UCloudRtcRenderView)view).setScreenShotBack(mUCloudRTCScreenShot);
         }
+        else {
+            if(view == mLocalVideoView){
+                if(view.getTag() != null && view.getTag() instanceof UCloudRtcSdkStreamInfo){
+                    takeScreenShot(true,(UCloudRtcSdkStreamInfo)view.getTag());
+                }
+            }
+        }
     }
 
     //初始化视频录制
@@ -2131,6 +2141,30 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         return mSwapRemoteLocalListener;
     }
 
+    private void takeScreenShot(boolean isLocal,UCloudRtcSdkStreamInfo streamInfo){
+        sdkEngine.takeSnapShot(isLocal,streamInfo,new UCloudRTCScreenShot() {
+            @Override
+            public void onReceiveRGBAData(ByteBuffer rgbBuffer, int width, int height) {
+                Log.d(TAG, "onReceiveRGBAData: rgbBuffer: " + rgbBuffer + " width: " + width + " height: " + height);
+                final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
 
+                bitmap.copyPixelsFromBuffer(rgbBuffer);
+                String name = "/mnt/sdcard/urtcscreen_" + System.currentTimeMillis() + "_local.jpg";
+                File file = new File(name);
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+                    if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
+                        out.flush();
+                        out.close();
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "screen shoot : " + name);
+            }
+        } );
+    }
 }
 

@@ -2,6 +2,7 @@ package com.urtcdemo.adpter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,14 +11,16 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -91,27 +94,27 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                     @Override
                     public void onClick(View v) {
                         //screen shot
-//                    Log.d(TAG, "onClick: take snapShop: " + viewInfo.getStreamInfo());
-//                    mSdkEngine.takeSnapShot(false,viewInfo.getStreamInfo(), (rgbBuffer, width, height) -> {
-//                        Log.d(TAG, "onReceiveRGBAData: rgbBuffer: " + rgbBuffer + " width: " + width + " height: " + height);
-//                        final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
-//
-//                        bitmap.copyPixelsFromBuffer(rgbBuffer);
-//                        String name = "/mnt/sdcard/urtcscreen_" + System.currentTimeMillis() + ".jpg";
-//                        File file = new File(name);
-//                        try {
-//                            FileOutputStream out = new FileOutputStream(file);
-//                            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
-//                                out.flush();
-//                                out.close();
-//                            }
-//                        } catch (FileNotFoundException e) {
-//                            e.printStackTrace();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                        Log.d(TAG, "screen shoot : " + name);
-//                    });
+                    Log.d(TAG, "onClick: take snapShop: " + viewInfo.getStreamInfo());
+                    mSdkEngine.takeSnapShot(false,viewInfo.getStreamInfo(), (rgbBuffer, width, height) -> {
+                        Log.d(TAG, "onReceiveRGBAData: rgbBuffer: " + rgbBuffer + " width: " + width + " height: " + height);
+                        final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
+
+                        bitmap.copyPixelsFromBuffer(rgbBuffer);
+                        String name = "/mnt/sdcard/urtcscreen_" + System.currentTimeMillis() + "_remote.jpg";
+                        File file = new File(name);
+                        try {
+                            FileOutputStream out = new FileOutputStream(file);
+                            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
+                                out.flush();
+                                out.close();
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d(TAG, "screen shoot : " + name);
+                    });
 
 
                         //view render mode change
