@@ -602,12 +602,12 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
         Log.d(TAG, "on Stop");
         if(mVideoIsPublished || mScreenIsPublished){
-//            Intent service = new Intent(this, UCloudRtcForeGroundService.class);
-//            startService(service);
-            sdkEngine.controlAudio(false);
-            if (!mExtendCameraCapture) {
-                sdkEngine.controlLocalVideo(false);
-            }
+            Intent service = new Intent(this, UCloudRtcForeGroundService.class);
+            startService(service);
+//            sdkEngine.controlAudio(false);
+//            if (!mExtendCameraCapture) {
+//                sdkEngine.controlLocalVideo(false);
+//            }
         }
     }
 
@@ -758,7 +758,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                                 mVideoIsPublished = true;
                                 mLocalStreamInfo = info;
                                 mLocalVideoView.setTag(mLocalStreamInfo);
-                                mLocalVideoView.setOnClickListener(mToggleScreenOnClickListener);
+//                                mLocalVideoView.setOnClickListener(mToggleScreenOnClickListener);
+                                mLocalVideoView.setOnClickListener(mScreenShotOnClickListener);
                             }
                         }
                         else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN.ordinal()) {
@@ -1367,6 +1368,14 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
         @Override
         public void onCancel(final UsbDevice device) {
+        }
+    };
+
+    private View.OnClickListener mScreenShotOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "takeScreenShot: ");
+            takeScreenShot(true,mLocalStreamInfo);
         }
     };
 
