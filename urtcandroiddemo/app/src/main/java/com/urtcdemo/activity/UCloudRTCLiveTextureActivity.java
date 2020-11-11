@@ -744,9 +744,9 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                                 localViewHeight = mLocalVideoView.getMeasuredHeight();
                                 if (!mIsPreview) {
                                     if (mExtendCameraCapture) {
-                                        sdkEngine.startCameraPreview(mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+                                        sdkEngine.renderLocalView(info,mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
                                     } else {
-                                        sdkEngine.startCameraPreview(mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                                        sdkEngine.renderLocalView(info,mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                                     }
                                     //if (mPublishMode != CommonUtils.AUTO_MODE) {
 //                                        setIconStats(true);
