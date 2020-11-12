@@ -516,7 +516,8 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                         vinfo.setKey(mkey);
                         //默认输出，和外部输出代码二选一
                         if (mVideoAdapter != null) {
-                            mVideoAdapter.addStreamView(mkey, vinfo, info);
+                            vinfo.setStreamInfo(info);
+                            mVideoAdapter.addStreamView(mkey, vinfo);
                         }
                         if (vinfo != null && textureView != null) {
 //                            sdkEngine.startRemoteView(info, textureView);

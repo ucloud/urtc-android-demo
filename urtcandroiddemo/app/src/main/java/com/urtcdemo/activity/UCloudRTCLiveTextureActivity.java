@@ -142,6 +142,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     UCloudRtcSdkEngine sdkEngine = null;
     private UCloudRtcSdkRoomType mClass;
     private UCloudRtcSdkStreamInfo mLocalStreamInfo;
+    private UCloudRtcSdkStreamInfo mSwapStreamInfo;
     private UCloudRtcSdkAudioDevice defaultAudioDevice;
     private List<UCloudRtcSdkStreamInfo> mSteamList;
     private List<String> mResolutionOption = new ArrayList<>();
@@ -754,6 +755,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                                 }
                                 mVideoIsPublished = true;
                                 mLocalStreamInfo = info;
+                                mSwapStreamInfo = info;
                                 mLocalVideoView.setTag(mLocalStreamInfo);
 //                                mLocalVideoView.setOnClickListener(mToggleScreenOnClickListener);
                                 mLocalVideoView.setOnClickListener(mScreenShotOnClickListener);
@@ -911,7 +913,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                         vinfo.setKey(mkey);
                         //默认输出，和外部输出代码二选一
                         if (mVideoAdapter != null) {
-                            mVideoAdapter.addStreamView(mkey, vinfo, info);
+                            vinfo.setStreamInfo(info);
+                            mVideoAdapter.addStreamView(mkey, vinfo);
                         }
 
                         //textureview动态生成
@@ -1380,36 +1383,27 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         @Override
         public void onClick(View v) {
             if (v instanceof TextureView) {
-                String key = ((URTCVideoViewInfo) v.getTag(R.id.index)).getKey();
-                if (mVideoAdapter.checkCanSwap(key)) {
-                    boolean state = mVideoAdapter.checkState(key);
-                    if (!state) {
-                        UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
-                        Log.d(TAG," stopRemoteView " + v);
-                        sdkEngine.stopRemoteView(remoteStreamInfo);
-                        if (mLocalStreamInfo != null) {
-                            sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
-                            sdkEngine.renderLocalView(mLocalStreamInfo, v,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
-                            v.setTag(R.id.swap_info, mLocalStreamInfo);
-                        }
-                        sdkEngine.startRemoteView(remoteStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
-                        mLocalVideoView.setTag(R.id.swap_info, remoteStreamInfo);
-                    } else {
-                        //有交换过
-                        UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
-                        //停止交换过的大窗渲染远端
-                        sdkEngine.stopRemoteView(remoteStreamInfo);
-                        //停止本地视频渲染
-                        sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
-                        sdkEngine.renderLocalView(mLocalStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
-                        sdkEngine.startRemoteView(remoteStreamInfo, v,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
-                        v.setTag(R.id.swap_info, null);
-                        mLocalVideoView.setTag(R.id.swap_info, null);
+                    UCloudRtcSdkStreamInfo clickStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
+                    boolean swapLocal = mSwapStreamInfo.getUId().equals(mUserid);
+                    boolean clickLocal = clickStreamInfo.getUId().equals(mUserid);
+                    if(swapLocal && !clickLocal){
+                        sdkEngine.stopRemoteView(clickStreamInfo);
+                        sdkEngine.stopPreview(mSwapStreamInfo.getMediaType());
+                        sdkEngine.renderLocalView(mSwapStreamInfo, v,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                        sdkEngine.startRemoteView(clickStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                    }else if(!swapLocal && clickLocal){
+                        sdkEngine.stopRemoteView(mSwapStreamInfo);
+                        sdkEngine.stopPreview(clickStreamInfo.getMediaType());
+                        sdkEngine.renderLocalView(clickStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                        sdkEngine.startRemoteView(mSwapStreamInfo, v,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                    }else if(!swapLocal && !clickLocal){
+                        sdkEngine.stopRemoteView(mSwapStreamInfo);
+                        sdkEngine.stopRemoteView(clickStreamInfo);
+                        sdkEngine.startRemoteView(clickStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                        sdkEngine.startRemoteView(mSwapStreamInfo, v,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
                     }
-                    mVideoAdapter.reverseState(key);
-                } else {
-                    ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "其它窗口已经交换过，请先交换回来");
-                }
+                    v.setTag(mSwapStreamInfo);
+                    mSwapStreamInfo = clickStreamInfo;
             }
         }
     };

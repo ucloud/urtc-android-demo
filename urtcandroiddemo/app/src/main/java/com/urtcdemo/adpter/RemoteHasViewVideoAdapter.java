@@ -160,9 +160,9 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
             return true;
         } else {
             boolean otherHasSwaped = false;
-            for (String ohterKey : mScreenState.keySet()) {
-                if (!ohterKey.equals(key)) {
-                    if (mScreenState.get(ohterKey)) {
+            for (String otherKey : mScreenState.keySet()) {
+                if (!otherKey.equals(key)) {
+                    if (mScreenState.get(otherKey)) {
                         //其它的已经有交换过的，那这次就不要交换
                         otherHasSwaped = true;
                         break;
@@ -173,11 +173,10 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         }
     }
 
-    public void addStreamView(String mkey, URTCVideoViewInfo videoViewInfo, UCloudRtcSdkStreamInfo streamInfo) {
+    public void addStreamView(String mkey, URTCVideoViewInfo videoViewInfo) {
 //        removeStreamView(mkey);
         if (!mStreamViews.containsKey(mkey)) {
             mStreamViews.put(mkey, videoViewInfo);
-            videoViewInfo.setStreamInfo(streamInfo);
             medialist.add(mkey);
         }
         if (!mScreenState.containsKey(mkey)) {
