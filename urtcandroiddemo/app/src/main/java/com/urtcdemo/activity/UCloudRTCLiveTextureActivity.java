@@ -190,6 +190,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     private UVCCamera mUVCCamera = null;
     private final Object mSync = new Object();
     private boolean isActive, isPreview;
+    private boolean mLeaveRoomFlag;
+
     //外部摄像数据读取
     private ArrayBlockingQueue<ByteBuffer> mQueueByteBuffer = new ArrayBlockingQueue(8);
 
@@ -601,7 +603,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
             }
         }
         Log.d(TAG, "on Stop");
-        if(mVideoIsPublished || mScreenIsPublished){
+        if((mVideoIsPublished || mScreenIsPublished) && !mLeaveRoomFlag){
             Intent service = new Intent(this, UCloudRtcForeGroundService.class);
             startService(service);
 //            sdkEngine.controlAudio(false);
@@ -640,12 +642,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     protected void onDestroy() {
         Log.d(TAG, "activity destory");
         super.onDestroy();
-//        if(mVideoPlayer != null ){
-//            mVideoPlayer.stop();
-//        }
-        releaseExtendCamera();
-        sdkEngine.leaveChannel().ordinal();
-        onMediaServerDisconnect();
         System.gc();
     }
 
@@ -689,11 +685,12 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    mLeaveRoomFlag = true;
                     ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, " 离开房间 " +
                             code + " errmsg " + msg);
-                    releaseExtendCamera();
                     onMediaServerDisconnect();
-                    System.gc();
+                    releaseExtendCamera();
+                    finish();
                 }
             });
         }
@@ -1397,28 +1394,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                         }
                         sdkEngine.startRemoteView(remoteStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
                         mLocalVideoView.setTag(R.id.swap_info, remoteStreamInfo);
-//                        if (mClass == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE) {
-//                            mLocalVideoView.setVisibility(View.VISIBLE);
-//                            mLocalVideoView.setTag(R.id.view_info, v);
-//                            mLocalVideoView.setBackgroundColor(Color.TRANSPARENT);
-//                            v.setVisibility(View.INVISIBLE);
-////和本地view截图功能触发重叠，App使用者可以另行定义触发
-//                            mLocalVideoView.setOnClickListener(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    if (v instanceof UCloudRtcSdkSurfaceVideoView) {
-//                                        mLocalVideoView.setVisibility(View.INVISIBLE);
-//                                        UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag(R.id.swap_info);
-//                                        sdkEngine.stopRemoteView(remoteStreamInfo);
-//                                        UCloudRtcSdkSurfaceVideoView view = (UCloudRtcSdkSurfaceVideoView) v.getTag(R.id.view_info);
-//                                        view.setVisibility(View.VISIBLE);
-//                                        view.refreshRemoteOp(View.VISIBLE);
-//                                        sdkEngine.startRemoteView(remoteStreamInfo, view, null, null);
-//                                        mVideoAdapter.reverseState(key);
-//                                    }
-//                                }
-//                            });
-//                        }
                     } else {
                         //有交换过
                         UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
@@ -1532,12 +1507,12 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
     private void endCall() {
         sdkEngine.leaveChannel().ordinal();
-        Intent intent = new Intent(UCloudRTCLiveTextureActivity.this, ConnectActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        releaseExtendCamera();
-        onMediaServerDisconnect();
-        startActivity(intent);
-        finish();
+//        Intent intent = new Intent(UCloudRTCLiveTextureActivity.this, ConnectActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//        releaseExtendCamera();
+//        onMediaServerDisconnect();
+//        startActivity(intent);
+//        finish();
     }
     private void onMediaServerDisconnect() {
         //mLocalVideoView.release();

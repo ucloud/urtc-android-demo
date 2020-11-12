@@ -191,6 +191,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private UVCCamera mUVCCamera = null;
     private final Object mSync = new Object();
     private boolean isActive, isPreview;
+    private boolean mLeaveRoomFlag;
     //外部摄像数据读取
     private ArrayBlockingQueue<ByteBuffer> mQueueByteBuffer = new ArrayBlockingQueue(8);
 
@@ -600,8 +601,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
         Log.d(TAG, "on Stop");
         if(mVideoIsPublished || mScreenIsPublished){
-            Intent service = new Intent(this, UCloudRtcForeGroundService.class);
-            startService(service);
+            if(!mLeaveRoomFlag){
+                Intent service = new Intent(this, UCloudRtcForeGroundService.class);
+                startService(service);
+            }
 //            sdkEngine.controlAudio(false);
 //            if (!mExtendCameraCapture) {
 //                sdkEngine.controlLocalVideo(false);
@@ -638,11 +641,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     protected void onDestroy() {
         Log.d(TAG, "activity destory");
         super.onDestroy();
-//        if(mVideoPlayer != null ){
-//            mVideoPlayer.stop();
-//        }
         releaseExtendCamera();
-        sdkEngine.leaveChannel().ordinal();
         onMediaServerDisconnect();
         System.gc();
     }
@@ -689,9 +688,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 public void run() {
                     ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 离开房间 " +
                             code + " errmsg " + msg);
-                    releaseExtendCamera();
-                    onMediaServerDisconnect();
-                    System.gc();
+//                    releaseExtendCamera();
+//                    onMediaServerDisconnect();
+//                    System.gc();
                 }
             });
         }
@@ -1431,7 +1430,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         sdkEngine.stopRemoteView(remoteStreamInfo);
                         if (mLocalStreamInfo != null) {
                             sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
-//                            sdkEngine.renderLocalView(mLocalStreamInfo, (UCloudRtcSdkSurfaceVideoView) v,null, null);
+                            sdkEngine.renderLocalView(mLocalStreamInfo, (UCloudRtcSdkSurfaceVideoView) v,null, null);
                             v.setTag(R.id.swap_info, mLocalStreamInfo);
                         }
                         sdkEngine.startRemoteView(remoteStreamInfo, mLocalVideoView,null,null);
@@ -1575,11 +1574,12 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
     private void endCall() {
         sdkEngine.leaveChannel().ordinal();
-        Intent intent = new Intent(UCloudRTCLiveActivity.this, ConnectActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        releaseExtendCamera();
-        onMediaServerDisconnect();
-        startActivity(intent);
+        mLeaveRoomFlag = true;
+//        Intent intent = new Intent(UCloudRTCLiveActivity.this, ConnectActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//        releaseExtendCamera();
+//        onMediaServerDisconnect();
+//        startActivity(intent);
         finish();
     }
     private void onMediaServerDisconnect() {
