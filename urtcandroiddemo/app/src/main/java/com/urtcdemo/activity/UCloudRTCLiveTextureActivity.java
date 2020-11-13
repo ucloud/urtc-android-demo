@@ -901,7 +901,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                 public void run() {
                     if (code == 0) {
                         Log.d(TAG, " subscribe info: " + info);
-                        URTCVideoViewInfo vinfo = new URTCVideoViewInfo(null);
+                        URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
                         vinfo.setmUid(info.getUId());
                         vinfo.setmMediatype(info.getMediaType());
                         vinfo.setmEanbleVideo(info.isHasVideo());
@@ -1403,6 +1403,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                         sdkEngine.startRemoteView(mSwapStreamInfo, v,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
                     }
                     v.setTag(mSwapStreamInfo);
+                    mVideoAdapter.updateSwapInfo(clickStreamInfo,mSwapStreamInfo);
                     mSwapStreamInfo = clickStreamInfo;
             }
         }

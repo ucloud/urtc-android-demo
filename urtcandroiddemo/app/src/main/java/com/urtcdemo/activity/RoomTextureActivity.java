@@ -479,7 +479,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                 @Override
                 public void run() {
                     if (code == 0) {
-                        URTCVideoViewInfo vinfo = new URTCVideoViewInfo(null);
+                        URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
                         UCloudRtcSdkSurfaceVideoView videoView = null;
                         TextureView textureView = null;
                         Log.d(TAG, " subscribe info: " + info.getUId() + " hasvideo " + info.isHasVideo());

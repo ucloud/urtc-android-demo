@@ -899,7 +899,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     if (code == 0) {
-                        URTCVideoViewInfo vinfo = new URTCVideoViewInfo(null);
+                        URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
                         UCloudRtcSdkSurfaceVideoView videoView = null;
                         Log.d(TAG, " subscribe info: " + info);
                         if (info.isHasVideo()) {

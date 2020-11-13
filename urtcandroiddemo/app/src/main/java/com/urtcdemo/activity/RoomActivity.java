@@ -753,7 +753,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                 @Override
                 public void run() {
                     if (code == 0) {
-                        URTCVideoViewInfo vinfo = new URTCVideoViewInfo(null);
+                        URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
 //                        UCloudRtcRenderView videoView = null;
                         UCloudRtcSdkSurfaceVideoView videoView = null;
                         Log.d(TAG, " subscribe info: " + info);

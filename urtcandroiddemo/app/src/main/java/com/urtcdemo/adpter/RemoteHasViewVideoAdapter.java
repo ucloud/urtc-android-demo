@@ -179,24 +179,35 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
             mStreamViews.put(mkey, videoViewInfo);
             medialist.add(mkey);
         }
-        if (!mScreenState.containsKey(mkey)) {
-            mScreenState.put(mkey, false);
-        }
+//        if (!mScreenState.containsKey(mkey)) {
+//            mScreenState.put(mkey, false);
+//        }
 //        notifyItemInserted(medialist.size() - 1);
         notifyDataSetChanged();
     }
 
-    public UCloudRtcSdkStreamInfo getStreamInfo(int position) {
-        UCloudRtcSdkStreamInfo streamInfo = null;
-        if (medialist.size() > position && mStreamViews.size() > position) {
-            streamInfo = new UCloudRtcSdkStreamInfo();
-            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getmMediatype());
-            streamInfo.setHasAudio(mStreamViews.get(medialist.get(position)).isEnableAudio());
-            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).ismEanbleVideo());
-            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getmUid());
-        }
-        return streamInfo;
+    public void updateSwapInfo(UCloudRtcSdkStreamInfo clickInfo,UCloudRtcSdkStreamInfo swapInfo){
+        String clickKey = clickInfo.getUId() + clickInfo.getMediaType().toString();
+        String swapKey = swapInfo.getUId() + swapInfo.getMediaType().toString();
+        mStreamViews.remove(clickKey);
+        URTCVideoViewInfo newBean = new URTCVideoViewInfo(swapInfo);
+        mStreamViews.put(swapKey,newBean);
+        int clickIndex = medialist.indexOf(clickKey);
+        Log.d(TAG, "updateSwapInfo: old medialist index: "+ medialist.indexOf(clickKey));
+        medialist.set(clickIndex,swapKey);
     }
+
+//    public UCloudRtcSdkStreamInfo getStreamInfo(int position) {
+//        UCloudRtcSdkStreamInfo streamInfo = null;
+//        if (medialist.size() > position && mStreamViews.size() > position) {
+//            streamInfo = new UCloudRtcSdkStreamInfo();
+//            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getmMediatype());
+//            streamInfo.setHasAudio(mStreamViews.get(medialist.get(position)).isEnableAudio());
+//            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).ismEanbleVideo());
+//            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getmUid());
+//        }
+//        return streamInfo;
+//    }
 
     public void removeStreamView(String mkey) {
         if (mStreamViews.containsKey(mkey)) {
@@ -210,16 +221,16 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 //            notifyItemRemoved(index);
             Log.d(TAG, " remove finished ,mStreamViews size: " + mStreamViews.size() + "medialist size: " + medialist.size());
         }
-        if (mScreenState.containsKey(mkey)) {
-            Log.d(TAG, " mScreenState key: " + mkey);
-            if (mScreenState.get(mkey)) {
-                if (mRemoveRemoteStreamReceiver != null) {
-                    mRemoveRemoteStreamReceiver.onRemoteStreamRemoved(true);
-                }
-            }
-            mScreenState.remove(mkey);
-            Log.d(TAG, " remove finished ,mScreenState size: " + mScreenState.size());
-        }
+//        if (mScreenState.containsKey(mkey)) {
+//            Log.d(TAG, " mScreenState key: " + mkey);
+//            if (mScreenState.get(mkey)) {
+//                if (mRemoveRemoteStreamReceiver != null) {
+//                    mRemoveRemoteStreamReceiver.onRemoteStreamRemoved(true);
+//                }
+//            }
+//            mScreenState.remove(mkey);
+//            Log.d(TAG, " remove finished ,mScreenState size: " + mScreenState.size());
+//        }
         notifyDataSetChanged();
     }
 
