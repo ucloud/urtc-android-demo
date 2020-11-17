@@ -721,7 +721,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
-        public void onRecordStart(int code,String fileName) {
+        public void onRecordRequestSend(int code, String fileName) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -755,7 +755,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
-        public void onMixStart(int code, String msg, String fileName) {
+        public void onRelayStart(int code, String msg, String fileName) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -773,7 +773,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
         }
 
         @Override
-        public void onMixStop(int code, String msg, String pushUrls) {
+        public void onRelayStop(int code, String msg, String pushUrls) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -812,6 +812,11 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
 
         @Override
         public void onLogOffNotify(int cmdType, String userId) {
+
+        }
+
+        @Override
+        public void onMixNotify(int code, String msg, String userId, String roomId, String mixId, String[] pushUrl, String fileName) {
 
         }
 
@@ -1021,7 +1026,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                                     .mainViewUserId(mUserid)
                                     .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                                     .build();
-                            sdkEngine.startMix(mixProfile);
+                            sdkEngine.startRelay(mixProfile);
                         } else if (!mAtomOpStart) {
                             mAtomOpStart = true;
                             JSONArray jsonArray = new JSONArray();

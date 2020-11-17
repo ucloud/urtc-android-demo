@@ -328,7 +328,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
-        sdkEngine.setScreenProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1920_1080);
+        sdkEngine.setScreenProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1280_720);
 
         //分辨率菜单显示
         mTextResolution.setText(mResolutionOption.get(mVideoProfileSelect));
@@ -1092,7 +1092,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onRecordStart(int code,String fileName) {
+        public void onRecordRequestSend(int code, String fileName) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1128,7 +1128,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onMixStart(int code,String msg, String fileName) {
+        public void onRelayStart(int code, String msg, String fileName) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1155,7 +1155,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onMixStop(int code, String msg, String pushUrls) {
+        public void onRelayStop(int code, String msg, String pushUrls) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1221,6 +1221,11 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                     Log.d(TAG, "onLogOffUsers: "+ cmdType + " userId: "+ userId);
                 }
             });
+        }
+
+        @Override
+        public void onMixNotify(int code, String msg, String userId, String roomId, String mixId, String[] pushUrl, String fileName) {
+
         }
 
         @Override
@@ -1685,47 +1690,41 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         if (!mIsRemoteRecording) {
             Log.d(TAG, " start remote record: ");
             mAtomOpStart = true;
-//            UCloudRtcSdkRecordProfile recordAudioProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-//                    .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_AUDIO)
-//                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-//                    .build();
-//            sdkEngine.startRecord(recordAudioProfile);
-            UCloudRtcSdkMixProfile mixProfile = new UCloudRtcSdkMixProfile();
-            //MIX_TYPE_TRANSCODING_PUSH：旁路推流
-            mixProfile.setType(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD);
-            //讲课模式。 LAYOUT_AVERAGE：均分模式，LAYOUT_CUSTOM：自定义模式
-            mixProfile.setLayout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM);
-            //画面分辨率
-            mixProfile.setWidth(1280);
-            mixProfile.setHeight(720);
-            //背景色
-            mixProfile.setBgColor(0, 0, 0);
-            //画面帧率
-            mixProfile.setFrameRate(15);
-            //画面码率
-            mixProfile.setBitrate(1000);
-            //h264视频编码。VIDEO_CODEC_H265：H265
-            mixProfile.setVideoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264);
-            //编码质量
-            mixProfile.setQualityLevel(UCloudRtcSdkMixProfile.QUALITY_H264_CB);
-            //aac音频编码
-            mixProfile.setAudioCodec(UCloudRtcSdkMixProfile.AUDIO_CODEC_AAC);
-            //旁路推流的地址
-            mixProfile.setPushUrl("rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
-            //主讲人id
-            mixProfile.setMainViewUserId(mUserid);
-            //主屏幕播放类型为摄像头
-            mixProfile.setMainViewType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal());
-            //自动添加模式
-            mixProfile.setStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_AUTO);
-            sdkEngine.startMix(mixProfile);
+            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+                    .type(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD)
+                    //画面模式
+                    .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
+                    //画面分辨率
+                    .resolution(1280, 720)
+                    //背景色
+                    .bgColor(0, 0, 0)
+                    //画面帧率
+                    .frameRate(15)
+                    //画面码率
+                    .bitRate(1000)
+                    //h264视频编码
+                    .videoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264)
+                    //编码质量
+                    .qualityLevel(UCloudRtcSdkMixProfile.QUALITY_H264_CB)
+                    //音频编码
+                    .audioCodec(UCloudRtcSdkMixProfile.AUDIO_CODEC_AAC)
+                    //主讲人ID
+                    .mainViewUserId(mUserid)
+                    //主讲人媒体类型
+                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                    //加流方式手动
+                    .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
+                    //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
+                    .addStream(mUserid,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                    .build();
+            sdkEngine.startRelay(mixProfile);
 
         }
         else if (!mAtomOpStart) {
             Log.d(TAG, " stop remote record: ");
             mAtomOpStart = true;
 //            sdkEngine.stopRecord();
-            sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD,"");
+            sdkEngine.stopRelay(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD,"");
 
         }
     }
@@ -1734,40 +1733,41 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         if (!mIsMixing) {
             Log.d(TAG, " start mix: ");
             mAtomOpStart = true;
-            UCloudRtcSdkMixProfile mixProfile = new UCloudRtcSdkMixProfile();
-            //MIX_TYPE_TRANSCODING_PUSH：旁路推流
-            mixProfile.setType(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH);
-            //讲课模式。 LAYOUT_AVERAGE：均分模式，LAYOUT_CUSTOM：自定义模式
-            mixProfile.setLayout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM);
-            //画面分辨率
-            mixProfile.setWidth(1280);
-            mixProfile.setHeight(720);
-            //背景色
-            mixProfile.setBgColor(0, 0, 0);
-            //画面帧率
-            mixProfile.setFrameRate(15);
-            //画面码率
-            mixProfile.setBitrate(1000);
-            //h264视频编码。VIDEO_CODEC_H265：H265
-            mixProfile.setVideoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264);
-            //编码质量
-            mixProfile.setQualityLevel(UCloudRtcSdkMixProfile.QUALITY_H264_CB);
-            //aac音频编码
-            mixProfile.setAudioCodec(UCloudRtcSdkMixProfile.AUDIO_CODEC_AAC);
-            //旁路推流的地址
-            mixProfile.setPushUrl("rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
-            //主讲人id
-            mixProfile.setMainViewUserId(mUserid);
-            //主屏幕播放类型为摄像头
-            mixProfile.setMainViewType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal());
-            //自动添加模式
-            mixProfile.setStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_AUTO);
-            sdkEngine.startMix(mixProfile);
+            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+                    .type(UCloudRtcSdkMixProfile.MIX_TYPE_RELAY)
+                    //画面模式
+                    .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
+                    //画面分辨率
+                    .resolution(1280, 720)
+                    //背景色
+                    .bgColor(0, 0, 0)
+                    //画面帧率
+                    .frameRate(15)
+                    //画面码率
+                    .bitRate(1000)
+                    //h264视频编码
+                    .videoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264)
+                    //编码质量
+                    .qualityLevel(UCloudRtcSdkMixProfile.QUALITY_H264_CB)
+                    //音频编码
+                    .audioCodec(UCloudRtcSdkMixProfile.AUDIO_CODEC_AAC)
+                    //主讲人ID
+                    .mainViewUserId(mUserid)
+                    //主讲人媒体类型
+                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                    //加流方式手动
+                    .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
+                    //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
+                    .addStream(mUserid,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                    //设置转推cdn 的地址
+                    .addPushUrl("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid)
+                    .build();
+            sdkEngine.startRelay(mixProfile);
         }
         else if(!mAtomOpStart) {
             Log.d(TAG, " stop mix: ");
             mAtomOpStart = true;
-            sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH,"");
+            sdkEngine.stopRelay(UCloudRtcSdkMixProfile.MIX_TYPE_RELAY,"");
         }
     }
 
