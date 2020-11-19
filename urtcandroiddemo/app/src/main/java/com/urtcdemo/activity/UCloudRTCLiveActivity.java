@@ -17,7 +17,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -44,6 +43,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaServiceStatus;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMixProfile;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkNetWorkQuality;
@@ -396,7 +396,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mImgBtnMuteVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                  update(UCloudRtcSdkMixProfile.MIX_TYPE_UPDATE);
+//                update(UCloudRtcSdkMixProfile.MIX_TYPE_UPDATE);
+                sdkEngine.queryMix();
 //                muteVideo();
             }
         });
@@ -1098,85 +1099,82 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
 
         @Override
-        public void onRecordRequestSend(int code, String fileName) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (code == NET_ERR_CODE_OK.ordinal()) {
-                        String videoPath = "http://" + mBucket + "." + mRegion + ".ufileos.com/" + fileName;
-                        Log.d(TAG, "remote record path: " + videoPath + ".mp4");
-                        ToastUtils.longShow(UCloudRTCLiveActivity.this, "观看地址: " + videoPath);
-                        mIsRemoteRecording = true;
-                        mImgRemoteRecord.setImageResource(R.mipmap.stop);
-                        mTextRemoteRecord.setText(R.string.remote_recording);
-                        if (mAtomOpStart)
-                            mAtomOpStart = false;
-                    } else {
-                        ToastUtils.longShow(UCloudRTCLiveActivity.this, "录制开始失败: 原因：" + code);
-                    }
-                }
-            });
-        }
-
-        @Override
         public void onRecordStop(int code) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     ToastUtils.longShow(UCloudRTCLiveActivity.this, "录制结束: " + (code == NET_ERR_CODE_OK.ordinal() ? "成功" : "失败: " + code));
-                    if (mIsRemoteRecording) {
-                        mIsRemoteRecording = false;
-                        mImgRemoteRecord.setImageResource(R.mipmap.remote_record);
-                        mTextRemoteRecord.setText(R.string.start_remote_record);
-                    }
                 }
             });
         }
 
         @Override
-        public void onRelayStart(int code, String msg, String fileName) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "code : " + code + "msg: " + msg + "fileName: " + fileName);
-                    if (code == NET_ERR_CODE_OK.ordinal()) {
-                        Log.d(TAG, "onMixStart: " + fileName);
-                        if (!TextUtils.isEmpty(fileName)) {
-                            String videoPath = "http://" + mBucket + "." + mRegion + ".ufileos.com/" + fileName + ".mp4";
-                            Log.d(TAG, "onMixStart record start: " + videoPath);
-                            mIsRemoteRecording = true;
-                            mImgRemoteRecord.setImageResource(R.mipmap.stop);
-                            mTextRemoteRecord.setText(R.string.remote_recording);
-                        } else {
-                            // ulive cdn watch address: http://rtchls.ugslb.com/rtclive/roomid.flv
-                            mIsMixing = true;
-                            mImgMix.setImageResource(R.mipmap.stop);
-                            mTextMix.setText(R.string.mixing);
-                        }
-                        if (mAtomOpStart)
-                            mAtomOpStart = false;
-                    }
-                }
-            });
+        public void onQueryMix(int code, String msg, int type, String mixId, String fileName) {
+            Log.d(TAG, "onQueryMix: "+ code + " msg: "+ msg + " type: "+ type);
         }
 
         @Override
-        public void onRelayStop(int code, String msg, String pushUrls) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "onMixStop: " + code + "msg: " + msg + " pushUrl: " + pushUrls);
-                    if (mIsMixing) {
-                        mIsMixing = false;
-                        mImgMix.setImageResource(R.mipmap.mix);
-                        mTextMix.setText(R.string.start_mix);
-                    } else if (mIsRemoteRecording) {
-                        mIsRemoteRecording = false;
-                        mImgRemoteRecord.setImageResource(R.mipmap.remote_record);
-                        mTextRemoteRecord.setText(R.string.start_remote_record);
-                    }
+        public void onRecordStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String fileName) {
+            Log.d(TAG, "onRecordStatusNotify " + status + " code: " + code + " msg: " + msg + " userid " + userId + " roomid: " + roomId + " mixId: " + mixId + "fileName: " + fileName);
+            if(status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START_REQUEST_SEND){
+                Log.d(TAG, "开始录制请求已发送: ");
+            }
+            else if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START) {
+                String videoPath = "http://" + mBucket + "." + mRegion + ".ufileos.com/" + fileName;
+                Log.d(TAG, "remote record path: " + videoPath + ".mp4");
+                ToastUtils.longShow(UCloudRTCLiveActivity.this, "观看地址: " + videoPath);
+                mIsRemoteRecording = true;
+                mImgRemoteRecord.setImageResource(R.mipmap.stop);
+                mTextRemoteRecord.setText(R.string.remote_recording);
+                if (mAtomOpStart)
+                    mAtomOpStart = false;
+            } else if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_STOP_REQUEST_SEND) {
+                if (mIsRemoteRecording) {
+                    mIsRemoteRecording = false;
+                    mImgRemoteRecord.setImageResource(R.mipmap.remote_record);
+                    mTextRemoteRecord.setText(R.string.start_remote_record);
                 }
-            });
+            } else if (status == UCloudRtcSdkMediaServiceStatus.STATUS_UPDATE_REQUEST_SEND) {
+                Log.d(TAG, "update 更新参数请求已发送: ");
+            } else if (status == UCloudRtcSdkMediaServiceStatus.STATUS_UPDATE_ADD_STREAM_SUCCESS) {
+                Log.d(TAG, "update 加流成功: ");
+            } else {
+                ToastUtils.longShow(UCloudRTCLiveActivity.this, "录制异常: 原因：" + code);
+            }
+        }
+
+        @Override
+        public void onRelayStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String[] pushUrls) {
+            Log.d(TAG, "onRelayStatusNotify " + status + " code: " + code + " msg: " + msg + " userid " + userId + " roomid: " + roomId + " mixId: " + mixId);
+            if (pushUrls != null) {
+                for (int i = 0; i < pushUrls.length; i++) {
+                    Log.d(TAG, "onRelayStatusNotify: pushUrl " + pushUrls[i]);
+                }
+            }
+            if(status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_START_REQUEST_SEND){
+                Log.d(TAG, "开始转推请求已发送: ");
+            }
+            else if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_START) {
+                // ulive cdn watch address: http://rtchls.ugslb.com/rtclive/roomid.flv
+                mIsMixing = true;
+                mImgMix.setImageResource(R.mipmap.stop);
+                mTextMix.setText(R.string.mixing);
+                if (mAtomOpStart)
+                    mAtomOpStart = false;
+            } else if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_STOP_REQUEST_SEND) {
+                if (mIsMixing) {
+                    mIsMixing = false;
+                    mImgMix.setImageResource(R.mipmap.mix);
+                    mTextMix.setText(R.string.start_mix);
+                }
+            }
+            else if (status == UCloudRtcSdkMediaServiceStatus.STATUS_UPDATE_REQUEST_SEND) {
+                Log.d(TAG, "update 更新参数请求已发送: ");
+            } else if (status == UCloudRtcSdkMediaServiceStatus.STATUS_UPDATE_ADD_STREAM_SUCCESS) {
+                Log.d(TAG, "update 加流成功: ");
+            } else {
+                ToastUtils.longShow(UCloudRTCLiveActivity.this, "转推异常: 原因：" + code);
+            }
         }
 
         @Override
@@ -1230,12 +1228,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
 
         @Override
-        public void onMixNotify(int code, String msg, String userId, String roomId, String mixId, String[] pushUrl, String fileName) {
+        public void onRecordStart(int code, String fileName) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    //通过此回调判断录制转推任务是否开启成功，中间是否有异常等等
-                    Log.d(TAG, "onMixNotify code "+ code + "userid" + userId);
+                    Log.d(TAG, "onRecordStart: " + code + " fileName: " + fileName);
                 }
             });
         }
@@ -1745,7 +1742,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         if (!mIsRemoteRecording) {
             Log.d(TAG, " start remote record: ");
             mAtomOpStart = true;
-            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleRecordMixParamsBuilder()
                     .type(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD)
                     //画面模式
                     .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
@@ -1770,14 +1767,13 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     //加流方式手动
                     .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
                     //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
-                    .addStream(mUserid,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                    .addStream(mUserid, UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                     .build();
-            sdkEngine.startRelay(mixProfile);
+            sdkEngine.startRecord(mixProfile);
         } else if (!mAtomOpStart) {
             Log.d(TAG, " stop remote record: ");
             mAtomOpStart = true;
-//            sdkEngine.stopRecord();
-            sdkEngine.stopRelay(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD, "");
+            sdkEngine.stopRecord();
         }
     }
 
@@ -1785,7 +1781,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         if (!mIsMixing) {
             Log.d(TAG, " start mix: ");
             mAtomOpStart = true;
-            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleUpdateMixParamsBuilder()
                     .type(UCloudRtcSdkMixProfile.MIX_TYPE_RELAY)
                     //画面模式
                     .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
@@ -1810,7 +1806,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     //加流方式手动
                     .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
                     //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
-                    .addStream(mUserid,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                    .addStream(mUserid, UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                     //设置转推cdn 的地址
                     .addPushUrl("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid)
                     //关键用户
@@ -1820,53 +1816,53 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     //房间没流多久结束任务
                     .taskTimeOut(70)
                     .build();
-            sdkEngine.startRelay(mixProfile);
+            sdkEngine.updateMixConfig(mixProfile);
         } else if (!mAtomOpStart) {
             Log.d(TAG, " stop mix: ");
             mAtomOpStart = true;
-            sdkEngine.stopRelay(UCloudRtcSdkMixProfile.MIX_TYPE_RELAY, "");
+            sdkEngine.stopRelay(null);
         }
     }
 
     private void update(int type) {
-            Log.d(TAG, " start update: ");
-            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
-                    .type(type)
-                    //画面模式
-                    .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
-                    //画面分辨率
-                    .resolution(1280, 720)
-                    //背景色
-                    .bgColor(0, 0, 0)
-                    //画面帧率
-                    .frameRate(15)
-                    //画面码率
-                    .bitRate(1000)
-                    //h264视频编码
-                    .videoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264)
-                    //编码质量
-                    .qualityLevel(UCloudRtcSdkMixProfile.QUALITY_H264_CB)
-                    //音频编码
-                    .audioCodec(UCloudRtcSdkMixProfile.AUDIO_CODEC_AAC)
-                    //主讲人ID
-                    .mainViewUserId(mUserid)
-                    //主讲人媒体类型
-                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-                    //加流方式手动
-                    .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
-                    //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
-                    .addStream(mUserid,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-                    .addStream(latestRemoteInfo.getUId(),latestRemoteInfo.getMediaType().ordinal())
-                    //设置转推cdn 的地址
-                    .addPushUrl("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid)
-                    //关键用户
-                    .keyUser(mUserid)
-                    //流上限
-                    .layoutUserLimit(2)
-                    //房间没流多久结束任务
-                    .taskTimeOut(70)
-                    .build();
-            sdkEngine.startRelay(mixProfile);
+        Log.d(TAG, " start update: ");
+        UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+                .type(type)
+                //画面模式
+                .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
+                //画面分辨率
+                .resolution(1280, 720)
+                //背景色
+                .bgColor(0, 0, 0)
+                //画面帧率
+                .frameRate(15)
+                //画面码率
+                .bitRate(1000)
+                //h264视频编码
+                .videoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264)
+                //编码质量
+                .qualityLevel(UCloudRtcSdkMixProfile.QUALITY_H264_CB)
+                //音频编码
+                .audioCodec(UCloudRtcSdkMixProfile.AUDIO_CODEC_AAC)
+                //主讲人ID
+                .mainViewUserId(mUserid)
+                //主讲人媒体类型
+                .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                //加流方式手动
+                .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
+                //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
+                .addStream(mUserid, UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                .addStream(latestRemoteInfo.getUId(), latestRemoteInfo.getMediaType().ordinal())
+                //设置转推cdn 的地址
+                .addPushUrl("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid)
+                //关键用户
+                .keyUser(mUserid)
+                //流上限
+                .layoutUserLimit(2)
+                //房间没流多久结束任务
+                .taskTimeOut(70)
+                .build();
+        sdkEngine.updateMixConfig(mixProfile);
     }
 
 

@@ -36,6 +36,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaServiceStatus;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMixProfile;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkNetWorkQuality;
@@ -1006,26 +1007,6 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onRecordRequestSend(int code, String fileName) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if(code == NET_ERR_CODE_OK.ordinal()){
-                        String videoPath = "http://"+ mBucket + "."+ mRegion +".ufileos.com/" + fileName;
-                        Log.d(TAG,"remote record path: " +  videoPath+".mp4");
-                        ToastUtils.longShow(RoomActivity.this, "观看地址: " +videoPath );
-                        mIsRecording = true;
-                        mOpBtn.setText("stop record");
-                        if(mAtomOpStart)
-                            mAtomOpStart = false;
-                    }else{
-                        ToastUtils.longShow(RoomActivity.this, "录制开始失败: 原因：" +code );
-                    }
-                }
-            });
-        }
-
-        @Override
         public void onRecordStop(int code) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -1040,34 +1021,47 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onRelayStart(int code, String msg, String fileName) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "code : "+ code + "msg: "+ msg + "fileName: " + fileName);
-                    if(code == NET_ERR_CODE_OK.ordinal()){
-                        Log.d(TAG,"onMixStart: " + fileName);
-                        mIsMixing = true;
-                        mOpBtn.setText("stop mix");
-                        if(mAtomOpStart)
-                            mAtomOpStart = false;
-                    }
-                }
-            });
+        public void onQueryMix(int code, String msg, int type, String mixId, String fileName) {
+            Log.d(TAG, "onQueryMix: "+ code + " msg: "+ msg + " type: "+ type);
         }
 
         @Override
-        public void onRelayStop(int code, String msg, String pushUrls) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG,"onMixStop: " + code + "msg: "+ msg + " pushUrl: "+ pushUrls);
-                    if(mIsMixing){
-                        mIsMixing = false;
-                        mOpBtn.setText("mix");
-                    }
+        public void onRecordStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String fileName) {
+            if(status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START){
+                String videoPath = "http://"+ mBucket + "."+ mRegion +".ufileos.com/" + fileName;
+                Log.d(TAG,"remote record path: " +  videoPath+".mp4");
+                ToastUtils.longShow(RoomActivity.this, "观看地址: " +videoPath );
+                mIsRecording = true;
+                mOpBtn.setText("stop record");
+                if(mAtomOpStart)
+                    mAtomOpStart = false;
+            }else if(status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_STOP_REQUEST_SEND){
+                ToastUtils.longShow(RoomActivity.this, "录制结束: " + (code == NET_ERR_CODE_OK.ordinal()?"成功":"失败: "+ code));
+                if(mIsRecording){
+                    mIsRecording = false;
+                    mOpBtn.setText("start record");
                 }
-            });
+            }else {
+                ToastUtils.longShow(RoomActivity.this, "录制异常: 原因：" +code );
+            }
+        }
+
+        @Override
+        public void onRelayStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String[] pushUrls) {
+            if(status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_START){
+                mIsMixing = true;
+                mOpBtn.setText("stop mix");
+                if(mAtomOpStart)
+                    mAtomOpStart = false;
+            }else if(status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_STOP_REQUEST_SEND){
+                Log.d(TAG,"onMixStop: " + code + "msg: "+ msg + " pushUrl: "+ pushUrls);
+                if(mIsMixing){
+                    mIsMixing = false;
+                    mOpBtn.setText("mix");
+                }
+            }else{
+                ToastUtils.longShow(RoomActivity.this, "转推异常: 原因：" +code );
+            }
         }
 
         @Override
@@ -1111,7 +1105,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onMixNotify(int code, String msg, String userId, String roomId, String mixId, String[] pushUrl, String fileName) {
+        public void onRecordStart(int code, String fileName) {
 
         }
 
@@ -1322,7 +1316,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 //                        pushURL.put("rtmp://push.urtc.com.cn/" + mAppid + "/"+ mUserid);
 //                        pushURL.put("rtmp://push.urtc.com.cn/live/URtc-h4r1txxy123131");
                             pushURL.put("rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
-                            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+                            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleRelayMixParamsBuilder()
                                     .pushUrl(pushURL)
                                     .mainViewUserId(mUserid)
                                     .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
@@ -1355,7 +1349,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                                 e.printStackTrace();
                             }
 
-                            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+                            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleRelayMixParamsBuilder()
                                     .pushUrl(pushURL)
                                     .streams(streams)
                                     .mainViewUserId(mUserid)

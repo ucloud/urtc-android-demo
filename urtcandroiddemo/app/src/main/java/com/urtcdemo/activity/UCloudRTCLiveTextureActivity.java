@@ -44,6 +44,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaServiceStatus;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMixProfile;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkNetWorkQuality;
@@ -1092,27 +1093,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onRecordRequestSend(int code, String fileName) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if(code == NET_ERR_CODE_OK.ordinal()){
-                        String videoPath = "http://"+ mBucket + "."+ mRegion +".ufileos.com/" + fileName;
-                        Log.d(TAG,"remote record path: " +  videoPath+".mp4");
-                        ToastUtils.longShow(UCloudRTCLiveTextureActivity.this, "观看地址: " +videoPath );
-                        mIsRemoteRecording = true;
-                        mImgRemoteRecord.setImageResource(R.mipmap.stop);
-                        mTextRemoteRecord.setText(R.string.remote_recording);
-                        if(mAtomOpStart)
-                            mAtomOpStart = false;
-                    }else{
-                        ToastUtils.longShow(UCloudRTCLiveTextureActivity.this, "录制开始失败: 原因：" +code );
-                    }
-                }
-            });
-        }
-
-        @Override
         public void onRecordStop(int code) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -1128,49 +1108,50 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onRelayStart(int code, String msg, String fileName) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "code : "+ code + "msg: "+ msg + "fileName: " + fileName);
-                    if(code == NET_ERR_CODE_OK.ordinal()){
-                        Log.d(TAG,"onMixStart: " + fileName);
-                        if(!TextUtils.isEmpty(fileName)){
-                            String videoPath = "http://"+ mBucket + "."+ mRegion +".ufileos.com/" + fileName+".mp4";
-                            Log.d(TAG,"onMixStart record start: "+ videoPath);
-                            mIsRemoteRecording = true;
-                            mImgRemoteRecord.setImageResource(R.mipmap.stop);
-                            mTextRemoteRecord.setText(R.string.remote_recording);
-                        }else{
-                            // ulive cdn watch address: http://rtchls.ugslb.com/rtclive/roomid.flv
-                            mIsMixing = true;
-                            mImgMix.setImageResource(R.mipmap.stop);
-                            mTextMix.setText(R.string.mixing);
-                        }
-                        if(mAtomOpStart)
-                            mAtomOpStart = false;
-                    }
-                }
-            });
+        public void onQueryMix(int code, String msg, int type, String mixId, String fileName) {
+            Log.d(TAG, "onQueryMix: "+ code + " msg: "+ msg + " type: "+ type);
         }
 
         @Override
-        public void onRelayStop(int code, String msg, String pushUrls) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG,"onMixStop: " + code + "msg: "+ msg + " pushUrl: "+ pushUrls);
-                    if(mIsMixing){
-                        mIsMixing = false;
-                        mImgMix.setImageResource(R.mipmap.mix);
-                        mTextMix.setText(R.string.start_mix);
-                    }else if(mIsRemoteRecording){
-                        mIsRemoteRecording = false;
-                        mImgRemoteRecord.setImageResource(R.mipmap.remote_record);
-                        mTextRemoteRecord.setText(R.string.start_remote_record);
-                    }
+        public void onRecordStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String fileName) {
+            if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START) {
+                String videoPath = "http://" + mBucket + "." + mRegion + ".ufileos.com/" + fileName;
+                Log.d(TAG, "remote record path: " + videoPath + ".mp4");
+                ToastUtils.longShow(UCloudRTCLiveTextureActivity.this, "观看地址: " + videoPath);
+                mIsRemoteRecording = true;
+                mImgRemoteRecord.setImageResource(R.mipmap.stop);
+                mTextRemoteRecord.setText(R.string.remote_recording);
+                if (mAtomOpStart)
+                    mAtomOpStart = false;
+            } else if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_STOP_REQUEST_SEND) {
+                if (mIsRemoteRecording) {
+                    mIsRemoteRecording = false;
+                    mImgRemoteRecord.setImageResource(R.mipmap.remote_record);
+                    mTextRemoteRecord.setText(R.string.start_remote_record);
                 }
-            });
+            } else {
+                ToastUtils.longShow(UCloudRTCLiveTextureActivity.this, "录制异常: 原因：" + code);
+            }
+        }
+
+        @Override
+        public void onRelayStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String[] pushUrls) {
+            if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_START) {
+                // ulive cdn watch address: http://rtchls.ugslb.com/rtclive/roomid.flv
+                mIsMixing = true;
+                mImgMix.setImageResource(R.mipmap.stop);
+                mTextMix.setText(R.string.mixing);
+                if (mAtomOpStart)
+                    mAtomOpStart = false;
+            } else if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_STOP_REQUEST_SEND) {
+                if (mIsMixing) {
+                    mIsMixing = false;
+                    mImgMix.setImageResource(R.mipmap.mix);
+                    mTextMix.setText(R.string.start_mix);
+                } else {
+                    ToastUtils.longShow(UCloudRTCLiveTextureActivity.this, "转推异常: 原因：" + code);
+                }
+            }
         }
 
         @Override
@@ -1224,8 +1205,13 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onMixNotify(int code, String msg, String userId, String roomId, String mixId, String[] pushUrl, String fileName) {
-
+        public void onRecordStart(int code, String fileName) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onRecordStart: " + code + " fileName: " + fileName);
+                }
+            });
         }
 
         @Override
@@ -1723,9 +1709,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         else if (!mAtomOpStart) {
             Log.d(TAG, " stop remote record: ");
             mAtomOpStart = true;
-//            sdkEngine.stopRecord();
-            sdkEngine.stopRelay(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD,"");
-
+            sdkEngine.stopRecord();
         }
     }
 
@@ -1767,7 +1751,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         else if(!mAtomOpStart) {
             Log.d(TAG, " stop mix: ");
             mAtomOpStart = true;
-            sdkEngine.stopRelay(UCloudRtcSdkMixProfile.MIX_TYPE_RELAY,"");
+            sdkEngine.stopRelay(null);
         }
     }
 
