@@ -87,8 +87,10 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 //            }
             videoView.setTag(R.id.index, viewInfo);
             videoView.setTag(viewInfo.getStreamInfo());
+            boolean isLocal = false;
             if(mSwapInterface != null){
                 videoView.setOnClickListener(mSwapInterface.provideSwapListener());
+                isLocal = mSwapInterface.isLocalStream(viewInfo.getmUid());
             }else{
                 videoView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -122,13 +124,23 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                     }
                 });
             }
-            mSdkEngine.startRemoteView(viewInfo.getStreamInfo(), videoView, null, new UCloudRTCFirstFrameRendered(){
+            if(isLocal){
+                mSdkEngine.renderLocalView(viewInfo.getStreamInfo(), videoView, null, new UCloudRTCFirstFrameRendered(){
+                    @Override
+                    public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
+                        Log.d(TAG, "onlocal first frame render: " + "view: " + view);
+                    }
+                });
+            }else{
+                mSdkEngine.startRemoteView(viewInfo.getStreamInfo(), videoView, null, new UCloudRTCFirstFrameRendered(){
 
-                @Override
-                public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
-                    Log.d(TAG, "onRemoteFirstFrameRender: " + "view: " + view);
-                }
-            });
+                    @Override
+                    public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
+                        Log.d(TAG, "onRemoteFirstFrameRender: " + "view: " + view);
+                    }
+                });
+            }
+
         } else {
             holderView.setBackground(mContext.getResources().getDrawable(R.drawable.border));
         }
@@ -282,5 +294,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 
     public interface SwapInterface{
         View.OnClickListener provideSwapListener();
+
+        boolean isLocalStream(String uid);
     }
 }

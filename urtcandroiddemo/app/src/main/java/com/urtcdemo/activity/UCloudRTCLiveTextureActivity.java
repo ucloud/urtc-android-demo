@@ -1377,6 +1377,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                     UCloudRtcSdkStreamInfo clickStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
                     boolean swapLocal = mSwapStreamInfo.getUId().equals(mUserid);
                     boolean clickLocal = clickStreamInfo.getUId().equals(mUserid);
+                    Log.d(TAG, "mSwapStreamInfo: "+ mSwapStreamInfo + " clickInfo: " + clickStreamInfo);
+                    Log.d(TAG, "onClick swaplocal"+ swapLocal + " clickLocal: " + clickLocal);
                     if(swapLocal && !clickLocal){
                         sdkEngine.stopRemoteView(clickStreamInfo);
                         sdkEngine.stopPreview(mSwapStreamInfo.getMediaType());
@@ -2103,6 +2105,12 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     public View.OnClickListener provideSwapListener() {
         return mSwapRemoteLocalListener;
     }
+
+    @Override
+    public boolean isLocalStream(String uid) {
+        return uid.equals(mUserid);
+    }
+
 
     private void takeScreenShot(boolean isLocal,UCloudRtcSdkStreamInfo streamInfo){
         sdkEngine.takeSnapShot(isLocal,streamInfo,new UCloudRTCScreenShot() {
