@@ -35,12 +35,6 @@
                 android:textSize="12sp"
                 android:gravity="center"
                 android:maxLines="1"/>
-<!--            <View
-                android:layout_height="1dp"
-                android:layout_width="match_parent"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@color/color_CCC5C5C5"/>-->
             <ImageView
                 android:id="@+id/local_record_pic"
                 android:layout_width="48dp"
@@ -59,12 +53,6 @@
                 android:textSize="12sp"
                 android:gravity="center"
                 android:maxLines="1"/>
-<!--            <View
-                android:layout_height="1dp"
-                android:layout_width="match_parent"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@color/color_CCC5C5C5"/>-->
             <ImageView
                 android:id="@+id/remote_record_pic"
                 android:layout_width="48dp"
@@ -83,12 +71,6 @@
                 android:textSize="12sp"
                 android:gravity="center"
                 android:maxLines="1"/>
-<!--            <View
-                android:layout_height="1dp"
-                android:layout_width="match_parent"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@color/color_CCC5C5C5"/>-->
             <ImageView
                 android:id="@+id/screenshot_pic"
                 android:layout_width="48dp"
@@ -107,12 +89,6 @@
                 android:textSize="12sp"
                 android:gravity="center"
                 android:maxLines="1"/>
-<!--            <View
-                android:layout_height="1dp"
-                android:layout_width="match_parent"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@color/color_CCC5C5C5"/>-->
             <ImageView
                 android:id="@+id/manual_publish_pic"
                 android:layout_width="48dp"
@@ -126,17 +102,47 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="@string/pub_manual"
+                android:text="@string/pub_video"
                 android:textColor="@color/lsq_color_white"
                 android:textSize="12sp"
                 android:gravity="center"
                 android:maxLines="1"/>
-<!--            <View
-                android:layout_height="1dp"
+            <ImageView
+                android:id="@+id/manual_publish_screen_pic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/lsq_color_transparent"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:src="@mipmap/publish_screen" />
+            <TextView
+                android:id="@+id/manual_publish_screen_text"
                 android:layout_width="match_parent"
-                android:layout_marginTop="8dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:background="@color/color_CCC5C5C5"/>-->
+                android:text="@string/pub_screen"
+                android:textColor="@color/lsq_color_white"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:maxLines="1"/>
+            <ImageView
+                android:id="@+id/preview_pic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/lsq_color_transparent"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:src="@mipmap/preview" />
+            <TextView
+                android:id="@+id/preview_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/start_preview"
+                android:textColor="@color/lsq_color_white"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:maxLines="1"/>
         </LinearLayout>
     </ScrollView>
 </FrameLayout>

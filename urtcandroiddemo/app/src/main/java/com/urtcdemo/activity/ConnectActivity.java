@@ -88,7 +88,7 @@ public class ConnectActivity extends AppCompatActivity {
         setContentView(R.layout.activity_connect);
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
-        mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID);
+        mAppid = preferences.getString(CommonUtils.APP_ID_TAG, CommonUtils.APP_ID);
         UCloudRtcSdkEnv.setMixSupport(preferences.getBoolean(CommonUtils.SDK_SUPPORT_MIX, false));
         UCloudRtcSdkEnv.setLoop(preferences.getBoolean(CommonUtils.SDK_IS_LOOP, true));
         UCloudRtcSdkEnv.setMixFilePath(preferences.getString(CommonUtils.SDK_MIX_FILE_PATH, getResources().getString(R.string.mix_file_path)));
@@ -102,6 +102,7 @@ public class ConnectActivity extends AppCompatActivity {
         mTextSDKVersion.setText(getString(R.string.app_name) + "\n" + UCloudRtcSdkEngine.getSdkVersion());
         connectButton = findViewById(R.id.connect_button);
         exportButton = findViewById(R.id.log_output_button);
+        exportButton.setVisibility(View.GONE);
         StatusBarUtils.setAndroidNativeLightStatusBar(this,true);
 
         connectButton.setOnClickListener(new View.OnClickListener() {
@@ -256,31 +257,10 @@ public class ConnectActivity extends AppCompatActivity {
         }
     }
 
-    private void startRoomTextureActivity() {
-        if (!mStartSuccess) {
-            mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, RoomTextureActivity.class);
-            intent.putExtra("room_id", mRoomid);
-            String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
-            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
-            intent.putExtra("user_id", mUserId);
-            intent.putExtra("app_id", mAppid);
-            intent.putExtra("token", mRoomToken);
-            mMainHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startActivity(intent);
-                    finish();
-                    mStartSuccess = false;
-                }
-            }, 500);
-        }
-    }
-
     private void startLivingActivity() {
         if (!mStartSuccess) {
             mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveTextureActivity.class);
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
             mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;

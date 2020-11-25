@@ -14,12 +14,25 @@ public class URTCVideoViewInfo {
     private UCloudRtcSdkMediaType mMediatype ;
     private String key;
     private UCloudRtcSdkStreamInfo mStreamInfo;
-
+    public URTCVideoViewInfo(){
+        mUid = "" ;
+        mEanbleVideo = false ;
+        mMediatype = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
+    }
     public URTCVideoViewInfo(UCloudRtcSdkSurfaceVideoView view) {
         mRenderview = view ;
         mUid = "" ;
         mEanbleVideo = false ;
         mMediatype = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
+    }
+
+    public URTCVideoViewInfo(UCloudRtcSdkStreamInfo info) {
+        mRenderview = null ;
+        mUid = info.getUId() ;
+        mEanbleVideo = info.isHasVideo() ;
+        mEnableAudio = info.isHasAudio();
+        mMediatype = info.getMediaType();
+        mStreamInfo = info;
     }
 
     public View getmRenderview() {

@@ -176,7 +176,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:shadowColor="@color/color_FF007AFF"
-                    android:text="@string/pub_manual"
+                    android:text="@string/pub_video"
                     android:textColor="@color/textcolor" />
 
             </com.urtcdemo.utils.RadioGroupFlow>

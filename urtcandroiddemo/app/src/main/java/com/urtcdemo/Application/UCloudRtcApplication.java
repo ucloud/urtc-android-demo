@@ -12,17 +12,17 @@ import android.view.WindowManager;
 
 import com.github.moduth.blockcanary.BlockCanaryContext;
 import com.tencent.bugly.crashreport.CrashReport;
-//import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkPushEncode;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkPushEncode;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkPushOrentation;
-import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
-import com.urtcdemo.BuildConfig;
-import com.urtcdemo.utils.CommonUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkLogLevel;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkPushEncode;
+import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
+import com.urtcdemo.BuildConfig;
+import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.UiHelper;
+
+//import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkPushEncode;
 
 public class UCloudRtcApplication extends Application {
 
@@ -63,15 +63,16 @@ public class UCloudRtcApplication extends Application {
         UCloudRtcSdkEnv.initEnv(getApplicationContext());
         UCloudRtcSdkEnv.setWriteToLogCat(true);
         UCloudRtcSdkEnv.setLogReport(true);
-//        UCloudRtcSdkEnv.setEncodeMode(UCloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);
+        UCloudRtcSdkEnv.setEncodeMode(UCloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);
         UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo);
         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
         UCloudRtcSdkEnv.setReConnectTimes(60);
-        UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.SEC_KEY);
+        UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.APP_KEY);
+        //UCloudRtcSdkEnv.setDeviceChannelType(UCloudRtcSdkChannelType.UCLOUD_RTC_SDK_CHANNEL_TYPE_VOICE);
 //        UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_LANDSCAPE_MODE);
         //私有化部署
 //        UCloudRtcSdkEnv.setPrivateDeploy(true);
-//        UCloudRtcSdkEnv.setPrivateDeployRoomURL("ws://mediapoc1.pingan.com.cn:5005/ws");
+        UCloudRtcSdkEnv.setPrivateDeployRoomURL("wss://mediapoc1.pingan.com.cn:5005/ws");
         //无限重连
 //        UCloudRtcSdkEnv.setReConnectTimes(-1);
         //默认vp8编码，可以改成h264

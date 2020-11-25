@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:clipToPadding="true">
+
+    <FrameLayout
+        android:id="@+id/drawer_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/videooff">
+
+        <TextureView
+            android:id="@+id/localvideoview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <FrameLayout
+            android:id="@+id/title_bar"
+            android:layout_width="match_parent"
+            android:background="@color/color_7F04A5EB"
+            android:layout_height="50dp">
+
+            <ImageButton
+                android:id="@+id/img_btn_switch_camera"
+                android:background="#00000000"
+                android:src="@mipmap/switchcamera"
+                android:contentDescription="@string/switch_camera"
+                android:layout_marginLeft="16dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+
+            <TextView
+                android:id="@+id/roomid_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:text="RoomID"
+                android:textColor="@color/lsq_color_white"
+                android:textSize="14sp"
+                android:layout_marginLeft="80dp"
+                android:layout_gravity="left|center_vertical"/>
+
+            <Chronometer
+                android:id="@+id/timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format="%s"
+                android:textColor="@color/colorWhite"
+                android:layout_gravity="center_horizontal|center_vertical" />
+
+            <TextView
+                android:id="@+id/resolution_text"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/lsq_color_white"
+                android:text="分辨率"
+                android:gravity="center"
+                android:layout_marginRight="75dp"
+                android:background="@drawable/textview_border"
+                android:layout_gravity="right|center_vertical"/>
+
+            <ImageButton
+                android:id="@+id/img_btn_more"
+                android:layout_gravity="right|center_vertical"
+                android:background="#00000000"
+                android:src="@mipmap/more"
+                android:layout_width="50dp"
+                android:layout_height="50dp">
+            </ImageButton>
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/mic_status_img"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="55dp"
+            android:layout_marginEnd="14dp"
+            android:layout_marginRight="14dp"
+            android:src="@mipmap/mic_volume" />
+
+        <ImageView
+            android:id="@+id/sound_volume_img"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="55dp"
+            android:src="@mipmap/sound_volume_01"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/remoteGridView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="51dp"
+            android:layout_gravity="bottom" />
+        <LinearLayout
+            android:id="@+id/tool_bar"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/lsq_color_white"
+            android:layout_weight="1"
+            android:layout_gravity="bottom">
+            <ImageButton
+                android:id="@+id/img_btn_toggle_mic"
+                android:background="@drawable/publish_layer"
+                android:src="@mipmap/mic"
+                android:contentDescription="@string/toggle_mic"
+                android:layout_width="48dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"/>
+
+            <ImageButton
+                android:id="@+id/img_btn_toggle_video"
+                android:background="@drawable/publish_layer"
+                android:src="@mipmap/camera"
+                android:contentDescription="toggle video"
+                android:layout_width="48dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"/>
+
+            <ImageButton
+                android:id="@+id/img_btn_endcall"
+                android:background="@mipmap/end"
+                android:contentDescription="@string/disconnect_call"
+                android:layout_width="32dp"
+                android:layout_height="fill_parent"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:layout_centerInParent="true"
+                android:layout_weight="1"/>
+
+            <ImageButton
+                android:id="@+id/img_btn_speaker"
+                android:background="@drawable/publish_layer"
+                android:src="@mipmap/speaker"
+                android:contentDescription="speaker on/off"
+                android:layout_width="48dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"/>
+            <ImageButton
+                android:id="@+id/img_btn_mirror"
+                android:background="@drawable/publish_layer"
+                android:src="@mipmap/mirror"
+                android:contentDescription="@string/mirror"
+                android:layout_width="48dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"/>
+        </LinearLayout>
+    </FrameLayout>
+
+    <include
+        layout="@layout/drawer_layout"/>
+</android.support.v4.widget.DrawerLayout>
