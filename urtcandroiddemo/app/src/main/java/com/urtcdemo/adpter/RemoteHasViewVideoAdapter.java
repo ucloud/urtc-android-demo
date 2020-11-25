@@ -6,16 +6,20 @@ import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderTextureView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
+
+import org.webrtc.TextureViewRenderer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -79,8 +83,10 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
             return;
         }
 
-        View videoView = holderView.findViewById(R.id.texture_view);
+        TextureView videoView = holderView.findViewById(R.id.texture_view);
+
         if (videoView != null) {
+
 //            ViewParent parent = videoView.getParent();
 //            if (parent != null) {
 //                ((FrameLayout) parent).removeView(videoView);
@@ -124,15 +130,24 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                     }
                 });
             }
+            UCloudRtcRenderTextureView render = null;
+            if(videoView.getTag(R.id.render)!= null){
+                render = (UCloudRtcRenderTextureView)videoView.getTag(R.id.render);
+            }else{
+                render = new UCloudRtcRenderTextureView(videoView);
+                render.init();
+                videoView.setTag(R.id.render,render);
+            }
+            viewInfo.setmRenderview(render);
             if(isLocal){
-                mSdkEngine.renderLocalView(viewInfo.getStreamInfo(), videoView, null, new UCloudRTCFirstFrameRendered(){
+                mSdkEngine.renderLocalView(viewInfo.getStreamInfo(), render, null, new UCloudRTCFirstFrameRendered(){
                     @Override
                     public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
                         Log.d(TAG, "onlocal first frame render: " + "view: " + view);
                     }
                 });
             }else{
-                mSdkEngine.startRemoteView(viewInfo.getStreamInfo(), videoView, null, new UCloudRTCFirstFrameRendered(){
+                mSdkEngine.startRemoteView(viewInfo.getStreamInfo(), render, null, new UCloudRTCFirstFrameRendered(){
 
                     @Override
                     public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
@@ -224,7 +239,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
     public void removeStreamView(String mkey) {
         if (mStreamViews.containsKey(mkey)) {
             Log.d(TAG, " removeStreamView key: " + mkey);
-//            releaseVideoContainerRes(mkey);
+            releaseVideoContainerRes(mkey);
             mStreamViews.remove(mkey);
             int index = medialist.indexOf(mkey);
             medialist.remove(mkey);

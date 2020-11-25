@@ -72,8 +72,9 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
             return;
         }
         if (holderView.getChildCount() == 0) {
-            View videoView = viewInfo.getmRenderview();
-            if (videoView != null) {
+            Object render = viewInfo.getmRenderview();
+            if (render != null && render instanceof View) {
+                View videoView = (View)render;
                 ViewParent parent = videoView.getParent();
                 if (parent != null) {
                     ((FrameLayout) parent).removeView(videoView);
