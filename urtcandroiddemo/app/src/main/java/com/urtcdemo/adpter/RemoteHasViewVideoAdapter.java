@@ -32,12 +32,10 @@ import java.util.List;
 public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasViewVideoAdapter.ViewHolder> {
     public static final String TAG = " RemoteVideoAdapter ";
     private HashMap<String, URTCVideoViewInfo> mStreamViews = new HashMap<>();
-    private HashMap<String, Boolean> mScreenState = new HashMap<>();
     private ArrayList<String> medialist = new ArrayList<>();
     protected final LayoutInflater mInflater;
     private Context mContext;
     private List<ViewHolder> mCacheHolder;
-    private RemoveRemoteStreamReceiver mRemoveRemoteStreamReceiver;
     private SwapInterface mSwapInterface;
     private UCloudRtcSdkEngine mSdkEngine;
 
@@ -161,43 +159,8 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         }
     }
 
-    public void setRemoveRemoteStreamReceiver(RemoveRemoteStreamReceiver removeRemoteStreamReceiver) {
-        mRemoveRemoteStreamReceiver = removeRemoteStreamReceiver;
-    }
-
-    public boolean checkState(String key) {
-        return mScreenState.get(key);
-    }
-
-    public void reverseState(String key) {
-        boolean reverse;
-        if (mScreenState.containsKey(key)) {
-            reverse = !mScreenState.get(key);
-            mScreenState.put(key, reverse);
-        }
-    }
-
     public int getPositionByKey(String key) {
         return medialist.indexOf(key);
-    }
-
-    public boolean checkCanSwap(String key) {
-        if (mScreenState.containsKey(key) && mScreenState.get(key)) {
-            //如果自己已经交换过就直接允许交换
-            return true;
-        } else {
-            boolean otherHasSwaped = false;
-            for (String otherKey : mScreenState.keySet()) {
-                if (!otherKey.equals(key)) {
-                    if (mScreenState.get(otherKey)) {
-                        //其它的已经有交换过的，那这次就不要交换
-                        otherHasSwaped = true;
-                        break;
-                    }
-                }
-            }
-            return !otherHasSwaped;
-        }
     }
 
     public void addStreamView(String mkey, URTCVideoViewInfo videoViewInfo) {
@@ -206,9 +169,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
             mStreamViews.put(mkey, videoViewInfo);
             medialist.add(mkey);
         }
-//        if (!mScreenState.containsKey(mkey)) {
-//            mScreenState.put(mkey, false);
-//        }
+//
 //        notifyItemInserted(medialist.size() - 1);
         notifyDataSetChanged();
     }
@@ -241,23 +202,12 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
             Log.d(TAG, " removeStreamView key: " + mkey);
             releaseVideoContainerRes(mkey);
             mStreamViews.remove(mkey);
-            int index = medialist.indexOf(mkey);
             medialist.remove(mkey);
 //            notifyItemRemoved(index);
 //            notifyItemRangeChanged(index, getItemCount());
 //            notifyItemRemoved(index);
             Log.d(TAG, " remove finished ,mStreamViews size: " + mStreamViews.size() + "medialist size: " + medialist.size());
         }
-//        if (mScreenState.containsKey(mkey)) {
-//            Log.d(TAG, " mScreenState key: " + mkey);
-//            if (mScreenState.get(mkey)) {
-//                if (mRemoveRemoteStreamReceiver != null) {
-//                    mRemoveRemoteStreamReceiver.onRemoteStreamRemoved(true);
-//                }
-//            }
-//            mScreenState.remove(mkey);
-//            Log.d(TAG, " remove finished ,mScreenState size: " + mScreenState.size());
-//        }
         notifyDataSetChanged();
     }
 
@@ -267,7 +217,6 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         }
         medialist.clear();
         mStreamViews.clear();
-        mScreenState.clear();
 
         if (mCacheHolder != null) {
             for (int i = 0; i < mCacheHolder.size(); i++) {

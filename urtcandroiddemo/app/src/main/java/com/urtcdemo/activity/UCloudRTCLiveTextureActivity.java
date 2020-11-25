@@ -39,7 +39,6 @@ import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderTextureView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
@@ -1375,7 +1374,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         @Override
         public void onClick(View v) {
             if (v instanceof TextureView) {
-                    TextureView textureView = (TextureView)v;
                     UCloudRtcSdkStreamInfo clickStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
                     boolean swapLocal = mSwapStreamInfo.getUId().equals(mUserid);
                     boolean clickLocal = clickStreamInfo.getUId().equals(mUserid);
@@ -1548,7 +1546,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                 mUSBMonitor = null;
             }
         }
-        mVideoAdapter.setRemoveRemoteStreamReceiver(null);
         if (mUCloudRTCDataProvider != null) {
             mUCloudRTCDataProvider = null;
         }
