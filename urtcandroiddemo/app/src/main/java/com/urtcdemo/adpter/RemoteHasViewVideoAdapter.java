@@ -27,11 +27,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasViewVideoAdapter.ViewHolder> {
     public static final String TAG = " RemoteVideoAdapter ";
     private HashMap<String, URTCVideoViewInfo> mStreamViews = new HashMap<>();
+    private Set<Object> cacheRender = new HashSet<>();
     private ArrayList<String> medialist = new ArrayList<>();
     protected final LayoutInflater mInflater;
     private Context mContext;
@@ -129,14 +132,29 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                 });
             }
             UCloudRtcRenderTextureView render = null;
+            Object viewInfoRender = viewInfo.getmRenderview();
+            Log.d(TAG, "onBindViewHolder: video info render "+ viewInfo.getmRenderview());
             if(videoView.getTag(R.id.render)!= null){
                 render = (UCloudRtcRenderTextureView)videoView.getTag(R.id.render);
+                Log.d(TAG, "onBindViewHolder: view "+ videoView +" has render "+ render);
             }else{
                 render = new UCloudRtcRenderTextureView(videoView);
                 render.init();
                 videoView.setTag(R.id.render,render);
+                Log.d(TAG, "onBindViewHolder: new render "+ render);
+            }
+            if(!render.equals(viewInfoRender)){
+                Log.d(TAG, "onBindViewHolder: render not the same");
+                mSwapInterface.stopRender(viewInfo);
             }
             viewInfo.setmRenderview(render);
+            for (Object releaseCacheRender : cacheRender) {
+                if(releaseCacheRender.equals(render)){
+                    Log.d(TAG, "onBindViewHolder: reinit render "+ releaseCacheRender);
+                    render.init();
+                    break;
+                }
+            }
             if(isLocal){
                 mSdkEngine.renderLocalView(viewInfo.getStreamInfo(), render, null, new UCloudRTCFirstFrameRendered(){
                     @Override
@@ -177,9 +195,12 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
     public void updateSwapInfo(UCloudRtcSdkStreamInfo clickInfo,UCloudRtcSdkStreamInfo swapInfo){
         String clickKey = clickInfo.getUId() + clickInfo.getMediaType().toString();
         String swapKey = swapInfo.getUId() + swapInfo.getMediaType().toString();
-        mStreamViews.remove(clickKey);
+        URTCVideoViewInfo oldBean = mStreamViews.remove(clickKey);
         URTCVideoViewInfo newBean = new URTCVideoViewInfo(swapInfo);
+        Log.d(TAG, "updateSwapInfo: old bean render: "+ oldBean.getmRenderview());
+        newBean.setmRenderview(oldBean.getmRenderview());
         mStreamViews.put(swapKey,newBean);
+
         int clickIndex = medialist.indexOf(clickKey);
         Log.d(TAG, "updateSwapInfo: old medialist index: "+ medialist.indexOf(clickKey));
         medialist.set(clickIndex,swapKey);
@@ -233,7 +254,9 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
     private void releaseVideoContainerRes(String mkey) {
         URTCVideoViewInfo viewInfo = mStreamViews.get(mkey);
         if (viewInfo != null) {
-            viewInfo.release();
+            Object release = viewInfo.release();
+            Log.d(TAG, "releaseVideoContainerRes: release cache " + release);
+            cacheRender.add(release);
         }
     }
 
@@ -260,5 +283,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         View.OnClickListener provideSwapListener();
 
         boolean isLocalStream(String uid);
+
+        void stopRender(URTCVideoViewInfo info);
     }
 }

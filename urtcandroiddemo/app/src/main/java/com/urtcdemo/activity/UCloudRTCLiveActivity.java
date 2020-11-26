@@ -902,13 +902,16 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 public void run() {
                     if (code == 0) {
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
-                        UCloudRtcSdkSurfaceVideoView videoView = null;
+//                        UCloudRtcSdkSurfaceVideoView videoView = null;
+                        UCloudRtcRenderView videoView = null;
                         Log.d(TAG, " subscribe info: " + info);
                         latestRemoteInfo = info;
                         if (info.isHasVideo()) {
                             //UCloudRtcSdkSurfaceVideoView 定义的viewgroup,内含UcloudRtcRenderView
-                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
-                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
+//                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
+//                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
+                            videoView = new UCloudRtcRenderView(getApplicationContext());
+                            videoView.init();
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
 

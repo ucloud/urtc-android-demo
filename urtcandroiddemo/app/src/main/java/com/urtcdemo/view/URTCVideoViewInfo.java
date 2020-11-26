@@ -93,7 +93,7 @@ public class URTCVideoViewInfo {
         return mStreamInfo;
     }
 
-    public void release() {
+    public Object release() {
         if (mRenderview != null) {
             if(mRenderview instanceof UCloudRtcSdkSurfaceVideoView){
                 ((UCloudRtcSdkSurfaceVideoView)mRenderview).refresh();
@@ -104,8 +104,10 @@ public class URTCVideoViewInfo {
             else if(mRenderview instanceof UCloudRtcRenderTextureView){
                 ((UCloudRtcRenderTextureView)mRenderview).release();
             }
-            mRenderview = null ;
+//            mRenderview = null ;
+
         }
+        return mRenderview;
     }
 
 }

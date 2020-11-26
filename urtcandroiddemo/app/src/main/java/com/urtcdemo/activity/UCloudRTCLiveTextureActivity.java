@@ -893,7 +893,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                             info.getUId() + " 取消媒体流 " + info.getMediaType());
                     String mkey = info.getUId() + info.getMediaType().toString();
                     if(mSwapStreamInfo!= null && mSwapStreamInfo.getUId().equals(info.getUId()) && mSwapStreamInfo.getMediaType().toString().equals(info.getMediaType().toString())){
-                        sdkEngine.stopRemoteView(mSwapStreamInfo);
+//                        sdkEngine.stopRemoteView(mSwapStreamInfo);
                         int localIndex  = mVideoAdapter.getPositionByKey(mUserid + mPublishMediaType.toString());
                         if(localIndex >= 0){
                             Log.d(TAG," onRemoteUnPublish localIndex "+ localIndex);
@@ -902,8 +902,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                             sdkEngine.renderLocalView(mLocalStreamInfo,mLocalRender,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
                             mSwapStreamInfo = mLocalStreamInfo;
                         }
-                    }else{
-                        sdkEngine.stopRemoteView(info);
                     }
                     if (mVideoAdapter != null) {
                         mVideoAdapter.removeStreamView(mkey);
@@ -2113,6 +2111,20 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     @Override
     public boolean isLocalStream(String uid) {
         return uid.equals(mUserid);
+    }
+
+    @Override
+    public void stopRender(URTCVideoViewInfo info) {
+        Log.d(TAG, "stop render: "+info.getmRenderview());
+        if(info != null && info.getmRenderview()!= null){
+            if(info.getStreamInfo().getUId().equals(mUserid)){
+                Log.d(TAG, "stop old list cache local render: "+info.getmRenderview());
+                sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO,info.getmRenderview());
+            }else{
+                Log.d(TAG, "stop old list cache remote render info: "+info.getStreamInfo());
+                sdkEngine.stopRemoteView(info.getStreamInfo());
+            }
+        }
     }
 
 
