@@ -65,6 +65,7 @@ import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataReceiver;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteHasViewVideoAdapter;
+import com.urtcdemo.adpter.RemoteNoCacheTextureVideoAdapter;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
 import com.urtcdemo.service.UCloudRtcForeGroundService;
 import com.urtcdemo.utils.CommonUtils;
@@ -155,6 +156,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
     private GridLayoutManager gridLayoutManager;
     private RemoteHasViewVideoAdapter mVideoAdapter;
+//    private RemoteNoCacheTextureVideoAdapter mVideoAdapter;
     private RecyclerView mRemoteGridView = null;
     private DrawerLayout mDrawer;
     private ViewGroup mDrawerContent;
@@ -230,6 +232,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         mRemoteGridView.setLayoutManager(gridLayoutManager);
         //点击remoteView交换
         mVideoAdapter = new RemoteHasViewVideoAdapter(this,sdkEngine,this);
+//        mVideoAdapter = new RemoteNoCacheTextureVideoAdapter(this,sdkEngine,this);
         //点击remoteView截图
         //mVideoAdapter = new RemoteHasViewVideoAdapter(this,sdkEngine,null);
 //        mVideoAdapter.setRemoveRemoteStreamReceiver(mRemoveRemoteStreamReceiver);
@@ -892,14 +895,15 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                     ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, " 用户 " +
                             info.getUId() + " 取消媒体流 " + info.getMediaType());
                     String mkey = info.getUId() + info.getMediaType().toString();
-                    if(mSwapStreamInfo!= null && mSwapStreamInfo.getUId().equals(info.getUId()) && mSwapStreamInfo.getMediaType().toString().equals(info.getMediaType().toString())){
+                    sdkEngine.stopRemoteView(info);
+                    if(mSwapStreamInfo!= null && mSwapStreamInfo.getUId().equals(info.getUId()) && mSwapStreamInfo.getMediaType().toString().equals(info.getMediaType().toString())) {
 //                        sdkEngine.stopRemoteView(mSwapStreamInfo);
-                        int localIndex  = mVideoAdapter.getPositionByKey(mUserid + mPublishMediaType.toString());
-                        if(localIndex >= 0){
-                            Log.d(TAG," onRemoteUnPublish localIndex "+ localIndex);
+                        int localIndex = mVideoAdapter.getPositionByKey(mUserid + mPublishMediaType.toString());
+                        if (localIndex >= 0) {
+                            Log.d(TAG, " onRemoteUnPublish localIndex " + localIndex);
                             mkey = mUserid + mPublishMediaType.toString();
                             sdkEngine.stopPreview(mPublishMediaType);
-                            sdkEngine.renderLocalView(mLocalStreamInfo,mLocalRender,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                            sdkEngine.renderLocalView(mLocalStreamInfo, mLocalRender, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                             mSwapStreamInfo = mLocalStreamInfo;
                         }
                     }

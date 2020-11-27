@@ -93,7 +93,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 //                ((FrameLayout) parent).removeView(videoView);
 //            }
             videoView.setTag(R.id.index, viewInfo);
-            videoView.setTag(viewInfo.getStreamInfo());
+
             boolean isLocal = false;
             if(mSwapInterface != null){
                 videoView.setOnClickListener(mSwapInterface.provideSwapListener());
@@ -143,10 +143,13 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                 videoView.setTag(R.id.render,render);
                 Log.d(TAG, "onBindViewHolder: new render "+ render);
             }
+
             if(!render.equals(viewInfoRender)){
-                Log.d(TAG, "onBindViewHolder: render not the same");
+                Log.d(TAG, "onBindViewHolder: new render old info "+ videoView.getTag());
+                Log.d(TAG, "onBindViewHolder: new info " + viewInfo.getStreamInfo() + " old render : "+ viewInfo.getmRenderview());
                 mSwapInterface.stopRender(viewInfo);
             }
+            videoView.setTag(viewInfo.getStreamInfo());
             viewInfo.setmRenderview(render);
             for (Object releaseCacheRender : cacheRender) {
                 if(releaseCacheRender.equals(render)){
