@@ -42,10 +42,10 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaServiceStatus;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMixProfile;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkNetWorkQuality;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRecordProfile;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStats;
@@ -187,6 +187,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private UVCCamera mUVCCamera = null;
     private final Object mSync = new Object();
     private boolean isActive, isPreview;
+    private boolean mLeaveRoomFlag;
+    private UCloudRtcSdkStreamInfo latestRemoteInfo;
     //外部摄像数据读取
     private ArrayBlockingQueue<ByteBuffer> mQueueByteBuffer = new ArrayBlockingQueue(8);
 
@@ -233,8 +235,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mDrawerContent = findViewById(R.id.drawer_content);
         mDrawerMenu = findViewById(R.id.menu_drawer);
         timeShow = findViewById(R.id.timer);
-        mDrawerContent.setPadding(0,StatusBarUtils.getStatusBarHeight(this),0,0);
-        mTitleBar= findViewById(R.id.title_bar);
+        mDrawerContent.setPadding(0, StatusBarUtils.getStatusBarHeight(this), 0, 0);
+        mTitleBar = findViewById(R.id.title_bar);
         mToolBar = findViewById(R.id.tool_bar);
         mImgBtnMore = findViewById(R.id.img_btn_more);
         mImgBtnSwitchCam = findViewById(R.id.img_btn_switch_camera);
@@ -243,7 +245,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mImgBtnMuteSpeaker = findViewById(R.id.img_btn_speaker);
         mImgBtnMirror = findViewById(R.id.img_btn_mirror);
         mImgBtnEndCall = findViewById(R.id.img_btn_endcall);
-        StatusBarUtils.setColor(this,getResources().getColor(R.color.color_7F04A5EB));
+        StatusBarUtils.setColor(this, getResources().getColor(R.color.color_7F04A5EB));
         mImgMix = findViewById(R.id.mix_pic);
         mTextMix = findViewById(R.id.mix_text);
         mImgLocalRecord = findViewById(R.id.local_record_pic);
@@ -290,16 +292,14 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         Log.d(TAG, " Camera enable is: " + mCameraEnable + " Mic enable is: " + mMicEnable + " ScreenShare enable is: " + mScreenEnable);
         if (!mScreenEnable && !mCameraEnable && mMicEnable) {
             sdkEngine.setAudioOnlyMode(true);
-        }
-        else {
+        } else {
             sdkEngine.setAudioOnlyMode(false);
         }
         sdkEngine.configLocalCameraPublish(mCameraEnable);
         sdkEngine.configLocalAudioPublish(mMicEnable);
         if (isScreenCaptureSupport) {
             sdkEngine.configLocalScreenPublish(mScreenEnable);
-        }
-        else {
+        } else {
             sdkEngine.configLocalScreenPublish(false);
         }
         defaultAudioDevice = sdkEngine.getDefaultAudioDevice();
@@ -330,8 +330,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             UCloudRtcSdkEngine.onRGBCaptureResult(mUCloudRTCDataProvider);
             mTextResolution.setVisibility(View.GONE);
             mImgBtnSwitchCam.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             UCloudRtcSdkEnv.setCaptureMode(
                     UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
         }
@@ -382,7 +381,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mImgBtnMuteVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                muteVideo();
+//                update(UCloudRtcSdkMixProfile.MIX_TYPE_UPDATE);
+                sdkEngine.queryMix();
+//                muteVideo();
             }
         });
 
@@ -446,8 +447,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     if (mScreenEnable && !mCameraEnable && !mMicEnable) {
                         if (isScreenCaptureSupport) {
                             results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
-                        }
-                        else {
+                        } else {
                             errorMessage.append("设备不支持屏幕捕捉\n");
                             results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true).getErrorCode());
                         }
@@ -475,8 +475,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     }
                     if (errorMessage.length() > 0) {
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this, errorMessage.toString());
-                    }
-                    else {
+                    } else {
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this, "发布");
                     }
                 }
@@ -495,8 +494,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 if (mIsPreview) {
                     mTextPreview.setText(R.string.stop_preview);
                     mLocalVideoView.setVisibility(View.VISIBLE);
-                }
-                else {
+                } else {
                     mTextPreview.setText(R.string.start_preview);
                     mLocalVideoView.setVisibility(View.INVISIBLE);
                 }
@@ -730,6 +728,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         mTextManualPub.setText(R.string.pub_manual);
                         mIsPublished = false;
                         if (info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
+
                             if (mLocalVideoView != null) {
 //                                localrenderview.refresh();
                             }
@@ -787,7 +786,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     //特殊情况下，譬如客户端在断网情况下离开房间，服务端可能还持有流，并没有超时，客户端就会收到自己的userid,
                     // 如果客户端是固定userid就可以过滤掉，如果不是，等待服务端超时也会删除流
                     Log.d(TAG, "onRemotePublish: " + info.getUId() + " me : " + mUserid);
-                    if(!mUserid.equals(info.getUId())){
+                    if (!mUserid.equals(info.getUId())) {
                         mSteamList.add(info);
                         if (!sdkEngine.isAutoSubscribe()) {
                             sdkEngine.subscribe(info);
@@ -828,6 +827,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo(null);
                         UCloudRtcSdkSurfaceVideoView videoView = null;
                         Log.d(TAG, " subscribe info: " + info);
+                        latestRemoteInfo = info;
                         if (info.isHasVideo()) {
                             //UCloudRtcSdkSurfaceVideoView 定义的viewgroup,内含UcloudRtcRenderView
                             videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
@@ -851,7 +851,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         }
 
                         if (vinfo != null && videoView != null) {
-                            sdkEngine.startRemoteView(info, videoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                            sdkEngine.startRemoteView(info, videoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                             //videoView.refreshRemoteOp(View.VISIBLE);
                         }
                         //如果订阅成功就删除待订阅列表中的数据
@@ -917,8 +917,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                             if (mMuteView != null) {
                                 mMuteView.refreshRemoteAudio(mute);
                             }
-                        }
-                        else if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
+                        } else if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
                             mRemoteVideoMute = mute;
                             if (mMuteView != null) {
                                 mMuteView.refreshRemoteVideo(mute);
@@ -1037,72 +1036,82 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
 
         @Override
-        public void onRecordStart(int code,String fileName) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if(code == NET_ERR_CODE_OK.ordinal()){
-                        String videoPath = "http://"+ mBucket + "."+ mRegion +".ufileos.com/" + fileName;
-                        Log.d(TAG,"remote record path: " +  videoPath+".mp4");
-                        ToastUtils.longShow(UCloudRTCLiveActivity.this, "观看地址: " +videoPath );
-                        mIsRemoteRecording = true;
-                        mImgRemoteRecord.setImageResource(R.mipmap.stop);
-                        mTextRemoteRecord.setText(R.string.remote_recording);
-                        if(mAtomOpStart)
-                            mAtomOpStart = false;
-                    }else{
-                        ToastUtils.longShow(UCloudRTCLiveActivity.this, "录制开始失败: 原因：" +code );
-                    }
-                }
-            });
-        }
-
-        @Override
         public void onRecordStop(int code) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ToastUtils.longShow(UCloudRTCLiveActivity.this, "录制结束: " + (code == NET_ERR_CODE_OK.ordinal()?"成功":"失败: "+ code));
-                    if(mIsRemoteRecording){
-                        mIsRemoteRecording = false;
-                        mImgRemoteRecord.setImageResource(R.mipmap.remote_record);
-                        mTextRemoteRecord.setText(R.string.start_remote_record);
-                    }
+                    ToastUtils.longShow(UCloudRTCLiveActivity.this, "录制结束: " + (code == NET_ERR_CODE_OK.ordinal() ? "成功" : "失败: " + code));
                 }
             });
         }
 
         @Override
-        public void onMixStart(int code,String msg, String fileName) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "code : "+ code + "msg: "+ msg + "fileName: " + fileName);
-                    if(code == NET_ERR_CODE_OK.ordinal()){
-                        Log.d(TAG,"onMixStart: " + fileName);
-                        mIsMixing = true;
-                        mImgMix.setImageResource(R.mipmap.stop);
-                        mTextMix.setText(R.string.mixing);
-                        if(mAtomOpStart)
-                            mAtomOpStart = false;
-                    }
-                }
-            });
+        public void onQueryMix(int code, String msg, int type, String mixId, String fileName) {
+            Log.d(TAG, "onQueryMix: "+ code + " msg: "+ msg + " type: "+ type);
         }
 
         @Override
-        public void onMixStop(int code, String msg, String pushUrls) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG,"onMixStop: " + code + "msg: "+ msg + " pushUrl: "+ pushUrls);
-                    if(mIsMixing){
-                        mIsMixing = false;
-                        mImgMix.setImageResource(R.mipmap.mix);
-                        mTextMix.setText(R.string.start_mix);
-                    }
+        public void onRecordStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String fileName) {
+            Log.d(TAG, "onRecordStatusNotify " + status + " code: " + code + " msg: " + msg + " userid " + userId + " roomid: " + roomId + " mixId: " + mixId + "fileName: " + fileName);
+            if(status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START_REQUEST_SEND){
+                Log.d(TAG, "开始录制请求已发送: ");
+            }
+            else if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START) {
+                String videoPath = "http://" + mBucket + "." + mRegion + ".ufileos.com/" + fileName;
+                Log.d(TAG, "remote record path: " + videoPath + ".mp4");
+                ToastUtils.longShow(UCloudRTCLiveActivity.this, "观看地址: " + videoPath);
+                mIsRemoteRecording = true;
+                mImgRemoteRecord.setImageResource(R.mipmap.stop);
+                mTextRemoteRecord.setText(R.string.remote_recording);
+                if (mAtomOpStart)
+                    mAtomOpStart = false;
+            } else if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_STOP_REQUEST_SEND) {
+                if (mIsRemoteRecording) {
+                    mIsRemoteRecording = false;
+                    mImgRemoteRecord.setImageResource(R.mipmap.remote_record);
+                    mTextRemoteRecord.setText(R.string.start_remote_record);
                 }
-            });
+            } else if (status == UCloudRtcSdkMediaServiceStatus.STATUS_UPDATE_REQUEST_SEND) {
+                Log.d(TAG, "update 更新参数请求已发送: ");
+            } else if (status == UCloudRtcSdkMediaServiceStatus.STATUS_UPDATE_ADD_STREAM_SUCCESS) {
+                Log.d(TAG, "update 加流成功: ");
+            } else {
+                ToastUtils.longShow(UCloudRTCLiveActivity.this, "录制异常: 原因：" + code);
+            }
+        }
+
+        @Override
+        public void onRelayStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String[] pushUrls) {
+            Log.d(TAG, "onRelayStatusNotify " + status + " code: " + code + " msg: " + msg + " userid " + userId + " roomid: " + roomId + " mixId: " + mixId);
+            if (pushUrls != null) {
+                for (int i = 0; i < pushUrls.length; i++) {
+                    Log.d(TAG, "onRelayStatusNotify: pushUrl " + pushUrls[i]);
+                }
+            }
+            if(status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_START_REQUEST_SEND){
+                Log.d(TAG, "开始转推请求已发送: ");
+            }
+            else if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_START) {
+                // ulive cdn watch address: http://rtchls.ugslb.com/rtclive/roomid.flv
+                mIsMixing = true;
+                mImgMix.setImageResource(R.mipmap.stop);
+                mTextMix.setText(R.string.mixing);
+                if (mAtomOpStart)
+                    mAtomOpStart = false;
+            } else if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_STOP_REQUEST_SEND) {
+                if (mIsMixing) {
+                    mIsMixing = false;
+                    mImgMix.setImageResource(R.mipmap.mix);
+                    mTextMix.setText(R.string.start_mix);
+                }
+            }
+            else if (status == UCloudRtcSdkMediaServiceStatus.STATUS_UPDATE_REQUEST_SEND) {
+                Log.d(TAG, "update 更新参数请求已发送: ");
+            } else if (status == UCloudRtcSdkMediaServiceStatus.STATUS_UPDATE_ADD_STREAM_SUCCESS) {
+                Log.d(TAG, "update 加流成功: ");
+            } else {
+                ToastUtils.longShow(UCloudRTCLiveActivity.this, "转推异常: 原因：" + code);
+            }
         }
 
         @Override
@@ -1110,7 +1119,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "onAddStreams: "+ code + msg);
+                    Log.d(TAG, "onAddStreams: " + code + msg);
                 }
             });
         }
@@ -1120,7 +1129,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "onDelStreams: "+ code + msg);
+                    Log.d(TAG, "onDelStreams: " + code + msg);
                 }
             });
         }
@@ -1130,7 +1139,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "onLogOffUsers: "+ code + " msg: "+ msg);
+                    Log.d(TAG, "onLogOffUsers: " + code + " msg: " + msg);
                 }
             });
         }
@@ -1150,7 +1159,17 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "onLogOffUsers: "+ cmdType + " userId: "+ userId);
+                    Log.d(TAG, "onLogOffUsers: " + cmdType + " userId: " + userId);
+                }
+            });
+        }
+
+        @Override
+        public void onRecordStart(int code, String fileName) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onRecordStart: " + code + " fileName: " + fileName);
                 }
             });
         }
@@ -1185,7 +1204,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onNetWorkQuality(String userId, UCloudRtcSdkStreamType streamType, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkNetWorkQuality quality) {
-            Log.d(TAG, "onNetWorkQuality: userid: " + userId + "streamType: " + streamType + "mediatype : "+ mediaType + " quality: " + quality);
+            Log.d(TAG, "onNetWorkQuality: userid: " + userId + "streamType: " + streamType + "mediatype : " + mediaType + " quality: " + quality);
         }
     };
 
@@ -1232,18 +1251,18 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
     UCloudRtcRecordListener mLocalRecordListener = new UCloudRtcRecordListener() {
         @Override
-        public void onLocalRecordStart(String path, int code,String msg) {
-            Log.d(TAG, "onLocalRecordStart: " + path + " code: "+ code + " msg: " + msg);
+        public void onLocalRecordStart(String path, int code, String msg) {
+            Log.d(TAG, "onLocalRecordStart: " + path + " code: " + code + " msg: " + msg);
         }
 
         @Override
         public void onLocalRecordStop(String path, long fileLength, int code) {
-            Log.d(TAG, "onLocalRecordStop: " + path + "fileLength: "+ fileLength + "code: "+ code);
+            Log.d(TAG, "onLocalRecordStop: " + path + "fileLength: " + fileLength + "code: " + code);
         }
 
         @Override
         public void onRecordStatusCallBack(long duration, long fileSize) {
-            Log.d(TAG, "onRecordStatusCallBack duration: " + duration + " fileSize: "+ fileSize);
+            Log.d(TAG, "onRecordStatusCallBack duration: " + duration + " fileSize: " + fileSize);
         }
     };
 
@@ -1263,7 +1282,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     synchronized (mSync) {
-                        if (mUSBMonitor != null ) {
+                        if (mUSBMonitor != null) {
                             if (mUSBMonitor.getDeviceCount() > 0) {
                                 mUSBMonitor.requestPermission(device);
                             }
@@ -1386,13 +1405,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             } else {
                 view.setVisibility(View.VISIBLE);
             }
-        }
-        else {
+        } else {
             if (mute) {
 //                localrenderview.refresh();
                 mLocalVideoView.setVisibility(View.INVISIBLE);
-            }
-            else {
+            } else {
                 mLocalVideoView.setVisibility(View.VISIBLE);
             }
         }
@@ -1403,8 +1420,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mMuteMic = mute;
         if (mMuteMic) {
             mImgSoundVolume.setVisibility(View.INVISIBLE);
-        }
-        else {
+        } else {
             mImgSoundVolume.setVisibility(View.VISIBLE);
         }
         mImgBtnMuteMic.setImageResource(mMuteMic ? R.mipmap.mic_off :
@@ -1429,15 +1445,18 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         startActivity(intent);
         finish();
     }
+
     private void onMediaServerDisconnect() {
         //mLocalVideoView.release();
         clearGridItem();
         UCloudRtcSdkEngine.destory();
     }
+
     private void clearGridItem() {
         mVideoAdapter.clearAll();
         mVideoAdapter.notifyDataSetChanged();
     }
+
     private void releaseExtendCamera() {
 /*        runOnUiThread(new Runnable() {
             @Override
@@ -1475,16 +1494,17 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         if (mUCloudRTCDataReceiver != null) {
             mUCloudRTCDataReceiver = null;
         }
-        if(UCloudRtcSdkEnv.getCaptureMode() == UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND ) {
+        if (UCloudRtcSdkEnv.getCaptureMode() == UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND) {
             //这里回收一遍
-            while(mQueueByteBuffer.size() != 0 ){
+            while (mQueueByteBuffer.size() != 0) {
                 ByteBuffer videoData = mQueueByteBuffer.poll();
-                if(videoData != null){
+                if (videoData != null) {
                     videoData = null;
                 }
             }
         }
     }
+
     private void startTimeShow() {
         timeShow.setBase(SystemClock.elapsedRealtime());
         timeShow.start();
@@ -1513,8 +1533,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             mImgSoundVolume.setVisibility(View.INVISIBLE);
             mImgMicSts.setVisibility(View.INVISIBLE);
             Log.d(TAG, "Switch full screen width: " + params.width + " height: " + params.height);
-        }
-        else {
+        } else {
             setSystemUIVisible(true);
             //退出全屏
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(localViewWidth, localViewHeight);
@@ -1527,7 +1546,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             //抽屉菜单还原
             DrawerLayout.LayoutParams dl_params = (DrawerLayout.LayoutParams) mDrawerMenu.getLayoutParams();
             dl_params.topMargin = mTitleBar.getHeight();
-            dl_params.bottomMargin =  mToolBar.getHeight();
+            dl_params.bottomMargin = mToolBar.getHeight();
             //还原麦克风状态图标
             if (!mMuteMic) {
                 mImgSoundVolume.setVisibility(View.VISIBLE);
@@ -1544,7 +1563,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         public void onReceiveRGBAData(ByteBuffer rgbBuffer, int width, int height) {
             final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
             bitmap.copyPixelsFromBuffer(rgbBuffer);
-            String name = "/mnt/sdcard/urtcscreen_"+System.currentTimeMillis() +".jpg";
+            String name = "/mnt/sdcard/urtcscreen_" + System.currentTimeMillis() + ".jpg";
             File file = new File(name);
             try {
                 FileOutputStream out = new FileOutputStream(file);
@@ -1558,16 +1577,15 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 e.printStackTrace();
             }
             Log.d(TAG, "screen shoot : " + name);
-            ToastUtils.shortShow(UCloudRTCLiveActivity.this,"screen shoot : " + name);
+            ToastUtils.shortShow(UCloudRTCLiveActivity.this, "screen shoot : " + name);
         }
     };
 
-    private void addScreenShotCallBack(View view){
+    private void addScreenShotCallBack(View view) {
         if (view instanceof UCloudRtcSdkSurfaceVideoView) {
-            ((UCloudRtcSdkSurfaceVideoView)view).setScreenShotBack(mUCloudRTCScreenShot);
-        }
-        else if(view instanceof UCloudRtcRenderView) {
-            ((UCloudRtcRenderView)view).setScreenShotBack(mUCloudRTCScreenShot);
+            ((UCloudRtcSdkSurfaceVideoView) view).setScreenShotBack(mUCloudRTCScreenShot);
+        } else if (view instanceof UCloudRtcRenderView) {
+            ((UCloudRtcRenderView) view).setScreenShotBack(mUCloudRTCScreenShot);
         }
     }
 
@@ -1577,15 +1595,14 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
     }
 
-    private void toggleLocalRecord(){
+    private void toggleLocalRecord() {
         if (!mIsLocalRecording) {
             Log.d(TAG, " start local record: ");
             //URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,"mnt/sdcard/urtc/mp4/"+ System.currentTimeMillis()+".mp4",mLocalRecordListener,1000);
             mIsLocalRecording = true;
             mImgLocalRecord.setImageResource(R.mipmap.stop);
             mTextLocalRecord.setText(R.string.local_recording);
-        }
-        else {
+        } else {
             Log.d(TAG, " stop local record: ");
             //URTCRecordManager.getInstance().stopRecord();
             mIsLocalRecording = false;
@@ -1594,64 +1611,133 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     }
 
-    private void toggleRemoteRecord(){
+    private void toggleRemoteRecord() {
         if (!mIsRemoteRecording) {
             Log.d(TAG, " start remote record: ");
             mAtomOpStart = true;
-            UCloudRtcSdkRecordProfile recordAudioProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-                    .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_AUDIO)
+            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleRecordMixParamsBuilder()
+                    .type(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD)
+                    //画面模式
+                    .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
+                    //画面分辨率
+                    .resolution(1280, 720)
+                    //背景色
+                    .bgColor(0, 0, 0)
+                    //画面帧率
+                    .frameRate(15)
+                    //画面码率
+                    .bitRate(1000)
+                    //h264视频编码
+                    .videoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264)
+                    //编码质量
+                    .qualityLevel(UCloudRtcSdkMixProfile.QUALITY_H264_CB)
+                    //音频编码
+                    .audioCodec(UCloudRtcSdkMixProfile.AUDIO_CODEC_AAC)
+                    //主讲人ID
+                    .mainViewUserId(mUserid)
+                    //主讲人媒体类型
                     .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                    //加流方式手动
+                    .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
+                    //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
+                    .addStream(mUserid, UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                     .build();
-            sdkEngine.startRecord(recordAudioProfile);
-
-        }
-        else if (!mAtomOpStart) {
+            sdkEngine.startRecord(mixProfile);
+        } else if (!mAtomOpStart) {
             Log.d(TAG, " stop remote record: ");
             mAtomOpStart = true;
             sdkEngine.stopRecord();
         }
     }
 
-    private void toggleMix(){
+    private void toggleMix() {
         if (!mIsMixing) {
             Log.d(TAG, " start mix: ");
             mAtomOpStart = true;
-            UCloudRtcSdkMixProfile mixProfile = new UCloudRtcSdkMixProfile();
-            //MIX_TYPE_TRANSCODING_PUSH：旁路推流
-            mixProfile.setType(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH);
-            //讲课模式。 LAYOUT_AVERAGE：均分模式，LAYOUT_CUSTOM：自定义模式
-            mixProfile.setLayout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM);
-            //画面分辨率
-            mixProfile.setWidth(1280);
-            mixProfile.setHeight(720);
-            //背景色
-            mixProfile.setBgColor(0, 0, 0);
-            //画面帧率
-            mixProfile.setFrameRate(15);
-            //画面码率
-            mixProfile.setBitrate(1000);
-            //h264视频编码。VIDEO_CODEC_H265：H265
-            mixProfile.setVideoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264);
-            //编码质量
-            mixProfile.setQualityLevel(UCloudRtcSdkMixProfile.QUALITY_H264_CB);
-            //aac音频编码
-            mixProfile.setAudioCodec(UCloudRtcSdkMixProfile.AUDIO_CODEC_AAC);
-            //旁路推流的地址
-            mixProfile.setPushUrl("rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
-            //主讲人id
-            mixProfile.setMainViewUserId(mUserid);
-            //主屏幕播放类型为摄像头
-            mixProfile.setMainViewType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal());
-            //自动添加模式
-            mixProfile.setStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_AUTO);
-            sdkEngine.startMix(mixProfile);
-        }
-        else if(!mAtomOpStart) {
+            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleUpdateMixParamsBuilder()
+                    .type(UCloudRtcSdkMixProfile.MIX_TYPE_RELAY)
+                    //画面模式
+                    .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
+                    //画面分辨率
+                    .resolution(1280, 720)
+                    //背景色
+                    .bgColor(0, 0, 0)
+                    //画面帧率
+                    .frameRate(15)
+                    //画面码率
+                    .bitRate(1000)
+                    //h264视频编码
+                    .videoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264)
+                    //编码质量
+                    .qualityLevel(UCloudRtcSdkMixProfile.QUALITY_H264_CB)
+                    //音频编码
+                    .audioCodec(UCloudRtcSdkMixProfile.AUDIO_CODEC_AAC)
+                    //主讲人ID
+                    .mainViewUserId(mUserid)
+                    //主讲人媒体类型
+                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                    //加流方式手动
+                    .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
+                    //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
+                    .addStream(mUserid, UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                    //设置转推cdn 的地址
+                    .addPushUrl("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid)
+                    //关键用户
+                    .keyUser(mUserid)
+                    //流上限
+                    .layoutUserLimit(2)
+                    //房间没流多久结束任务
+                    .taskTimeOut(70)
+                    .build();
+            sdkEngine.updateMixConfig(mixProfile);
+        } else if (!mAtomOpStart) {
             Log.d(TAG, " stop mix: ");
             mAtomOpStart = true;
-            sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH,"");
+            sdkEngine.stopRelay(null);
         }
     }
+
+    private void update(int type) {
+        Log.d(TAG, " start update: ");
+        UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+                .type(type)
+                //画面模式
+                .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
+                //画面分辨率
+                .resolution(1280, 720)
+                //背景色
+                .bgColor(0, 0, 0)
+                //画面帧率
+                .frameRate(15)
+                //画面码率
+                .bitRate(1000)
+                //h264视频编码
+                .videoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264)
+                //编码质量
+                .qualityLevel(UCloudRtcSdkMixProfile.QUALITY_H264_CB)
+                //音频编码
+                .audioCodec(UCloudRtcSdkMixProfile.AUDIO_CODEC_AAC)
+                //主讲人ID
+                .mainViewUserId(mUserid)
+                //主讲人媒体类型
+                .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                //加流方式手动
+                .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
+                //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
+                .addStream(mUserid, UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                .addStream(latestRemoteInfo.getUId(), latestRemoteInfo.getMediaType().ordinal())
+                //设置转推cdn 的地址
+                .addPushUrl("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid)
+                //关键用户
+                .keyUser(mUserid)
+                //流上限
+                .layoutUserLimit(2)
+                //房间没流多久结束任务
+                .taskTimeOut(70)
+                .build();
+        sdkEngine.updateMixConfig(mixProfile);
+    }
+
 
     /**
      * 根据音量大小设置录音时的音量动画
@@ -1703,7 +1789,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             getWindow().setAttributes(attrs);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         } else {
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
     }
 
@@ -1746,7 +1832,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             public void onFrame(ByteBuffer frame) {
                 createFrameByteBuffer(frame);
             }
-        },mUVCCameraFormat);
+        }, mUVCCameraFormat);
         return camera;
     }
 
@@ -1782,10 +1868,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void releaseBuffer() {
-            if(videoSourceData != null){
+            if (videoSourceData != null) {
                 videoSourceData = null;
             }
-            if(cacheBuffer != null){
+            if (cacheBuffer != null) {
                 sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cacheBuffer);
                 cacheBuffer = null;
             }
@@ -1827,11 +1913,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public ByteBuffer getCacheBuffer() {
-            if(cache == null){
+            if (cache == null) {
                 //根据需求来，设置最大的可能用到的buffersize，后续回调会复用这块内存
-                int size = 4096*2160*4;
+                int size = 4096 * 2160 * 4;
                 cache = sdkEngine.getNativeOpInterface().
-                        createNativeByteBuffer(4096*2160*4);
+                        createNativeByteBuffer(4096 * 2160 * 4);
             }
             cache.clear();
             return cache;
@@ -1839,19 +1925,19 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void releaseBuffer() {
-            if(cache != null)
+            if (cache != null)
                 sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cache);
             cache = null;
         }
     };
 
-    private void createFrameByteBuffer(ByteBuffer frame){
+    private void createFrameByteBuffer(ByteBuffer frame) {
         try {
-            if(frame != null){
+            if (frame != null) {
                 //add videoSource
                 mQueueByteBuffer.offer(frame, 1, TimeUnit.SECONDS);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -1873,7 +1959,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     }
 
-    private void updateVideoFormat(int videoFormat){
+    private void updateVideoFormat(int videoFormat) {
         switch (videoFormat) {
             case CommonUtils.nv21_format:
                 mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_NV21;
@@ -1917,8 +2003,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 sdkEngine.startPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO,
                         mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
             }
-        }
-        else {
+        } else {
             sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
         }
     }
@@ -1940,8 +2025,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             mImgBtnMuteVideo.setVisibility(View.INVISIBLE);
             mImgBtnMirror.setVisibility(View.INVISIBLE);
             mTextResolution.setVisibility(View.INVISIBLE);
-        }
-        else {
+        } else {
             mImgBtnMuteMic.setVisibility(View.VISIBLE);
             mImgBtnMuteVideo.setVisibility(View.VISIBLE);
             mTextResolution.setVisibility(View.VISIBLE);
@@ -1956,6 +2040,40 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             mTextRemoteRecord.setVisibility(View.VISIBLE);
             mImgPreview.setVisibility(View.INVISIBLE);
             mTextPreview.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void refreshSettings() {
+        SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
+                Context.MODE_PRIVATE);
+
+        mCameraEnable = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
+        mMicEnable = preferences.getBoolean(CommonUtils.MIC_ENABLE, CommonUtils.MIC_ON);
+        mScreenEnable = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
+        int classType = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL.ordinal());
+        mClass = UCloudRtcSdkRoomType.valueOf(classType);
+        mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
+        mScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
+        mExtendCameraCapture = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
+        mExtendVideoFormat = preferences.getInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, CommonUtils.i420_format);
+        updateVideoFormat(mExtendVideoFormat);
+
+        //分辨率选择菜单
+        String[] resolutions = getResources().getStringArray(R.array.videoResolutions);
+        mResolutionOption.addAll(Arrays.asList(resolutions));
+
+        Log.d(TAG, " Camera enable is: " + mCameraEnable + " Mic enable is: " + mMicEnable + " ScreenShare enable is: " + mScreenEnable);
+        if (!mScreenEnable && !mCameraEnable && mMicEnable) {
+            sdkEngine.setAudioOnlyMode(true);
+        } else {
+            sdkEngine.setAudioOnlyMode(false);
+        }
+        sdkEngine.configLocalCameraPublish(mCameraEnable);
+        sdkEngine.configLocalAudioPublish(mMicEnable);
+        if (isScreenCaptureSupport) {
+            sdkEngine.configLocalScreenPublish(mScreenEnable);
+        } else {
+            sdkEngine.configLocalScreenPublish(false);
         }
     }
 }

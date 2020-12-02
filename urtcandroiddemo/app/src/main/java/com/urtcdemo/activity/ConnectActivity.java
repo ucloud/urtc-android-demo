@@ -257,27 +257,6 @@ public class ConnectActivity extends AppCompatActivity {
         }
     }
 
-    private void startRoomTextureActivity() {
-        if (!mStartSuccess) {
-            mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, RoomTextureActivity.class);
-            intent.putExtra("room_id", mRoomid);
-            String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
-            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
-            intent.putExtra("user_id", mUserId);
-            intent.putExtra("app_id", mAppid);
-            intent.putExtra("token", mRoomToken);
-            mMainHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startActivity(intent);
-                    finish();
-                    mStartSuccess = false;
-                }
-            }, 500);
-        }
-    }
-
     private void startLivingActivity() {
         if (!mStartSuccess) {
             mStartSuccess = true;
