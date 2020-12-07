@@ -81,7 +81,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
@@ -195,6 +194,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private UCloudRtcSdkStreamInfo latestRemoteInfo;
     //外部摄像数据读取
     private ArrayBlockingQueue<ByteBuffer> mQueueByteBuffer = new ArrayBlockingQueue(8);
+    private ByteBuffer videoSourceData = null;
+    private final Object extendByteBufferSync = new Object();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -326,6 +327,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
         sdkEngine.setScreenProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1920_1080);
 
+        synchronized (extendByteBufferSync) {
+            videoSourceData = sdkEngine.getNativeOpInterface().
+                    createNativeByteBuffer(1280 * 720 * 4);
+            videoSourceData.clear();
+        }
         //分辨率菜单显示
         mTextResolution.setText(mResolutionOption.get(mVideoProfileSelect));
         mAdapter = new ArrayAdapter<String>(this, R.layout.videoprofile_item, mResolutionOption);
@@ -1616,9 +1622,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
         mVideoAdapter.setRemoveRemoteStreamReceiver(null);
         if (mUCloudRTCDataProvider != null) {
+            mUCloudRTCDataProvider.releaseBuffer();
             mUCloudRTCDataProvider = null;
         }
         if (mUCloudRTCDataReceiver != null) {
+            mUCloudRTCDataReceiver.releaseBuffer();
             mUCloudRTCDataReceiver = null;
         }
         if (UCloudRtcSdkEnv.getCaptureMode() == UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND) {
@@ -1626,6 +1634,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             while (mQueueByteBuffer.size() != 0) {
                 ByteBuffer videoData = mQueueByteBuffer.poll();
                 if (videoData != null) {
+                    Log.d("UCloudRTCLiveActivity", "videoData clear");
+                    videoData.clear();
                     videoData = null;
                 }
             }
@@ -1959,6 +1969,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         camera.setFrameCallback(new IFrameCallback() {
             @Override
             public void onFrame(ByteBuffer frame) {
+/*                Log.d("UCloudRTCLiveActivity", "onFrame byteBuffer, frame.position: " + frame.position()
+                                + " frame.limit: " + frame.limit());*/
                 createFrameByteBuffer(frame);
             }
         }, mUVCCameraFormat);
@@ -1968,39 +1980,55 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     //外置数据输入监听
     private UCloudRTCDataProvider mUCloudRTCDataProvider = new UCloudRTCDataProvider() {
         private ByteBuffer cacheBuffer;
-        private ByteBuffer videoSourceData;
 
         @Override
         public ByteBuffer provideRGBData(List<Integer> params) {
-            videoSourceData = mQueueByteBuffer.poll();
-            if (videoSourceData == null) {
-                //Log.d("UCloudRTCLiveActivity", "provideRGBData: " + null);
+            //Log.d("UCloudRTCLiveActivity", "poll video byteBuffer! queue size is: " + mQueueByteBuffer.size());
+            //videoSourceData = mQueueByteBuffer.poll();
+            if (videoSourceData == null ) {
+                Log.d("UCloudRTCLiveActivity", "provideRGBData byteBuffer data is null");
                 return null;
             } else {
                 //Log.d("UCloudRTCLiveActivity", "provideRGBData: ! = null");
+/*                Log.d("UCloudRTCLiveActivity", "provideRGBData byteBuffer, videoSourceData.position: " + videoSourceData.position()
+                        + " videoSourceData.limit: " + videoSourceData.limit());*/
                 params.add(mURTCVideoFormat);
                 params.add(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth());
                 params.add(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight());
                 if (cacheBuffer == null) {
                     cacheBuffer = sdkEngine.getNativeOpInterface().
                             createNativeByteBuffer(1280 * 720 * 4);
-                } else {
+                    Log.d("UCloudRTCLiveActivity", "byteBuffer createNativeByteBuffer call ");
                     cacheBuffer.clear();
+                } else {
+                    cacheBuffer.rewind();
                 }
-                cacheBuffer = videoSourceData;
-                videoSourceData = null;
-                //Log.d("UCloudRTCLiveActivity", "provideRGBData finish" + Thread.currentThread());
-                cacheBuffer.position(0);
+                synchronized (extendByteBufferSync) {
+                    cacheBuffer.put(videoSourceData);
+                    videoSourceData.rewind();
+                }
+
+                //videoSourceData.clear();
+                //videoSourceData = null;
+                //cacheBuffer.position(0);
+                cacheBuffer.flip();
+
                 return cacheBuffer;
             }
         }
 
         @Override
         public void releaseBuffer() {
-            if (videoSourceData != null) {
-                videoSourceData = null;
+            Log.d("UCloudRTCLiveActivity", "releaseBuffer");
+            synchronized (extendByteBufferSync) {
+                if (videoSourceData != null) {
+                    videoSourceData.clear();
+                    sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(videoSourceData);
+                    videoSourceData = null;
+                }
             }
             if (cacheBuffer != null) {
+                cacheBuffer.clear();
                 sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cacheBuffer);
                 cacheBuffer = null;
             }
@@ -2014,7 +2042,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onReceiveRGBAData(ByteBuffer rgbBuffer, int width, int height) {
-            //Log.d("MainActivity", "onReceiveRGBAData!");
+            Log.d("MainActivity", "onReceiveRGBAData!");
 
 /*            final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
             bitmap.copyPixelsFromBuffer(rgbBuffer);
@@ -2064,7 +2092,15 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         try {
             if (frame != null) {
                 //add videoSource
-                mQueueByteBuffer.offer(frame, 1, TimeUnit.SECONDS);
+                //Log.d("UCloudRTCLiveActivity", "offer video byteBuffer!");
+                //mQueueByteBuffer.offer(frame, 1, TimeUnit.SECONDS);
+                synchronized (extendByteBufferSync) {
+                    if (videoSourceData != null) {
+                        videoSourceData.clear();
+                        videoSourceData.put(frame);
+                        videoSourceData.flip();
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
