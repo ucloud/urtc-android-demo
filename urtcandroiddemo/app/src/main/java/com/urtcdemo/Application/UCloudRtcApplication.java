@@ -84,7 +84,7 @@ public class UCloudRtcApplication extends Application {
         DisplayMetrics outMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(outMetrics);
        // CommonUtils.mItemWidth = (outMetrics.widthPixels - UiHelper.dipToPx(this, 15)) / 6;
-        CommonUtils.mItemWidth = (UiHelper.dipToPx(this, 80)) ;
+        CommonUtils.mItemWidth = (UiHelper.dipToPx(this, 300)) ;
 //        CommonUtils.mItemWidth = outMetrics.widthPixels  / 3;
         CommonUtils.mItemHeight = CommonUtils.mItemWidth;
         CrashReport.initCrashReport(getApplicationContext(), "9a51ae062a", true);
