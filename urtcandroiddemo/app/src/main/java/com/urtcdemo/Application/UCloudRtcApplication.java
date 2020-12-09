@@ -71,21 +71,16 @@ public class UCloudRtcApplication extends Application {
         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
         UCloudRtcSdkEnv.setReConnectTimes(60);
         UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.SEC_KEY);
-
 //        UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_LANDSCAPE_MODE);
         //私有化部署
 //        UCloudRtcSdkEnv.setPrivateDeploy(true);
-//        UCloudRtcSdkEnv.setPrivateDeployRoomURL("wss://47.96.180.6:5005/ws");
+//        UCloudRtcSdkEnv.setPrivateDeployRoomURL("ws://mediapoc1.pingan.com.cn:5005/ws");
         //无限重连
 //        UCloudRtcSdkEnv.setReConnectTimes(-1);
-        //默认vp8编码，可以改成h264
-//        UCloudRtcSdkEnv.setEncodeMode(UcloudRtcSdkPushEncode.);
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics outMetrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(outMetrics);
-       // CommonUtils.mItemWidth = (outMetrics.widthPixels - UiHelper.dipToPx(this, 15)) / 6;
-        CommonUtils.mItemWidth = (UiHelper.dipToPx(this, 80)) ;
-//        CommonUtils.mItemWidth = outMetrics.widthPixels  / 3;
+        CommonUtils.mItemWidth = (outMetrics.widthPixels - UiHelper.dipToPx(this, 15)) / 3;
         CommonUtils.mItemHeight = CommonUtils.mItemWidth;
         CrashReport.initCrashReport(getApplicationContext(), "9a51ae062a", true);
 //        BlockCanary.install(this, new AppContext()).start();

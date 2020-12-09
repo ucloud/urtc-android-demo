@@ -5,7 +5,7 @@ import android.support.annotation.IntDef;
 public class CommonUtils {
     public static int mItemWidth;
     public static int mItemHeight;
-    public static int videoprofilesel = 6;
+    public static int videoprofilesel = 1;
 
     public static final int camera_capture_mode = 1;
     public static final int audio_capture_mode = 2;
@@ -47,7 +47,6 @@ public class CommonUtils {
     public static final String RTST_URL = "rtsp://192.168.161.148:554/ch1";
     public static final String RTSP_URL_KEY_MIXED = "RTSP_URL_KEY_MIXED" ;
     public static final String RTST_URL_MIXED = "rtsp://192.168.165.121:554/ch1";
-//    public static final String RTST_URL = "rtsp://192.168.0.105/ch1";
     public static final String APPID_KEY = "APPID_KEY";
     public static final String APP_ID = "URtc-h4r1txxy";
     public static final String SEC_KEY = "9129304dbf8c5c4bf68d70824462409f";

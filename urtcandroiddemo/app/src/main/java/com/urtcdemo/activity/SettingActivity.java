@@ -19,17 +19,16 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-
+import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
 import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.BuildConfig;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.RadioGroupFlow;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
-import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -165,9 +164,9 @@ public class SettingActivity extends AppCompatActivity {
                 }
                 editor.putInt(CommonUtils.videoprofile, mSelectPos);
                 editor.putInt(CommonUtils.capture_mode, mCaptureMode);
-                editor.putString(CommonUtils.APPID_KEY, mAppid);
+                editor.putString(CommonUtils.APP_ID_TAG, mAppid);
                 editor.putInt(CommonUtils.PUBLISH_MODE, mPublishMode);
-                editor.putInt(CommonUtils.SCRIBE_MODE, mScribeMode);
+                editor.putInt(CommonUtils.SUBSCRIBE_MODE, mScribeMode);
                 editor.putInt(CommonUtils.SDK_STREAM_ROLE, mRole.ordinal());
                 editor.putInt(CommonUtils.SDK_CLASS_TYPE, mRoomType.ordinal());
                 editor.putBoolean(CommonUtils.SDK_SUPPORT_MIX, mSupportMix);
@@ -193,7 +192,7 @@ public class SettingActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
         mSelectPos = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
-        mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID);
+        mAppid = preferences.getString(CommonUtils.APP_ID_TAG, CommonUtils.APP_ID);
         mAppidEditText.setText(mAppid);
         mConfigTextView.setText(mDefaultConfiguration.get(mSelectPos));
         mAdapter = new ArrayAdapter<String>(this, R.layout.videoprofile_item, mDefaultConfiguration);
@@ -232,7 +231,7 @@ public class SettingActivity extends AppCompatActivity {
                 break;
         }
 
-        mScribeMode = preferences.getInt(CommonUtils.SCRIBE_MODE, CommonUtils.AUTO_MODE);
+        mScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
         switch (mScribeMode) {
             case CommonUtils.AUTO_MODE:
                 mRBScribeAuto.setChecked(true);

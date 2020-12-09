@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BaseSwitch">
+        <!--off属性-->
+        <attr format="color" name="track_color_off"/>
+        <attr format="color" name="thumb_color_off"/>
+        <attr format="color" name="stroke_color_off"/>
+        <attr format="color" name="text_color_off"/>
+        <attr format="dimension" name="text_size_off"/>
+        <attr format="string" name="text_off"/>
+
+        <!--on属性-->
+        <attr format="color" name="track_color_on"/>
+        <attr format="color" name="thumb_color_on"/>
+        <attr format="color" name="stroke_color_on"/>
+        <attr format="color" name="text_color_on"/>
+        <attr format="dimension" name="text_size_on"/>
+        <attr format="string" name="text_on"/>
+
+        <!--其它属性-->
+        <attr format="boolean" name="checked"/>
+        <attr format="boolean" name="text_show"/>
+        <attr format="integer" name="animator_duration"/>
+        <attr format="dimension"   name="stroke_width"/>
+    </declare-styleable>
+
+
+    <declare-styleable name="LSwitch">
+        <attr format="dimension" name="track_radius" />
+        <attr format="dimension" name="track_height" />
+
+        <attr format="dimension" name="thumb_radius" />
+        <attr format="dimension" name="thumb_height" />
+        <attr format="dimension" name="thumb_width" />
+
+        <!--&lt;!&ndash;off属性&ndash;&gt;-->
+        <!--<attr name="track_color_off"/>-->
+        <!--<attr name="thumb_color_off"/>-->
+        <!--<attr name="stroke_color_off"/>-->
+        <!--<attr name="text_color_off"/>-->
+        <!--<attr name="text_size_off"/>-->
+        <!--<attr name="text_off"/>-->
+
+        <!--&lt;!&ndash;on属性&ndash;&gt;-->
+        <!--<attr name="track_color_on"/>-->
+        <!--<attr name="thumb_color_on"/>-->
+        <!--<attr name="stroke_color_on"/>-->
+        <!--<attr name="text_color_on"/>-->
+        <!--<attr name="text_size_on"/>-->
+        <!--<attr name="text_on"/>-->
+
+        <!--&lt;!&ndash;其它属性&ndash;&gt;-->
+        <!--<attr name="checked"/>-->
+        <!--<attr name="text_show"/>-->
+        <!--<attr name="animator_duration"/>-->
+        <!--<attr name="stroke_width"/>-->
+    </declare-styleable>
+</resources>

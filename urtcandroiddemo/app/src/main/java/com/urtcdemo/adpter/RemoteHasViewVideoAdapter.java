@@ -2,24 +2,25 @@ package com.urtcdemo.adpter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,22 +32,18 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
     private ArrayList<String> medialist = new ArrayList<>();
     protected final LayoutInflater mInflater;
     private Context mContext;
-    private Activity host;
     private List<ViewHolder> mCacheHolder;
     private RemoveRemoteStreamReceiver mRemoveRemoteStreamReceiver;
+    private SwapInterface mSwapInterface;
     private UCloudRtcSdkEngine mSdkEngine;
-    private List<View> mRenderViews;
 
 
-    public RemoteHasViewVideoAdapter(Context context, UCloudRtcSdkEngine sdkEngine, List<View> remoteViewLists) {
+    public RemoteHasViewVideoAdapter(Context context, UCloudRtcSdkEngine sdkEngine,SwapInterface provider) {
         mContext = context;
-        if(context instanceof Activity){
-            mContext = (Activity)context;
-        }
         mSdkEngine = sdkEngine;
+        mSwapInterface = provider;
         mInflater = ((Activity) context).getLayoutInflater();
         mCacheHolder = new ArrayList<>();
-        mRenderViews = remoteViewLists;
     }
 
     @Override
@@ -64,12 +61,6 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         return holder;
     }
 
-
-    @Override
-    public void onViewRecycled(ViewHolder holder) {
-        super.onViewRecycled(holder);
-        mRenderViews.remove(holder.itemView.findViewById(R.id.texture_view));
-    }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
@@ -94,50 +85,62 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 //            if (parent != null) {
 //                ((FrameLayout) parent).removeView(videoView);
 //            }
-            if (videoView instanceof UCloudRtcSdkSurfaceVideoView)
-                ((UCloudRtcSdkSurfaceVideoView) videoView).setZOrderMediaOverlay(true);
             videoView.setTag(R.id.index, viewInfo);
-            if(mRenderViews != null && !mRenderViews.contains(mRenderViews)){
-                mRenderViews.add(videoView);
-            }
-            videoView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //screen shot
-//                    Log.d(TAG, "onClick: take snapShop: " + viewInfo.getStreamInfo());
-//                    mSdkEngine.takeSnapShot(false,viewInfo.getStreamInfo(), (rgbBuffer, width, height) -> {
-//                        Log.d(TAG, "onReceiveRGBAData: rgbBuffer: " + rgbBuffer + " width: " + width + " height: " + height);
-//                        final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
-//
-//                        bitmap.copyPixelsFromBuffer(rgbBuffer);
-//                        String name = "/mnt/sdcard/urtcscreen_" + System.currentTimeMillis() + ".jpg";
-//                        File file = new File(name);
-//                        try {
-//                            FileOutputStream out = new FileOutputStream(file);
-//                            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
-//                                out.flush();
-//                                out.close();
-//                            }
-//                        } catch (FileNotFoundException e) {
-//                            e.printStackTrace();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                        Log.d(TAG, "screen shoot : " + name);
-//                    });
+            videoView.setTag(viewInfo.getStreamInfo());
+            boolean isLocal = false;
+            if(mSwapInterface != null){
+                videoView.setOnClickListener(mSwapInterface.provideSwapListener());
+                isLocal = mSwapInterface.isLocalStream(viewInfo.getmUid());
+            }else{
+                videoView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //screen shot
+                    Log.d(TAG, "onClick: take snapShop: " + viewInfo.getStreamInfo());
+                    mSdkEngine.takeSnapShot(false,viewInfo.getStreamInfo(), (rgbBuffer, width, height) -> {
+                        Log.d(TAG, "onReceiveRGBAData: rgbBuffer: " + rgbBuffer + " width: " + width + " height: " + height);
+                        final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
+
+                        bitmap.copyPixelsFromBuffer(rgbBuffer);
+                        String name = "/mnt/sdcard/urtcscreen_" + System.currentTimeMillis() + "_remote.jpg";
+                        File file = new File(name);
+                        try {
+                            FileOutputStream out = new FileOutputStream(file);
+                            if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
+                                out.flush();
+                                out.close();
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d(TAG, "screen shoot : " + name);
+                    });
 
 
-                    //view render mode change
+                        //view render mode change
 //                    mSdkEngine.setRenderViewMode(false, viewInfo.getStreamInfo(), UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_FILL);
-                }
-            });
-            mSdkEngine.startRemoteView(viewInfo.getStreamInfo(), videoView, null, new UCloudRTCFirstFrameRendered(){
+                    }
+                });
+            }
+            if(isLocal){
+                mSdkEngine.renderLocalView(viewInfo.getStreamInfo(), videoView, null, new UCloudRTCFirstFrameRendered(){
+                    @Override
+                    public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
+                        Log.d(TAG, "onlocal first frame render: " + "view: " + view);
+                    }
+                });
+            }else{
+                mSdkEngine.startRemoteView(viewInfo.getStreamInfo(), videoView, null, new UCloudRTCFirstFrameRendered(){
 
-                @Override
-                public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
-                    Log.d(TAG, "onRemoteFirstFrameRender: " + "view: " + view);
-                }
-            });
+                    @Override
+                    public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
+                        Log.d(TAG, "onRemoteFirstFrameRender: " + "view: " + view);
+                    }
+                });
+            }
+
         } else {
             holderView.setBackground(mContext.getResources().getDrawable(R.drawable.border));
         }
@@ -169,9 +172,9 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
             return true;
         } else {
             boolean otherHasSwaped = false;
-            for (String ohterKey : mScreenState.keySet()) {
-                if (!ohterKey.equals(key)) {
-                    if (mScreenState.get(ohterKey)) {
+            for (String otherKey : mScreenState.keySet()) {
+                if (!otherKey.equals(key)) {
+                    if (mScreenState.get(otherKey)) {
                         //其它的已经有交换过的，那这次就不要交换
                         otherHasSwaped = true;
                         break;
@@ -182,31 +185,41 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         }
     }
 
-    public void addStreamView(String mkey, URTCVideoViewInfo videoViewInfo, UCloudRtcSdkStreamInfo streamInfo) {
+    public void addStreamView(String mkey, URTCVideoViewInfo videoViewInfo) {
 //        removeStreamView(mkey);
         if (!mStreamViews.containsKey(mkey)) {
             mStreamViews.put(mkey, videoViewInfo);
-            videoViewInfo.setStreamInfo(streamInfo);
             medialist.add(mkey);
         }
-        if (!mScreenState.containsKey(mkey)) {
-            mScreenState.put(mkey, false);
-        }
+//        if (!mScreenState.containsKey(mkey)) {
+//            mScreenState.put(mkey, false);
+//        }
 //        notifyItemInserted(medialist.size() - 1);
         notifyDataSetChanged();
     }
 
-    public UCloudRtcSdkStreamInfo getStreamInfo(int position) {
-        UCloudRtcSdkStreamInfo streamInfo = null;
-        if (medialist.size() > position && mStreamViews.size() > position) {
-            streamInfo = new UCloudRtcSdkStreamInfo();
-            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getmMediatype());
-            streamInfo.setHasAudio(mStreamViews.get(medialist.get(position)).isEnableAudio());
-            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).ismEanbleVideo());
-            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getmUid());
-        }
-        return streamInfo;
+    public void updateSwapInfo(UCloudRtcSdkStreamInfo clickInfo,UCloudRtcSdkStreamInfo swapInfo){
+        String clickKey = clickInfo.getUId() + clickInfo.getMediaType().toString();
+        String swapKey = swapInfo.getUId() + swapInfo.getMediaType().toString();
+        mStreamViews.remove(clickKey);
+        URTCVideoViewInfo newBean = new URTCVideoViewInfo(swapInfo);
+        mStreamViews.put(swapKey,newBean);
+        int clickIndex = medialist.indexOf(clickKey);
+        Log.d(TAG, "updateSwapInfo: old medialist index: "+ medialist.indexOf(clickKey));
+        medialist.set(clickIndex,swapKey);
     }
+
+//    public UCloudRtcSdkStreamInfo getStreamInfo(int position) {
+//        UCloudRtcSdkStreamInfo streamInfo = null;
+//        if (medialist.size() > position && mStreamViews.size() > position) {
+//            streamInfo = new UCloudRtcSdkStreamInfo();
+//            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getmMediatype());
+//            streamInfo.setHasAudio(mStreamViews.get(medialist.get(position)).isEnableAudio());
+//            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).ismEanbleVideo());
+//            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getmUid());
+//        }
+//        return streamInfo;
+//    }
 
     public void removeStreamView(String mkey) {
         if (mStreamViews.containsKey(mkey)) {
@@ -220,16 +233,16 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 //            notifyItemRemoved(index);
             Log.d(TAG, " remove finished ,mStreamViews size: " + mStreamViews.size() + "medialist size: " + medialist.size());
         }
-        if (mScreenState.containsKey(mkey)) {
-            Log.d(TAG, " mScreenState key: " + mkey);
-            if (mScreenState.get(mkey)) {
-                if (mRemoveRemoteStreamReceiver != null) {
-                    mRemoveRemoteStreamReceiver.onRemoteStreamRemoved(true);
-                }
-            }
-            mScreenState.remove(mkey);
-            Log.d(TAG, " remove finished ,mScreenState size: " + mScreenState.size());
-        }
+//        if (mScreenState.containsKey(mkey)) {
+//            Log.d(TAG, " mScreenState key: " + mkey);
+//            if (mScreenState.get(mkey)) {
+//                if (mRemoveRemoteStreamReceiver != null) {
+//                    mRemoveRemoteStreamReceiver.onRemoteStreamRemoved(true);
+//                }
+//            }
+//            mScreenState.remove(mkey);
+//            Log.d(TAG, " remove finished ,mScreenState size: " + mScreenState.size());
+//        }
         notifyDataSetChanged();
     }
 
@@ -250,12 +263,6 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                 holderView.removeAllViews();
             }
             mCacheHolder.clear();
-        }
-    }
-
-    public void releaseReference(){
-        if(host != null){
-            host = null;
         }
     }
 
@@ -283,5 +290,11 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 
     public interface RemoveRemoteStreamReceiver {
         void onRemoteStreamRemoved(boolean swaped);
+    }
+
+    public interface SwapInterface{
+        View.OnClickListener provideSwapListener();
+
+        boolean isLocalStream(String uid);
     }
 }

@@ -37,7 +37,7 @@
                     android:layout_height="100dp"
                     android:id="@+id/test_t"
                     android:visibility="gone"
-                    android:background="@color/color_4C3BA6CC"/>
+                    android:background="@color/color_FFFEFEFE"/>
 
                 <FrameLayout
                     android:layout_width="match_parent"
