@@ -72,6 +72,7 @@ dependencies {
     implementation var.SupportV4
     implementation var.SupportRecyclerviewV7
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.github.markzhai:blockcanary-android:1.5.0'
     testImplementation 'junit:junit:4.12'
 

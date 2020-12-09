@@ -46,7 +46,7 @@ public class CommonUtils {
     public static final String RTSP_URL_KEY = "RTSP_URL_TEXT" ;
     public static final String RTST_URL = "rtsp://192.168.161.148:554/ch1";
     public static final String RTSP_URL_KEY_MIXED = "RTSP_URL_KEY_MIXED" ;
-    public static final String RTST_URL_MIXED = "rtsp://192.168.165.121:554/ch1";
+    public static final String RTST_URL_MIXED = "rtsp://192.168.161.148:554/ch3";
     public static final String APPID_KEY = "APPID_KEY";
     public static final String APP_ID = "URtc-h4r1txxy";
     public static final String SEC_KEY = "9129304dbf8c5c4bf68d70824462409f";

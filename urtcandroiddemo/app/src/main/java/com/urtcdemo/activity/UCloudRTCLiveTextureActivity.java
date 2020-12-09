@@ -53,6 +53,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
+import com.ucloudrtclib.sdkengine.define.UcloudRtcCameraMixConfig;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataProvider;
@@ -186,7 +187,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     //UVCCamera
 //    private USBMonitor mUSBMonitor = null;
 //    private UVCCamera mUVCCamera = null;
-    private final Object mSync = new Object();
     private boolean isActive, isPreview;
     private boolean mLeaveRoomFlag;
 
@@ -335,10 +335,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         mResolutionPopupWindow.setOnSpinnerItemClickListener(mOnResulutionOptionClickListener);
         if (mExtendCameraCapture) {
             //扩展摄像头方式
-            UCloudRtcSdkEnv.setCaptureMode(
-                    UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND);
-            mUSBMonitor = new USBMonitor(this, mOnDeviceConnectListener);
-            UCloudRtcSdkEngine.onRGBCaptureResult(mUCloudRTCDataProvider);
             mTextResolution.setVisibility(View.GONE);
             mImgBtnSwitchCam.setVisibility(View.GONE);
         }
@@ -464,7 +460,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                     refreshSettings();
                     if ( mCameraEnable || mMicEnable) {
                         if (!mVideoIsPublished) {
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, mCameraEnable, mMicEnable).getErrorCode());
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, mCameraEnable, mMicEnable,false).getErrorCode());
                         }
                     }
                     else {
@@ -507,7 +503,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                     refreshSettings();
                     if (mScreenEnable && !mScreenIsPublished) {
                         if (isScreenCaptureSupport) {
-                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false).getErrorCode());
+                            results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN, true, false,false).getErrorCode());
                         }
                         else {
                             errorMessage.append("设备不支持屏幕捕捉\n");
@@ -573,14 +569,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        synchronized (mSync) {
-            if (mUSBMonitor != null) {
-                mUSBMonitor.register();
-            }
-            if (mUVCCamera != null) {
-                mUVCCamera.startPreview();
-            }
-        }
     }
 
     @Override
@@ -592,14 +580,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        synchronized (mSync) {
-            if (mUVCCamera != null) {
-                //mUVCCamera.stopPreview();
-            }
-            if (mUSBMonitor != null) {
-                mUSBMonitor.unregister();
-            }
-        }
         Log.d(TAG, "on Stop");
         if((mVideoIsPublished || mScreenIsPublished) && !mLeaveRoomFlag){
             Intent service = new Intent(this, UCloudRtcForeGroundService.class);
@@ -621,14 +601,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 //        if (!mExtendCameraCapture) {
 //            sdkEngine.controlLocalVideo(true);
 //        }
-        synchronized (mSync) {
-            if (mUSBMonitor != null) {
-                mUSBMonitor.register();
-            }
-            if (mUVCCamera != null) {
-                //mUVCCamera.startPreview();
-            }
-        }
     }
 
     @Override
@@ -1242,6 +1214,31 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         public void onNetWorkQuality(String userId, UCloudRtcSdkStreamType streamType, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkNetWorkQuality quality) {
             Log.d(TAG, "onNetWorkQuality: userid: " + userId + "streamType: " + streamType + "mediatype : "+ mediaType + " quality: " + quality);
         }
+
+        @Override
+        public void onLocalMixRenderReady(List<UcloudRtcCameraMixConfig.CameraInfo> infos) {
+
+        }
+
+        @Override
+        public void onLocalMixSyn(List<UcloudRtcCameraMixConfig.SynInfo> infos) {
+
+        }
+
+        @Override
+        public void onHDMIFreezed() {
+
+        }
+
+        @Override
+        public void onHDMIResume() {
+
+        }
+
+        @Override
+        public void onChangeMixSource(boolean isRtsp) {
+
+        }
     };
 
     private RemoteVideoAdapter.RemoveRemoteStreamReceiver mRemoveRemoteStreamReceiver = new RemoteVideoAdapter.RemoveRemoteStreamReceiver() {
@@ -1280,81 +1277,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         @Override
         public void onClick(View v) {
             toggleFullScreen();
-        }
-    };
-
-    private final USBMonitor.OnDeviceConnectListener mOnDeviceConnectListener = new USBMonitor.OnDeviceConnectListener() {
-        @Override
-        public void onAttach(final UsbDevice device) {
-            Log.v(TAG, "onAttach:");
-            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "USB摄像头已连接");
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (mSync) {
-                        if (mUSBMonitor != null ) {
-                            if (mUSBMonitor.getDeviceCount() > 0) {
-                                mUSBMonitor.requestPermission(device);
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void onConnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock, final boolean createNew) {
-            Log.v(TAG, "onConnect:");
-            synchronized (mSync) {
-                if (mUVCCamera != null) {
-                    mUVCCamera.destroy();
-                }
-                isActive = isPreview = false;
-            }
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (mSync) {
-                        //final UVCCamera camera = initUVCCamera(ctrlBlock);
-                        mUVCCamera = initUVCCamera(ctrlBlock);
-                        isActive = true;
-                        isPreview = true;
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void onDisconnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock) {
-            Log.v(TAG, "onDisconnect:");
-            // XXX you should check whether the comming device equal to camera device that currently using
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (mSync) {
-                        if (mUVCCamera != null) {
-                            mUVCCamera.stopPreview();
-                            mUVCCamera.close();
-                            mUVCCamera.destroy();
-/*                            if (mPreviewSurface != null) {
-                                mPreviewSurface.release();
-                                mPreviewSurface = null;
-                            }*/
-                            isActive = isPreview = false;
-                        }
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void onDetach(final UsbDevice device) {
-            Log.v(TAG, "onDetach:");
-            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "USB摄像头被移除");
-        }
-
-        @Override
-        public void onCancel(final UsbDevice device) {
         }
     };
 
@@ -1525,18 +1447,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                 }
             }
         });*/
-        synchronized (mSync) {
-            isActive = isPreview = false;
-            if (mUVCCamera != null) {
-                mUVCCamera.stopPreview();
-                mUVCCamera.close();
-                mUVCCamera = null;
-            }
-            if (mUSBMonitor != null) {
-                mUSBMonitor.destroy();
-                mUSBMonitor = null;
-            }
-        }
+
         mVideoAdapter.setRemoveRemoteStreamReceiver(null);
         if (mUCloudRTCDataProvider != null) {
             mUCloudRTCDataProvider = null;
@@ -1701,7 +1612,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                     //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
                     .addStream(mUserid,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                     .build();
-            sdkEngine.startRelay(mixProfile);
+            sdkEngine.startRecord(mixProfile);
 
         }
         else if (!mAtomOpStart) {
@@ -1929,58 +1840,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public USBMonitor getUSBMonitor() {
-        return mUSBMonitor;
-    }
-
-    @Override
-    public void onDialogResult(boolean canceled) {
-        if (canceled) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    // FIXME
-                }
-            });
-        }
-    }
-
-    private void updateVideoFormat(int videoFormat){
-        switch (videoFormat) {
-            case CommonUtils.nv21_format:
-                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_NV21;
-                mURTCVideoFormat = UCloudRTCDataProvider.NV21;
-                break;
-            case CommonUtils.nv12_format:
-                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_YUV420SP;
-                mURTCVideoFormat = UCloudRTCDataProvider.NV12;
-                break;
-            case CommonUtils.i420_format:
-                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_I420;
-                mURTCVideoFormat = UCloudRTCDataProvider.I420;
-                break;
-            case CommonUtils.rgba_format:
-                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_RGBX;
-                mURTCVideoFormat = UCloudRTCDataProvider.RGBA_TO_I420;
-                break;
-            case CommonUtils.argb_format:
-                //UVCCamera不支持输出argb格式，测试用rgbx格式，输出时颜色会有偏差
-                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_ARGB;
-                mURTCVideoFormat = UCloudRTCDataProvider.ARGB_TO_I420;
-                break;
-            case CommonUtils.rgb24_format:
-                //UVCCamera的RGB888与libyuv的数据有大小端区别，所以UVCCamera输出使用BGR888,保证颜色正确
-                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_BGR888;
-                mURTCVideoFormat = UCloudRTCDataProvider.RGB24_TO_I420;
-                break;
-            case CommonUtils.rgb565_format:
-                mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_RGB565;
-                mURTCVideoFormat = UCloudRTCDataProvider.RGB565_TO_I420;
-                break;
-        }
-    }
-
     private void setPreview(boolean onOff) {
         if (onOff) {
             if (mExtendCameraCapture) {
@@ -2045,8 +1904,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         mScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
         mExtendCameraCapture = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
         mExtendVideoFormat = preferences.getInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, CommonUtils.i420_format);
-        updateVideoFormat(mExtendVideoFormat);
-
         //分辨率选择菜单
         String[] resolutions = getResources().getStringArray(R.array.videoResolutions);
         mResolutionOption.addAll(Arrays.asList(resolutions));

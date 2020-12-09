@@ -164,7 +164,7 @@ public class SettingActivity extends AppCompatActivity {
                 }
                 editor.putInt(CommonUtils.videoprofile, mSelectPos);
                 editor.putInt(CommonUtils.capture_mode, mCaptureMode);
-                editor.putString(CommonUtils.APP_ID_TAG, mAppid);
+                editor.putString(CommonUtils.APPID_KEY, mAppid);
                 editor.putInt(CommonUtils.PUBLISH_MODE, mPublishMode);
                 editor.putInt(CommonUtils.SUBSCRIBE_MODE, mScribeMode);
                 editor.putInt(CommonUtils.SDK_STREAM_ROLE, mRole.ordinal());
@@ -192,7 +192,7 @@ public class SettingActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
         mSelectPos = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
-        mAppid = preferences.getString(CommonUtils.APP_ID_TAG, CommonUtils.APP_ID);
+        mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID);
         mAppidEditText.setText(mAppid);
         mConfigTextView.setText(mDefaultConfiguration.get(mSelectPos));
         mAdapter = new ArrayAdapter<String>(this, R.layout.videoprofile_item, mDefaultConfiguration);

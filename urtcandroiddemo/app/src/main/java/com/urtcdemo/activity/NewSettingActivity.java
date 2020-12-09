@@ -102,7 +102,7 @@ public class NewSettingActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
         mSelectPos = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
-        mAppid = preferences.getString(CommonUtils.APP_ID_TAG, CommonUtils.APP_ID);
+        mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID);
         mEnableCamera = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
         mEnableMic = preferences.getBoolean(CommonUtils.MIC_ENABLE, CommonUtils.MIC_ON);
         mEnableScreen = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
@@ -278,7 +278,7 @@ public class NewSettingActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE).edit();
 
-        editor.putString(CommonUtils.APP_ID_TAG, mAppid);
+        editor.putString(CommonUtils.APPID_KEY, mAppid);
         if (mExtendCamera && mSelectPos < 4) {
             editor.putInt(CommonUtils.videoprofile, 5);
         }
