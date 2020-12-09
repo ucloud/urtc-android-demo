@@ -72,19 +72,26 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
             return;
         }
         if (holderView.getChildCount() == 0) {
-            View videoView = viewInfo.getmRenderview();
-            if (videoView != null) {
+            Object render = viewInfo.getmRenderview();
+            Log.d(TAG, "onBindViewHolder: render" + render + "info "+ viewInfo.getStreamInfo());
+            if (render != null && render instanceof View) {
+                View videoView = (View)render;
                 ViewParent parent = videoView.getParent();
                 if (parent != null) {
                     ((FrameLayout) parent).removeView(videoView);
                 }
                 if(videoView instanceof UCloudRtcSdkSurfaceVideoView ){
                     ((UCloudRtcSdkSurfaceVideoView)videoView).setZOrderMediaOverlay(true);
+                    videoView.setTag(R.id.render,((UCloudRtcSdkSurfaceVideoView)videoView).getSurfaceView());
                 }
                 else if(videoView instanceof UCloudRtcRenderView){
                     ((UCloudRtcRenderView)videoView).setZOrderMediaOverlay(true);
+                    videoView.setTag(R.id.render,render);
                 }
-                videoView.setTag(R.id.index, viewInfo);
+                Log.d(TAG, "onBindViewHolder: "+ "view info"+ viewInfo.getStreamInfo());
+                videoView.setTag(viewInfo.getStreamInfo());
+//                videoView.setTag(R.id.index, viewInfo);
+
                 FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT);
                 holderView.addView(videoView, layoutParams);
@@ -98,6 +105,18 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
                 holderView.addView(imageView, layoutParams);
             }
         }
+    }
+
+    public void updateSwapInfo(UCloudRtcSdkStreamInfo clickInfo,UCloudRtcSdkStreamInfo swapInfo){
+        String clickKey = clickInfo.getUId() + clickInfo.getMediaType().toString();
+        String swapKey = swapInfo.getUId() + swapInfo.getMediaType().toString();
+        URTCVideoViewInfo click = mStreamViews.remove(clickKey);
+        URTCVideoViewInfo newBean = new URTCVideoViewInfo(swapInfo);
+        newBean.setmRenderview(click.getmRenderview());
+        mStreamViews.put(swapKey,newBean);
+        int clickIndex = medialist.indexOf(clickKey);
+        Log.d(TAG, "updateSwapInfo: old medialist index: "+ medialist.indexOf(clickKey));
+        medialist.set(clickIndex,swapKey);
     }
 
     public void setRemoveRemoteStreamReceiver(RemoveRemoteStreamReceiver removeRemoteStreamReceiver) {
