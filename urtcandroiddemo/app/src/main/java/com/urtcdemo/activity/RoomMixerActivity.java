@@ -9,6 +9,8 @@ import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -210,6 +212,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private List<UCloudRtcSdkStreamInfo> remoteStreamInfos = new ArrayList<>();
     private List<UCloudRtcRenderView> remoteRenderViews = new ArrayList<>();
     private int currentIndex = -1;
+    private Handler mHandler;
 
 
     /**
@@ -1077,41 +1080,51 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
 
         @Override
         public void onRecordStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String fileName) {
-            if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START) {
-                Log.d(TAG, "code : " + code + "msg: " + msg + "fileName: " + fileName);
-                if (code == NET_ERR_CODE_OK.ordinal()) {
-                    Log.d(TAG, "onMixStart: " + fileName);
-                    mIsMixing = true;
-                    mOpBtn.setText("stop mix");
-                    if (mAtomOpStart)
-                        mAtomOpStart = false;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START) {
+                        Log.d(TAG, "code : " + code + "msg: " + msg + "fileName: " + fileName);
+                        if (code == NET_ERR_CODE_OK.ordinal()) {
+                            Log.d(TAG, "onMixStart: " + fileName);
+                            mIsMixing = true;
+                            mOpBtn.setText("stop mix");
+                            if (mAtomOpStart)
+                                mAtomOpStart = false;
+                        }
+                    }else if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_STOP_REQUEST_SEND) {
+                        if (mIsMixing) {
+                            mIsMixing = false;
+                            mOpBtn.setText("mix");
+                        }
+                    }
                 }
-            }else if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_STOP_REQUEST_SEND) {
-                if (mIsMixing) {
-                    mIsMixing = false;
-                    mOpBtn.setText("mix");
-                }
-            }
+            });
         }
 
         @Override
         public void onRelayStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String[] pushUrls) {
-            if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_START) {
-                // ulive cdn watch address: http://rtchls.ugslb.com/rtclive/roomid.flv
-                Log.d(TAG, "code : " + code + "msg: " + msg);
-                if (code == NET_ERR_CODE_OK.ordinal()) {
-                    Log.d(TAG, "onMixRelayStart: ");
-                    mIsMixing = true;
-                    mOpBtn.setText("stop mix");
-                    if (mAtomOpStart)
-                        mAtomOpStart = false;
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_START) {
+                        // ulive cdn watch address: http://rtchls.ugslb.com/rtclive/roomid.flv
+                        Log.d(TAG, "code : " + code + "msg: " + msg);
+                        if (code == NET_ERR_CODE_OK.ordinal()) {
+                            Log.d(TAG, "onMixRelayStart: ");
+                            mIsMixing = true;
+                            mOpBtn.setText("stop mix");
+                            if (mAtomOpStart)
+                                mAtomOpStart = false;
+                        }
+                    } else if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_STOP_REQUEST_SEND) {
+                        if (mIsMixing) {
+                            mIsMixing = false;
+                            mOpBtn.setText("mix");
+                        }
+                    }
                 }
-            } else if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_STOP_REQUEST_SEND) {
-                if (mIsMixing) {
-                    mIsMixing = false;
-                    mOpBtn.setText("mix");
-                }
-            }
+            });
         }
 
         @Override
@@ -1676,7 +1689,6 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                             sdkEngine.startRelay(mixProfile);
                         } else if (!mAtomOpStart) {
                             mAtomOpStart = true;
-                            mAtomOpStart = true;
                             Log.d(TAG, " stop mix: ");
                             sdkEngine.stopRelay(null);
                         }
@@ -1895,6 +1907,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mViewGroup = findViewById(R.id.parent_swap);
         mHdmiView = findViewById(R.id.HDMIView);
         localprocess = findViewById(R.id.processlocal);
+        mHandler = new Handler(Looper.getMainLooper());
         isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture();
         Log.d(TAG, " mCaptureMode " + mCaptureMode);
         switch (mCaptureMode) {

@@ -73,8 +73,8 @@ public class ConnectActivity extends AppCompatActivity {
             return;
         }
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
-//        startRoomMixerActivity();
-        startLivingActivity();
+        startRoomMixerActivity();
+//        startLivingActivity();
     }
 
     @Override
@@ -118,8 +118,8 @@ public class ConnectActivity extends AppCompatActivity {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
                         } else {
-//                            startRoomMixerActivity();
-                            startLivingActivity();
+                            startRoomMixerActivity();
+//                            startLivingActivity();
                         }
                     } else {
                         //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
