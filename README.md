@@ -169,8 +169,6 @@ sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfile)) ;/
 ~~~
 
 ## 5.2 加入房间
-Appid在开通URTC服务后从UCloud控制台获取，开通服务参考：https://docs.ucloud.cn/urtc/quick
-Token生成指导参考：https://docs.ucloud.cn/urtc/sdk/token
 ~~~
 UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo();
 info.setAppId(mAppid); // UCloud控制台创建项目获取到的AppID
@@ -180,7 +178,9 @@ info.setUId(mUserid);
 Log.d(TAG, " roomtoken = " + mRoomToken);
 sdkEngine.joinChannel(info);
 ~~~
+Appid在开通URTC服务后从UCloud控制台获取，开通服务参考：https://docs.ucloud.cn/urtc/quick
 
+Token生成指导参考：https://docs.ucloud.cn/urtc/sdk/token
 ## 5.3 自动/手动发布
 如果配置了自动发布无需调用发布视频接口，SDK会在用户成功加入房间后自动发布，只需要监听事件调用渲染接口即可。
 如果配置了手动发布需要调用sdkEngine引擎的publish接口 配置手动/自动发布
