@@ -752,6 +752,14 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                     ToastUtils.shortShow(RoomMixerActivity.this, " 用户 " +
                             info.getUId() + " 取消媒体流 " + info.getMediaType());
                     String mkey = info.getUId() + info.getMediaType().toString();
+                    for (UCloudRtcSdkStreamInfo remoteStreamInfo : remoteStreamInfos) {
+                        if(remoteStreamInfo.getUId().equals(info.getUId()) && remoteStreamInfo.getMediaType().ordinal()
+                            == info.getMediaType().ordinal()){
+                            remoteStreamInfos.remove(remoteStreamInfo);
+                            break;
+                        }
+                    }
+
                     if (mVideoAdapter != null) {
                         mVideoAdapter.removeStreamView(mkey);
                     }
@@ -1583,13 +1591,13 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                     //画面模式
                                     .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
                                     //画面分辨率
-                                    .resolution(1280, 720)
+                                    .resolution(1920, 1080)
                                     //背景色
                                     .bgColor(0, 0, 0)
                                     //画面帧率
-                                    .frameRate(15)
+                                    .frameRate(30)
                                     //画面码率
-                                    .bitRate(1000)
+                                    .bitRate(1500)
                                     //h264视频编码
                                     .videoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264)
                                     //编码质量
@@ -1621,13 +1629,13 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                     //画面模式
                                     .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
                                     //画面分辨率
-                                    .resolution(1280, 720)
+                                    .resolution(1920, 1080)
                                     //背景色
                                     .bgColor(0, 0, 0)
                                     //画面帧率
-                                    .frameRate(15)
+                                    .frameRate(30)
                                     //画面码率
-                                    .bitRate(1000)
+                                    .bitRate(1500)
                                     //h264视频编码
                                     .videoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264)
                                     //编码质量
@@ -1662,13 +1670,13 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                     //画面模式
                                     .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
                                     //画面分辨率
-                                    .resolution(1280, 720)
+                                    .resolution(1920, 1080)
                                     //背景色
                                     .bgColor(0, 0, 0)
                                     //画面帧率
-                                    .frameRate(15)
+                                    .frameRate(30)
                                     //画面码率
-                                    .bitRate(1000)
+                                    .bitRate(1500)
                                     //h264视频编码
                                     .videoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264)
                                     //编码质量
@@ -1702,6 +1710,39 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             public void onClick(View v) {
                 if (mMixAddOrDel) {
                     mMixAddOrDel = false;
+                    if(!remoteStreamInfos.isEmpty()){
+                        UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+                                .type(MIX_TYPE_UPDATE)
+                                //画面模式
+                                .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
+                                //画面分辨率
+                                .resolution(1920, 1080)
+                                //背景色
+                                .bgColor(0, 0, 0)
+                                //画面帧率
+                                .frameRate(30)
+                                //画面码率
+                                .bitRate(1500)
+                                //h264视频编码
+                                .videoCodec(UCloudRtcSdkMixProfile.VIDEO_CODEC_H264)
+                                //编码质量
+                                .qualityLevel(UCloudRtcSdkMixProfile.QUALITY_H264_CB)
+                                //音频编码
+                                .audioCodec(UCloudRtcSdkMixProfile.AUDIO_CODEC_AAC)
+                                //主讲人ID
+                                .mainViewUserId(mUserid)
+                                //主讲人媒体类型
+                                .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                                //加流方式手动
+                                .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
+                                //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
+                                .addStream(mUserid,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                                .addStream(remoteStreamInfos.get(0).getUId(),remoteStreamInfos.get(0).getMediaType().ordinal())
+                                //设置转推cdn 的地址
+                                .addPushUrl("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid)
+                                .build();
+                        sdkEngine.startRelay(mixProfile);
+                    }
                     mAddDelBtn.setText("del_st");
                 } else {
                     mMixAddOrDel = true;
@@ -1985,10 +2026,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             mStreamSelect.setVisibility(View.VISIBLE);
         }
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
-        //设置sdk 外部扩展模式及其采集的帧率，同时sdk内部会自动调整初始码率和最小码率
-        //扩展模式只支持720p的分辨率及以下，若要自定义更高分辨率，请联系Ucloud商务定制，否则sdk会抛出异常，终止运行。
-        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_EXTEND.extendParams(30,640,480));
-        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfile));
+        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1920_1080);
         initButtonSize();
         UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo();
         info.setAppId(mAppid);
