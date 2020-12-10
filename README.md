@@ -80,7 +80,7 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
 # 5 快速使用
 ## 5.1 初始化
 ### 5.1.1 引擎环境初始化
-主要配置android context  sdkmode以及AppID ，测试用的SEC_KEY(即为AppKey),日志等级
+主要配置日志等级，android context，sdkmode，AppID以及测试用的SEC_KEY(AppKey)
 ~~~
 public class UCloudRtcApplication extends Application {
     @Override
@@ -169,10 +169,12 @@ sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfile)) ;/
 ~~~
 
 ## 5.2 加入房间
+Appid在开通URTC服务后从UCloud控制台获取，开通服务参考：https://docs.ucloud.cn/urtc/quick
+Token生成指导参考：https://docs.ucloud.cn/urtc/sdk/token
 ~~~
 UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo();
-info.setAppId(mAppid);
-info.setToken(mRoomToken);
+info.setAppId(mAppid); // UCloud控制台创建项目获取到的AppID
+info.setToken(mRoomToken); // 客户端向后台服务器申请得到的Token
 info.setRoomId(mRoomid);
 info.setUId(mUserid);
 Log.d(TAG, " roomtoken = " + mRoomToken);
