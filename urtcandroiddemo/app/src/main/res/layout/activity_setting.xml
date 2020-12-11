@@ -11,7 +11,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_margin="16dp"
-        android:background="@color/backgroundColor"
+        android:background="@color/lsq_color_white"
         android:src="@mipmap/back" />
 
     <ScrollView
@@ -196,7 +196,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:shadowColor="@color/color_FF007AFF"
-                    android:text="@string/pub_manual"
+                    android:text="@string/pub_video"
                     android:textColor="@color/textcolor" />
 
             </com.urtcdemo.utils.RadioGroupFlow>

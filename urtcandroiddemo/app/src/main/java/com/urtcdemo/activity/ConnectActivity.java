@@ -27,6 +27,7 @@ import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.PermissionUtils;
+import com.urtcdemo.utils.StatusBarUtils;
 import com.urtcdemo.utils.ToastUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
@@ -72,11 +73,8 @@ public class ConnectActivity extends AppCompatActivity {
             return;
         }
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
-//        startRoomActivity();
-//        startRoomTextureActivity();
-//        startWebViewActivity();
         startRoomMixerActivity();
-//        startTestActivity();
+//        startLivingActivity();
     }
 
     @Override
@@ -95,13 +93,17 @@ public class ConnectActivity extends AppCompatActivity {
         UCloudRtcSdkEnv.setMixFilePath(preferences.getString(CommonUtils.SDK_MIX_FILE_PATH, getResources().getString(R.string.mix_file_path)));
         UCloudRtcSdkEnv.setLogReport(true);
         mAnimal = findViewById(R.id.userporta);
-        ((AnimationDrawable) mAnimal.getBackground()).start();
+        //((AnimationDrawable) mAnimal.getBackground()).start();
         setButton = findViewById(R.id.setting_btn);
         roomEditText = findViewById(R.id.room_edittext);
         roomEditText.requestFocus();
         mTextSDKVersion = findViewById(R.id.tv_sdk_version);
         mTextSDKVersion.setText(getString(R.string.app_name) + "\n" + UCloudRtcSdkEngine.getSdkVersion());
         connectButton = findViewById(R.id.connect_button);
+        exportButton = findViewById(R.id.log_output_button);
+        exportButton.setVisibility(View.GONE);
+        StatusBarUtils.setAndroidNativeLightStatusBar(this,true);
+
         connectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,9 +118,8 @@ public class ConnectActivity extends AppCompatActivity {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
                         } else {
-                            startRoomActivity();
-//                        startRoomTextureActivity();
-//                            startWebViewActivity();
+                            startRoomMixerActivity();
+//                            startLivingActivity();
                         }
                     } else {
                         //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
@@ -169,7 +170,7 @@ public class ConnectActivity extends AppCompatActivity {
                 }
             }
         });
-        exportButton = findViewById(R.id.export_button);
+
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -195,7 +196,7 @@ public class ConnectActivity extends AppCompatActivity {
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ConnectActivity.this, SettingActivity.class);
+                Intent intent = new Intent(ConnectActivity.this, NewSettingActivity.class);
                 startActivity(intent);
             }
         });
@@ -231,26 +232,6 @@ public class ConnectActivity extends AppCompatActivity {
          startActivity(intent);
          finish();
     }
-    private void startRoomActivity() {
-        if (!mStartSuccess) {
-            mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
-            intent.putExtra("room_id", mRoomid);
-            String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
-            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
-            intent.putExtra("user_id", mUserId);
-            intent.putExtra("app_id", mAppid);
-            intent.putExtra("token", mRoomToken);
-            mMainHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startActivity(intent);
-                    finish();
-                    mStartSuccess = false;
-                }
-            }, 500);
-        }
-    }
 
     private void startRoomMixerActivity() {
         if (!mStartSuccess) {
@@ -273,10 +254,10 @@ public class ConnectActivity extends AppCompatActivity {
         }
     }
 
-    private void startTestActivity() {
+    private void startLivingActivity() {
         if (!mStartSuccess) {
             mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, TestActivity.class);
+            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveTextureActivity.class);
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
             mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
@@ -287,28 +268,7 @@ public class ConnectActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     startActivity(intent);
-                    finish();
-                    mStartSuccess = false;
-                }
-            }, 500);
-        }
-    }
-
-    private void startRoomTextureActivity() {
-        if (!mStartSuccess) {
-            mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, RoomTextureActivity.class);
-            intent.putExtra("room_id", mRoomid);
-            String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
-            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
-            intent.putExtra("user_id", mUserId);
-            intent.putExtra("app_id", mAppid);
-            intent.putExtra("token", mRoomToken);
-            mMainHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startActivity(intent);
-                    finish();
+                    //finish();
                     mStartSuccess = false;
                 }
             }, 500);
@@ -318,14 +278,12 @@ public class ConnectActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        ((AnimationDrawable) mAnimal.getBackground()).start();
     }
 
     @Override
     protected void onStop() {
         Log.d(TAG, "activity onStop");
         super.onStop();
-        ((AnimationDrawable) mAnimal.getBackground()).stop();
     }
 
     static class CopyMixFileTask implements Runnable {

@@ -1,0 +1,82 @@
+
+1. 渲染和摄像头预览从startpreview接口拆分成以下两个接口,textureview 传入UCloudRtcRenderTextureView ，具体使用看UCloudRTCLiveTextureActivity
+/**
+     * 渲染本地推流
+     * @param info 参见 {@link UCloudRtcSdkStreamInfo}
+     * @param renderView 渲染view，参见 {@link UCloudRtcSdkSurfaceVideoView} {@link UCloudRtcRenderView} {@link android.view.TextureView}
+     * @param scaleType 渲染模式 参见{@link UCloudRtcSdkScaleType}
+     * @param callBack 可以为空，首帧渲染回调
+     * @return 错误码, 参见 {@link com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode}
+     */
+    UCloudRtcSdkErrorCode renderLocalView(UCloudRtcSdkStreamInfo info, Object renderView, UCloudRtcSdkScaleType scaleType, UCloudRTCFirstFrameRendered callBack);
+
+    /**
+     * 开启本地预览
+     * @param renderView 渲染view，参见 {@link UCloudRtcSdkSurfaceVideoView} {@link UCloudRtcRenderView} {@link android.view.TextureView}
+     * @param scaleType 渲染模式 参见{@link UCloudRtcSdkScaleType}
+     * @param callBack 可以为空，首帧渲染回调
+     * @return 错误码, 参见 {@link com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode}
+     */
+    public UCloudRtcSdkErrorCode startCameraPreview(Object renderView, UCloudRtcSdkScaleType scaleType, UCloudRTCFirstFrameRendered callBack);
+
+2.远端转推和录制接口更新 
+    引擎接口
+    /**
+     * 开始转推
+     * @param mixProfile 混流参数配置，参见{@link UCloudRtcSdkMixProfile}
+     */
+    void startRelay(UCloudRtcSdkMixProfile mixProfile);
+
+    /**
+     * 结束转推
+     * @param pushUrls mixprofile中pushurl的子集，需要结束推流的地址
+     */
+    void stopRelay(String[] pushUrls);
+
+    /**
+     * 更新录制+混流参数
+     * @param mixProfile 录制参数，参见{@link UCloudRtcSdkMixProfile}
+     */
+    void updateMixConfig(UCloudRtcSdkMixProfile mixProfile);
+
+    回调接口
+     /**
+     * 录制状态通知
+     * @param code 通知消息状态id，具体请参考文档
+     * @param msg 状态说明
+     * @param userId 用户id
+     * @param roomId 房间号
+     * @param fileName 录制文件名
+     */
+    void onRecordStatusNotify(UCloudRtcSdkMediaServiceStatus status,int code, String msg, String userId, String roomId, String mixId, String fileName);
+
+    /**
+     * 转推状态回调
+     * @param code 通知消息状态id，具体请参考文档
+     * @param msg 状态说明
+     * @param userId 用户id
+     * @param roomId 房间号
+     * @param pushUrls 转推地址
+     */
+    void onRelayStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String[] pushUrls);
+
+    3.混合通道切换源
+
+     /**
+     * 混合通道内切换数据源为rtsp
+     */
+    void hackVideoChannel();
+
+/**
+     * 混合通道内切换数据源为hdmi
+     */
+    void recoverVideoChannel();
+
+    /**
+     * 混合通道内更换rtsp地址，非混合通道切换rtsp地址调用changeRTSPUrl
+     */
+    void changeRTSPUrlMixed();
+
+    4.textureview
+
+

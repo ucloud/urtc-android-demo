@@ -2,19 +2,25 @@ package com.urtcdemo.view;
 
 import android.view.View;
 
+import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderTextureView;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 
 public class URTCVideoViewInfo {
-    private View mRenderview ;
+    private Object mRenderview ;
     private String mUid ;
     private boolean mEanbleVideo ;
     private boolean mEnableAudio;
     private UCloudRtcSdkMediaType mMediatype ;
     private String key;
     private UCloudRtcSdkStreamInfo mStreamInfo;
-
+    public URTCVideoViewInfo(){
+        mUid = "" ;
+        mEanbleVideo = false ;
+        mMediatype = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
+    }
     public URTCVideoViewInfo(UCloudRtcSdkSurfaceVideoView view) {
         mRenderview = view ;
         mUid = "" ;
@@ -22,11 +28,20 @@ public class URTCVideoViewInfo {
         mMediatype = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
     }
 
-    public View getmRenderview() {
+    public URTCVideoViewInfo(UCloudRtcSdkStreamInfo info) {
+        mRenderview = null ;
+        mUid = info.getUId() ;
+        mEanbleVideo = info.isHasVideo() ;
+        mEnableAudio = info.isHasAudio();
+        mMediatype = info.getMediaType();
+        mStreamInfo = info;
+    }
+
+    public Object getmRenderview() {
         return mRenderview;
     }
 
-    public void setmRenderview(View mRenderview) {
+    public void setmRenderview(Object mRenderview) {
         this.mRenderview = mRenderview;
     }
 
@@ -78,14 +93,21 @@ public class URTCVideoViewInfo {
         return mStreamInfo;
     }
 
-    public void release() {
+    public Object release() {
         if (mRenderview != null) {
             if(mRenderview instanceof UCloudRtcSdkSurfaceVideoView){
                 ((UCloudRtcSdkSurfaceVideoView)mRenderview).refresh();
                 ((UCloudRtcSdkSurfaceVideoView)mRenderview).release();
+            }else if(mRenderview instanceof UCloudRtcRenderView){
+                ((UCloudRtcRenderView)mRenderview).release();
             }
-            mRenderview = null ;
+            else if(mRenderview instanceof UCloudRtcRenderTextureView){
+                ((UCloudRtcRenderTextureView)mRenderview).release();
         }
+//            mRenderview = null ;
+
+        }
+        return mRenderview;
     }
 
 }
