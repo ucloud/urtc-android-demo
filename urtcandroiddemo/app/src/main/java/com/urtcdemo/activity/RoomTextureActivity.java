@@ -26,7 +26,6 @@ import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.ucloudrtclib.common.URTCLogUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
@@ -1079,7 +1078,7 @@ public class RoomTextureActivity extends AppCompatActivity implements TextureVie
                     sdkEngine.stopRemoteView(remoteStreamInfos.get(currentIndex));
                     sdkEngine.startRemoteView(remoteStreamInfos.get(currentIndex), mTestTextureView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                 }else{
-                    URTCLogUtils.d(TAG, "swapSurface = true");
+                    Log.d(TAG, "swapSurface = true");
                     sdkEngine.stopRemoteView(remoteStreamInfos.get(currentIndex));
                     sdkEngine.startRemoteView(remoteStreamInfos.get(currentIndex),remoteRenderViews.get(currentIndex) , UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                     currentIndex = 1;
