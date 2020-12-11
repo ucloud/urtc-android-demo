@@ -59,19 +59,6 @@
         </activity>
 
         <activity
-            android:name=".activity.RoomActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
-
-        <activity
-            android:name=".activity.RoomTextureActivity"
-            android:screenOrientation="landscape"
-            android:hardwareAccelerated="true">
-
-        </activity>
-
-        <activity
             android:name=".activity.UCloudRTCLiveActivity"
             android:screenOrientation="portrait"
             android:launchMode="singleTop">
