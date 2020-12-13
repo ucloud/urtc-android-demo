@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -45,7 +46,7 @@ import java.util.UUID;
 public class ConnectActivity extends AppCompatActivity {
     private static final String TAG = "ConnectActivity";
 
-    private EditText roomEditText;
+    private EditText userEditText,roomEditText;
     private String mUserId = "";
     private String mRoomid = "";
     private String mAppid = "";
@@ -95,7 +96,9 @@ public class ConnectActivity extends AppCompatActivity {
         UCloudRtcSdkEnv.setLogReport(true);
         mAnimal = findViewById(R.id.userporta);
         //((AnimationDrawable) mAnimal.getBackground()).start();
+
         setButton = findViewById(R.id.setting_btn);
+        userEditText = findViewById(R.id.user_edittext);
         roomEditText = findViewById(R.id.room_edittext);
         roomEditText.requestFocus();
         mTextSDKVersion = findViewById(R.id.tv_sdk_version);
@@ -263,7 +266,8 @@ public class ConnectActivity extends AppCompatActivity {
             final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
-            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
+//            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
+            mUserId = !TextUtils.isEmpty(userEditText.getText()) ? userEditText.getText().toString() : autoGenUserId;
             intent.putExtra("user_id", mUserId);
             intent.putExtra("app_id", mAppid);
             intent.putExtra("token", mRoomToken);
