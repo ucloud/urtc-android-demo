@@ -563,7 +563,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         info.setToken(mRoomToken);
         info.setRoomId(mRoomid);
         info.setUId(mUserid);
-        Log.d(TAG, " roomtoken = " + mRoomToken);
+        Log.d(TAG, " roomtoken = " + mRoomToken + "appid : "+ mAppid + " userid :"+ mUserid);
         initRecordManager();
         sdkEngine.joinChannel(info);
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -45,7 +46,7 @@ import java.util.UUID;
 public class ConnectActivity extends AppCompatActivity {
     private static final String TAG = "ConnectActivity";
 
-    private EditText roomEditText;
+    private EditText userEditText,roomEditText;
     private String mUserId = "";
     private String mRoomid = "";
     private String mAppid = "";
@@ -72,9 +73,7 @@ public class ConnectActivity extends AppCompatActivity {
             return;
         }
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
-//        startRoomActivity();
         startLivingActivity();
-//        startRoomTextureActivity();
 //        startWebViewActivity();
     }
 
@@ -88,7 +87,7 @@ public class ConnectActivity extends AppCompatActivity {
         setContentView(R.layout.activity_connect);
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
-        mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID);
+        mAppid = preferences.getString(CommonUtils.APP_ID_TAG, CommonUtils.APP_ID);
         UCloudRtcSdkEnv.setMixSupport(preferences.getBoolean(CommonUtils.SDK_SUPPORT_MIX, false));
         UCloudRtcSdkEnv.setLoop(preferences.getBoolean(CommonUtils.SDK_IS_LOOP, true));
         UCloudRtcSdkEnv.setMixFilePath(preferences.getString(CommonUtils.SDK_MIX_FILE_PATH, getResources().getString(R.string.mix_file_path)));
@@ -96,6 +95,7 @@ public class ConnectActivity extends AppCompatActivity {
         mAnimal = findViewById(R.id.userporta);
         //((AnimationDrawable) mAnimal.getBackground()).start();
         setButton = findViewById(R.id.setting_btn);
+        userEditText = findViewById(R.id.user_edittext);
         roomEditText = findViewById(R.id.room_edittext);
         roomEditText.requestFocus();
         mTextSDKVersion = findViewById(R.id.tv_sdk_version);
@@ -120,8 +120,7 @@ public class ConnectActivity extends AppCompatActivity {
                             UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
 
                         } else {
-                            startRoomActivity();
-//                        startRoomTextureActivity();
+                            startLivingActivity();
 //                            startWebViewActivity();
                         }
                     } else {
@@ -236,55 +235,36 @@ public class ConnectActivity extends AppCompatActivity {
          startActivity(intent);
          finish();
     }
-    private void startRoomActivity() {
-        if (!mStartSuccess) {
-            mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
-            intent.putExtra("room_id", mRoomid);
-            String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
-            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
-            intent.putExtra("user_id", mUserId);
-            intent.putExtra("app_id", mAppid);
-            intent.putExtra("token", mRoomToken);
-            mMainHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startActivity(intent);
-                    finish();
-                    mStartSuccess = false;
-                }
-            }, 500);
-        }
-    }
-
-    private void startRoomTextureActivity() {
-        if (!mStartSuccess) {
-            mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, RoomTextureActivity.class);
-            intent.putExtra("room_id", mRoomid);
-            String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
-            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
-            intent.putExtra("user_id", mUserId);
-            intent.putExtra("app_id", mAppid);
-            intent.putExtra("token", mRoomToken);
-            mMainHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startActivity(intent);
-                    finish();
-                    mStartSuccess = false;
-                }
-            }, 500);
-        }
-    }
+//    private void startRoomActivity() {
+//        if (!mStartSuccess) {
+//            mStartSuccess = true;
+//            final Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
+//            intent.putExtra("room_id", mRoomid);
+//            String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
+//            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
+//            intent.putExtra("user_id", mUserId);
+//            intent.putExtra("app_id", mAppid);
+//            intent.putExtra("token", mRoomToken);
+//            mMainHandler.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    startActivity(intent);
+//                    finish();
+//                    mStartSuccess = false;
+//                }
+//            }, 500);
+//        }
+//    }
 
     private void startLivingActivity() {
         if (!mStartSuccess) {
             mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+//            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveTextureActivity.class);
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
-            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
+//            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
+            mUserId = !TextUtils.isEmpty(userEditText.getText()) ? userEditText.getText().toString() : autoGenUserId;
             intent.putExtra("user_id", mUserId);
             intent.putExtra("app_id", mAppid);
             intent.putExtra("token", mRoomToken);
