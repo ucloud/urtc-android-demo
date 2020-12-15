@@ -94,6 +94,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
+import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMixProfile.MIX_TYPE_UPDATE;
 import static com.urtcdemo.activity.RoomMixerActivity.BtnOp.OP_MIX_MANUAL;
 
@@ -1631,6 +1632,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                                 e.printStackTrace();
                             }
                             UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+                                    .type(MIX_TYPE_TRANSCODING_PUSH)
                                     .pushUrl(pushURL)
                                     .streams(streams)
                                     .mainViewUserId(mUserid)
@@ -1644,7 +1646,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                             mAtomOpStart = true;
                             JSONArray jsonArray = new JSONArray();
                             jsonArray.put("");
-                            sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_BOTH, jsonArray);
+                            sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_TRANSCODING_PUSH, jsonArray);
                         }
 //                    mVideoPlayer.start();
                         break;
