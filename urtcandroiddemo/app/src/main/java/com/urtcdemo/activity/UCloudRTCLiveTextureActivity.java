@@ -37,6 +37,7 @@ import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
+import com.ucloudrtclib.common.URTCLogUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderTextureView;
@@ -1135,6 +1136,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
         @Override
         public void onRecordStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String fileName) {
+            Log.d(TAG," onRecordStatusNotify "+ status + " code: "+ code +
+                    " msg: "+ msg + " userId : "+ userId + " roomId: "+ roomId + " fileName: "+ fileName);
             if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START) {
                 String videoPath = "http://" + mBucket + "." + mRegion + ".ufileos.com/" + fileName;
                 Log.d(TAG, "remote record path: " + videoPath + ".mp4");
@@ -1157,6 +1160,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
         @Override
         public void onRelayStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String[] pushUrls) {
+            Log.d(TAG," onRelayStatusNotify "+ status + " code: "+ code +
+                    " msg: "+ msg + " userId : "+ userId + " roomId: "+ roomId + " pushUrls: "+ pushUrls);
             if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_START) {
                 // ulive cdn watch address: http://rtchls.ugslb.com/rtclive/roomid.flv
                 mIsMixing = true;
