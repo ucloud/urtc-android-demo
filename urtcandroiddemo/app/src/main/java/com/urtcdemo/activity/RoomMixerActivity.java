@@ -1791,7 +1791,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                     sdkEngine.setStreamRole(UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH);
                     List<Integer> results = new ArrayList<>();
                     StringBuffer errorMessage = new StringBuffer();
-                    mCaptureMode = CommonUtils.screen_capture_mode;
+                    mCaptureMode = CommonUtils.multi_capture_mode;
                     switch (mCaptureMode) {
                         //音频
                         case CommonUtils.audio_capture_mode:
