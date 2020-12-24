@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -52,7 +53,8 @@ public class NewSettingActivity extends AppCompatActivity {
 
     private List<String> mDefaultConfiguration = new ArrayList<>();
     private String mAppid;
-
+    private String mMixRtspUrl;
+    private String mRtspUrl;
     private LSwitch mCameraSwitch;
     private LSwitch mMicSwitch;
     private LSwitch mScreenShareSwitch;
@@ -66,6 +68,9 @@ public class NewSettingActivity extends AppCompatActivity {
     private boolean mEnableScreen;
     private boolean mExtendCamera;
     private int mExtendVideoFormat;
+
+    private EditText mEditTextMixRtspUrl;
+    private EditText mEditTextRtspUrl;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -99,10 +104,16 @@ public class NewSettingActivity extends AppCompatActivity {
                 showPopupWindow();
             }
         });
+        mEditTextMixRtspUrl = findViewById(R.id.mixed_rtsp_url);
+        mEditTextRtspUrl = findViewById(R.id.rtsp_url);
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
         mSelectPos = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
         mAppid = preferences.getString(CommonUtils.APPID_KEY, CommonUtils.APP_ID);
+        mMixRtspUrl = preferences.getString(CommonUtils.RTSP_URL_KEY_MIXED,CommonUtils.RTST_URL_MIXED);
+        mEditTextMixRtspUrl.setText(mMixRtspUrl);
+        mRtspUrl = preferences.getString(CommonUtils.RTSP_URL_KEY,CommonUtils.RTST_URL);
+        mEditTextRtspUrl.setText(mRtspUrl);
         mEnableCamera = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
         mEnableMic = preferences.getBoolean(CommonUtils.MIC_ENABLE, CommonUtils.MIC_ON);
         mEnableScreen = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
@@ -293,7 +304,8 @@ public class NewSettingActivity extends AppCompatActivity {
         editor.putInt(CommonUtils.SDK_CLASS_TYPE, mRoomType.ordinal());
         editor.putBoolean(CommonUtils.CAMERA_CAPTURE_MODE, mExtendCamera);
         editor.putInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, mExtendVideoFormat);
-
+        editor.putString(CommonUtils.RTSP_URL_KEY_MIXED,mEditTextMixRtspUrl.getText().toString());
+        editor.putString(CommonUtils.RTSP_URL_KEY,mEditTextRtspUrl.getText().toString());
         editor.apply();
     }
 
