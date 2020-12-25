@@ -140,7 +140,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private UCloudRtcSdkRoomType mClass;
     private UCloudRtcSdkStreamInfo mLocalStreamInfo;
     private UCloudRtcSdkAudioDevice defaultAudioDevice;
-    private List<UCloudRtcSdkStreamInfo> mSteamList;
+    // private List<UCloudRtcSdkStreamInfo> mSteamList;
     private List<String> mResolutionOption = new ArrayList<>();
     private ArrayAdapter<String> mAdapter;
     private UCloudRtcRenderView mLocalVideoView = null; //Surfaceview
@@ -226,6 +226,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         screenWidth = displaymetrics.widthPixels;
         screenHeight = displaymetrics.heightPixels;
 
+        // 界面初始化
         setContentView(R.layout.activity_living);
         mVideoProfileSelect = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
         mRemoteGridView = findViewById(R.id.remoteGridView);
@@ -285,6 +286,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mImgControlMixSound = findViewById(R.id.control_mix_pic);
         mTextControlMixSound = findViewById(R.id.control_mix_text);
 
+        // 用户配置参数获取
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
@@ -300,7 +302,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mExtendCameraCapture = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
         mExtendVideoFormat = preferences.getInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, CommonUtils.i420_format);
         updateVideoFormat(mExtendVideoFormat);
-        mSteamList = new ArrayList<>();
+        // mSteamList = new ArrayList<>();
 
         //房间号
         mTextRoomId = findViewById(R.id.roomid_text);
@@ -420,8 +422,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
 //                update(UCloudRtcSdkMixProfile.MIX_TYPE_UPDATE);
-                sdkEngine.queryMix();
-//                muteVideo();
+//                sdkEngine.queryMix();
+                muteVideo();
             }
         });
 
@@ -601,7 +603,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         info.setUId(mUserid);
         Log.d(TAG, " roomtoken = " + mRoomToken + "appid : "+ mAppid + " userid :"+ mUserid);
         initRecordManager();
-        sdkEngine.joinChannel(info);
+        sdkEngine.joinChannel(info); // 加入房间
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
     }
 
@@ -698,13 +700,14 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onJoinRoomResult(int code, String msg, String roomid) {
+            // 加入房间回调结果
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (code == 0) {
+                    if (code == 0) { // 成功
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 加入房间成功");
                         startTimeShow();
-                    } else {
+                    } else { // 失败
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 加入房间失败 " +
                                 code + " errmsg " + msg);
                         Intent intent = new Intent(UCloudRTCLiveActivity.this, ConnectActivity.class);
@@ -719,6 +722,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onLeaveRoomResult(int code, String msg, String roomid) {
+            // 离开房间回调结果
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -756,28 +760,31 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onLocalPublish(int code, String msg, UCloudRtcSdkStreamInfo info) {
+            // 发布本地流回调结果
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (code == 0) {
-                        int mediatype = info.getMediaType().ordinal();
+                        int mediatype = info.getMediaType().ordinal(); // 获取媒体类型（音视频流或桌面流）
                         mPublishMediaType = UCloudRtcSdkMediaType.matchValue(mediatype);
-                        if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
-                            mImgManualPubVideo.setImageResource(R.mipmap.stop);
-                            mTextManualPubVideo.setText(R.string.pub_cancel_video);
-                            if (!sdkEngine.isAudioOnlyMode()) {
+                        if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) { // 音视频流
+                            mImgManualPubVideo.setImageResource(R.mipmap.stop); // 修改界面图标
+                            mTextManualPubVideo.setText(R.string.pub_cancel_video); // 修改界面文字
+                            if (!sdkEngine.isAudioOnlyMode()) {  // 非单音频流
                                 // UCloudRtcSdkSurfaceVideoView打开
                                 //mLocalVideoView.init(false);
                                 // Surfaceview打开
+
+                                // 回显view布局设置
                                 mLocalVideoView.setBackgroundColor(Color.TRANSPARENT);
                                 mLocalVideoView.setVisibility(View.VISIBLE);
                                 localViewWidth = mLocalVideoView.getMeasuredWidth();
                                 localViewHeight = mLocalVideoView.getMeasuredHeight();
                                 if (!mIsPreview) {
-                                    if (mExtendCameraCapture) {
+                                    if (mExtendCameraCapture) { // 扩展摄像头开启渲染
                                         sdkEngine.renderLocalView(info,
                                                 mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
-                                    } else {
+                                    } else { // 自带摄像头开启渲染
                                         sdkEngine.renderLocalView(info,
                                                 mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                                     }
@@ -787,20 +794,23 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                                 } else {
                                     //setIconStats(true);
                                 }
+                                // 状态记录
                                 mVideoIsPublished = true;
                                 mLocalStreamInfo = info;
                                 mSwapStreamInfo = info;
                                 mLocalVideoView.setTag(mLocalStreamInfo);
                                 mLocalVideoView.setOnClickListener(mToggleScreenOnClickListener);
                             }
-                        } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN.ordinal()) {
+                        } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN.ordinal()) { // 屏幕流
+                            // 状态记录及界面更新
                             mScreenIsPublished = true;
                             mImgManualPubScreen.setImageResource(R.mipmap.stop);
                             mTextManualPubScreen.setText(R.string.pub_cancel_screen);
-                            if (mScreenEnable) {
+                            if (mScreenEnable) { // 屏幕流一般无需渲染
                                 //sdkEngine.startPreview(info.getMediaType(), mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
                             }
                         }
+                        // 界面图标状态设置
                         setIconStats(true);
                     } else {
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this,
@@ -813,11 +823,13 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onLocalUnPublish(int code, String msg, UCloudRtcSdkStreamInfo info) {
+            // 取消发布回调结果
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (code == 0) {
-                        if (info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
+                        if (info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) { // 音视频流
+                            // 界面更新
                             if (mPublishMode == CommonUtils.AUTO_MODE) {
                                 mImgManualPubVideo.setVisibility(View.GONE);
                                 mTextManualPubVideo.setVisibility(View.GONE);
@@ -836,7 +848,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                             if (mIsRemoteMixingSound) {
                                 toggleMixingSound(true);
                             }
-                        } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
+                        } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) { //屏幕流
                             mScreenIsPublished = false;
                             if (mPublishMode == CommonUtils.AUTO_MODE) {
                                 mImgManualPubScreen.setVisibility(View.GONE);
@@ -871,6 +883,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onRemoteUserJoin(String uid) {
+            // 远端用户加入房间
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -882,6 +895,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onRemoteUserLeave(String uid, int reason) {
+            // 远端用户离开房间
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -895,6 +909,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onRemotePublish(UCloudRtcSdkStreamInfo info) {
+            // 远端用户发布流
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -902,8 +917,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     // 如果客户端是固定userid就可以过滤掉，如果不是，等待服务端超时也会删除流
                     Log.d(TAG, "onRemotePublish: " + info.getUId() + " me : " + mUserid);
                     if (!mUserid.equals(info.getUId())) {
-                        mSteamList.add(info);
-                        if (!sdkEngine.isAutoSubscribe()) {
+                        // mSteamList.add(info);
+                        if (!sdkEngine.isAutoSubscribe()) { // 非自动订阅模式情况下调用订阅接口
                             sdkEngine.subscribe(info);
                         } else {
                             //mSpinnerPopupWindowScribe.notifyUpdate();
@@ -916,15 +931,16 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onRemoteUnPublish(UCloudRtcSdkStreamInfo info) {
+            // 远端用户取消发布
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     Log.d(TAG, " onRemoteUnPublish " + info.getMediaType() + " " + info.getUId());
                     ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 用户 " +
-                            info.getUId() + " 取消媒体流 " + info.getMediaType());
+                            info.getUId() + " 取消媒体流 " + info.getMediaType()); // 界面提示信息
                     String mkey = info.getUId() + info.getMediaType().toString();
                     if(mSwapStreamInfo!= null && mSwapStreamInfo.getUId().equals(info.getUId()) && mSwapStreamInfo.getMediaType().toString().equals(info.getMediaType().toString())){
-                        sdkEngine.stopRemoteView(mSwapStreamInfo);
+                        sdkEngine.stopRemoteView(mSwapStreamInfo); // 停止渲染远端视频流
                         int localIndex  = mVideoAdapter.getPositionByKey(mUserid + mPublishMediaType.toString());
                         if(localIndex >= 0){
                             Log.d(TAG," onRemoteUnPublish localIndex "+ localIndex);
@@ -948,20 +964,21 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onSubscribeResult(int code, String msg, UCloudRtcSdkStreamInfo info) {
+            // 订阅结果回调
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (code == 0) {
+                    if (code == 0) { // 订阅成功
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
 //                        UCloudRtcSdkSurfaceVideoView videoView = null;
                         UCloudRtcRenderView videoView = null;
                         Log.d(TAG, " subscribe info: " + info);
                         latestRemoteInfo = info;
-                        if (info.isHasVideo()) {
+                        if (info.isHasVideo()) { // 订阅流是否包含视频
                             //UCloudRtcSdkSurfaceVideoView 定义的viewgroup,内含UcloudRtcRenderView
 //                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
 //                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
-                            videoView = new UCloudRtcRenderView(getApplicationContext());
+                            videoView = new UCloudRtcRenderView(getApplicationContext());// 初始化渲染界面
                             videoView.init();
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
@@ -985,7 +1002,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         }
 
                         if (vinfo != null && videoView != null) {
-                            sdkEngine.startRemoteView(info, videoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                            sdkEngine.startRemoteView(info, videoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null); // 渲染订阅流
                             //videoView.refreshRemoteOp(View.VISIBLE);
                         }
                         //如果订阅成功就删除待订阅列表中的数据
@@ -1002,13 +1019,14 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onUnSubscribeResult(int code, String msg, UCloudRtcSdkStreamInfo info) {
+            // 取消订阅结果回调
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 取消订阅用户 " +
                             info.getUId() + " 类型 " + info.getMediaType());
                     if (mVideoAdapter != null) {
-                        mVideoAdapter.removeStreamView(info.getUId() + info.getMediaType().toString());
+                        mVideoAdapter.removeStreamView(info.getUId() + info.getMediaType().toString()); // 远端渲染流移除
                     }
                     //取消订阅又变成可订阅
                     //mSpinnerPopupWindowScribe.addStreamInfo(info, true);
@@ -1018,11 +1036,12 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onLocalStreamMuteRsp(int code, String msg, UCloudRtcSdkMediaType mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
+            // 静音本地流回调
             Log.d(TAG, " code " + code + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (code == 0) {
+                    if (code == 0) { // mute成功，更新界面
                         if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
                             if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
                                 onMuteMicResult(mute);
@@ -1039,11 +1058,12 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onRemoteStreamMuteRsp(int code, String msg, String uid, UCloudRtcSdkMediaType mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
+            // 静音远端流回调
             Log.d(TAG, " code " + code + " uid " + uid + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (code == 0) {
+                    if (code == 0) {// mute成功，更新界面
                         String mkey = uid + mediatype.toString();
                         Log.d(TAG, " onRemoteStreamMuteRsp " + mkey + " " + mVideoAdapter);
                         if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
@@ -1067,10 +1087,12 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onRemoteTrackNotify(String uid, UCloudRtcSdkMediaType mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
+            // 远端流状态改变通知
             Log.d(TAG, " uid " + uid + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    // 更新界面和界面提醒
                     if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
                         String cmd = mute ? "关闭" : "打开";
                         if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
@@ -1112,6 +1134,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onLocalAudioLevel(int volume) {
+            // 本端声音调整回调
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1125,6 +1148,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onRemoteAudioLevel(String uid, int volume) {
+            // 远端声音调整回调
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1137,6 +1161,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onKickoff(int code) {
+            // 被踢出房间通知
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1186,13 +1211,15 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onRecordStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String fileName) {
+            // 录制状态通知
             Log.d(TAG, "onRecordStatusNotify " + status + " code: " + code + " msg: " + msg + " userid " + userId + " roomid: " + roomId + " mixId: " + mixId + "fileName: " + fileName);
-            if(status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START_REQUEST_SEND){
+            if(status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START_REQUEST_SEND){ // 录制请求已送出
                 Log.d(TAG, "开始录制请求已发送: ");
             }
-            else if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START) {
-                String videoPath = "http://" + mBucket + "." + mRegion + ".ufileos.com/" + fileName;
+            else if (status == UCloudRtcSdkMediaServiceStatus.RECORD_STATUS_START) { // 录制已经开始
+                String videoPath = "http://" + mBucket + "." + mRegion + ".ufileos.com/" + fileName; // 录制观看地址
                 Log.d(TAG, "remote record path: " + videoPath + ".mp4");
+                // 界面提醒和更新
                 ToastUtils.longShow(UCloudRTCLiveActivity.this, "观看地址: " + videoPath);
                 mIsRemoteRecording = true;
                 mImgRemoteRecord.setImageResource(R.mipmap.stop);
@@ -1216,17 +1243,19 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onRelayStatusNotify(UCloudRtcSdkMediaServiceStatus status, int code, String msg, String userId, String roomId, String mixId, String[] pushUrls) {
+            // 转推状态通知
             Log.d(TAG, "onRelayStatusNotify " + status + " code: " + code + " msg: " + msg + " userid " + userId + " roomid: " + roomId + " mixId: " + mixId);
             if (pushUrls != null) {
                 for (int i = 0; i < pushUrls.length; i++) {
-                    Log.d(TAG, "onRelayStatusNotify: pushUrl " + pushUrls[i]);
+                    Log.d(TAG, "onRelayStatusNotify: pushUrl " + pushUrls[i]); // 转推地址
                 }
             }
             if(status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_START_REQUEST_SEND){
                 Log.d(TAG, "开始转推请求已发送: ");
             }
-            else if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_START) {
+            else if (status == UCloudRtcSdkMediaServiceStatus.RELAY_STATUS_START) { // 开始转推
                 // ulive cdn watch address: http://rtchls.ugslb.com/rtclive/roomid.flv
+                // 界面更新和提醒
                 mIsMixing = true;
                 mImgMix.setImageResource(R.mipmap.stop);
                 mTextMix.setText(R.string.mixing);
@@ -1250,6 +1279,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onAddStreams(int code, String msg) {
+            // 加流回调
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1260,6 +1290,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onDelStreams(int code, String msg) {
+            // 减流回调
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1320,6 +1351,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onAudioDeviceChanged(UCloudRtcSdkAudioDevice device) {
+            // 播放声音设备切换
             defaultAudioDevice = device;
 //            URTCLogUtils.d(TAG,"URTCAudioManager: room change device to "+ defaultAudioDevice);
             if (defaultAudioDevice == UCloudRtcSdkAudioDevice.UCLOUD_RTC_SDK_AUDIODEVICE_SPEAKER) {
@@ -1338,6 +1370,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onNetWorkQuality(String userId, UCloudRtcSdkStreamType streamType, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkNetWorkQuality quality) {
+            // 网络质量通知
             Log.d(TAG, "onNetWorkQuality: userid: " + userId + "streamType: " + streamType + "mediatype : " + mediaType + " quality: " + quality);
         }
     };
@@ -1403,11 +1436,12 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private View.OnClickListener mToggleScreenOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            // 回显画面全屏切换
             toggleFullScreen();
         }
     };
 
-    private final USBMonitor.OnDeviceConnectListener mOnDeviceConnectListener = new USBMonitor.OnDeviceConnectListener() {
+    private final USBMonitor.OnDeviceConnectListener mOnDeviceConnectListener = new USBMonitor.OnDeviceConnectListener() { // 外接usb监听接口
         @Override
         public void onAttach(final UsbDevice device) {
             Log.v(TAG, "onAttach:");
@@ -1482,7 +1516,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     };
 
-    private View.OnClickListener mSwapRemoteLocalListener = new View.OnClickListener() {
+    private View.OnClickListener mSwapRemoteLocalListener = new View.OnClickListener() { // 大小窗切换监听
         @Override
         public void onClick(View v) {
             if (v instanceof UCloudRtcSdkSurfaceVideoView) {
@@ -1579,13 +1613,13 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     };
 
-    private void switchCamera() {
+    private void switchCamera() { // 前后置摄像头切换
         sdkEngine.switchCamera();
         ToastUtils.shortShow(this, "切换摄像头");
         mSwitchCamera = !mSwitchCamera;
     }
 
-    private boolean muteMic() {
+    private boolean muteMic() { // 关闭打开本端麦克风
         sdkEngine.muteLocalMic(!mMuteMic);
         if (!mMuteMic) {
             ToastUtils.shortShow(UCloudRTCLiveActivity.this, "关闭麦克风");
@@ -1595,7 +1629,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         return false;
     }
 
-    private boolean muteVideo() {
+    private boolean muteVideo() { // 关闭打开本端视频
         if (mScreenEnable || mCameraEnable) {
             if (isScreenCaptureSupport && !mCameraEnable) {
                 sdkEngine.muteLocalVideo(!mMuteVideo, UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN);
@@ -1611,7 +1645,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         return false;
     }
 
-    private void muteSpeaker(boolean enable) {
+    private void muteSpeaker(boolean enable) { //喇叭听筒切换
         if (mSpeakerOn) {
             ToastUtils.shortShow(UCloudRTCLiveActivity.this, "关闭喇叭");
         } else {
@@ -1660,14 +1694,14 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 R.mipmap.mic_volume);
     }
 
-    private void mirrorSwitch() {
+    private void mirrorSwitch() { // 前置摄像头镜像切换
         mMirror = !mMirror;
         UCloudRtcSdkEnv.setFrontCameraMirror(mMirror);
         mImgBtnMirror.setImageResource(mMirror ? R.mipmap.mirror_on :
                 R.mipmap.mirror);
     }
 
-    private void endCall() {
+    private void endCall() { // 离开频道
         sdkEngine.leaveChannel().ordinal();
         mLeaveRoomFlag = true;
 //        Intent intent = new Intent(UCloudRTCLiveActivity.this, ConnectActivity.class);
@@ -1689,24 +1723,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mVideoAdapter.notifyDataSetChanged();
     }
 
-    private void releaseExtendCamera() {
-/*        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (mSync) {
-                    isActive = isPreview = false;
-                    if (mUVCCamera != null) {
-                        mUVCCamera.stopPreview();
-                        mUVCCamera.close();
-                        mUVCCamera = null;
-                    }
-                    if (mUSBMonitor != null) {
-                        mUSBMonitor.destroy();
-                        mUSBMonitor = null;
-                    }
-                }
-            }
-        });*/
+    private void releaseExtendCamera() { // 释放扩展摄像头资源
         synchronized (mSync) {
             isActive = isPreview = false;
             if (mUVCCamera != null) {
@@ -1794,7 +1811,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mLocalViewFullScreen = !mLocalViewFullScreen;
     }
 
-    private UCloudRTCScreenShot mUCloudRTCScreenShot = new UCloudRTCScreenShot() {
+    private UCloudRTCScreenShot mUCloudRTCScreenShot = new UCloudRTCScreenShot() { // 本地截图
         @Override
         public void onReceiveRGBAData(ByteBuffer rgbBuffer, int width, int height) {
             final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
@@ -1831,7 +1848,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
     }
 
-    private void toggleLocalRecord() {
+    private void toggleLocalRecord() { // 本地录制界面更新（未实现）
         if (!mIsLocalRecording) {
             Log.d(TAG, " start local record: ");
             //URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,"mnt/sdcard/urtc/mp4/"+ System.currentTimeMillis()+".mp4",mLocalRecordListener,1000);
@@ -1847,10 +1864,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     }
 
-    private void toggleRemoteRecord() {
+    private void toggleRemoteRecord() { // 远端录制
         if (!mIsRemoteRecording) {
             Log.d(TAG, " start remote record: ");
             mAtomOpStart = true;
+            // 生成录制配置
             UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleRecordMixParamsBuilder()
                     .type(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD)
                     //画面模式
@@ -1878,18 +1896,19 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
                     .addStream(mUserid, UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                     .build();
-            sdkEngine.startRecord(mixProfile);
+            sdkEngine.startRecord(mixProfile); // 开始录制
         } else if (!mAtomOpStart) {
             Log.d(TAG, " stop remote record: ");
             mAtomOpStart = true;
-            sdkEngine.stopRecord();
+            sdkEngine.stopRecord(); // 停止录制
         }
     }
 
-    private void toggleMix() {
+    private void toggleMix() { // 转推
         if (!mIsMixing) {
             Log.d(TAG, " start mix: ");
             mAtomOpStart = true;
+            // 生成转推配置
             UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleUpdateMixParamsBuilder()
                     .type(UCloudRtcSdkMixProfile.MIX_TYPE_RELAY)
                     //画面模式
@@ -1925,11 +1944,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     //房间没流多久结束任务
                     .taskTimeOut(70)
                     .build();
-            sdkEngine.updateMixConfig(mixProfile);
+            sdkEngine.updateMixConfig(mixProfile); // 开始转推
         } else if (!mAtomOpStart) {
             Log.d(TAG, " stop mix: ");
             mAtomOpStart = true;
-            sdkEngine.stopRelay(null);
+            sdkEngine.stopRelay(null); // 停止转推
         }
     }
 
@@ -2037,7 +2056,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     }
 
-    private void toggleControlMixingSound() {
+    private void toggleControlMixingSound() { // 混音控制
         if (mIsLocalMixingSound || mIsRemoteMixingSound) {
             if (mIsPauseMixingSound) {
                 sdkEngine.resumeAudioFile();
@@ -2122,7 +2141,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     };
 
-    private UVCCamera initUVCCamera(USBMonitor.UsbControlBlock ctrlBlock) {
+    private UVCCamera initUVCCamera(USBMonitor.UsbControlBlock ctrlBlock) { // usb外接摄像头初始化
         Log.d(TAG, "initUVCCamera-----mVideoProfileSelect:" + mVideoProfileSelect + " width:" + UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth()
                 + " height:" + UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight());
         final UVCCamera camera = new UVCCamera();
@@ -2194,7 +2213,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
 
         @Override
-        public void releaseBuffer() {
+        public void releaseBuffer() { // 释放资源
             Log.d("UCloudRTCLiveActivity", "releaseBuffer");
             synchronized (extendByteBufferSync) {
                 if (videoSourceData != null) {
@@ -2264,12 +2283,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     };
 
-    private void createFrameByteBuffer(ByteBuffer frame) {
+    private void createFrameByteBuffer(ByteBuffer frame) { // 获取外接视频数据
         try {
             if (frame != null) {
-                //add videoSource
-                //Log.d("UCloudRTCLiveActivity", "offer video byteBuffer!");
-                //mQueueByteBuffer.offer(frame, 1, TimeUnit.SECONDS);
                 synchronized (extendByteBufferSync) {
                     if (videoSourceData != null) {
                         videoSourceData.clear();
@@ -2300,7 +2316,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     }
 
-    private void updateVideoFormat(int videoFormat) {
+    private void updateVideoFormat(int videoFormat) { // 设置外接视频格式
         switch (videoFormat) {
             case CommonUtils.nv21_format:
                 mUVCCameraFormat = UVCCamera.PIXEL_FORMAT_NV21;
@@ -2335,7 +2351,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     }
 
-    private void setPreview(boolean onOff) {
+    private void setPreview(boolean onOff) { //预览窗口开关
         if (onOff) {
             if (mExtendCameraCapture) {
                 sdkEngine.startCameraPreview(
@@ -2348,7 +2364,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     }
 
-    private void setIconStats(boolean visible) {
+    private void setIconStats(boolean visible) { // 图标状态切换
         if (!visible) {
             //未发布时，按钮隐藏
             mImgPreview.setVisibility(View.VISIBLE);
@@ -2393,7 +2409,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
     }
 
-    private void refreshSettings() {
+    private void refreshSettings() { // 配置刷新
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
 
