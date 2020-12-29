@@ -1141,6 +1141,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         public void onNetWorkQuality(String userId, UCloudRtcSdkStreamType streamType, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkNetWorkQuality quality) {
             Log.d(TAG, "onNetWorkQuality: userid: " + userId + "streamType: " + streamType + "mediatype : "+ mediaType + " quality: " + quality);
         }
+
+        @Override
+        public void onAudioFileFinish() {
+            Log.d(TAG, "onAudioFileFinish" );
+        }
     };
     private int mSelectPos;
 

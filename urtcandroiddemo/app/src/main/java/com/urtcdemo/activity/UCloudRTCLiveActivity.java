@@ -1373,6 +1373,38 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             // 网络质量通知
             Log.d(TAG, "onNetWorkQuality: userid: " + userId + "streamType: " + streamType + "mediatype : " + mediaType + " quality: " + quality);
         }
+
+        @Override
+        public void onAudioFileFinish() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onAudioFileFinish" );
+
+                    if ( mIsLocalMixingSound){
+                        // 本地混音中
+                        mImgLocalMixSound.setImageResource(R.mipmap.local_mix_sound);
+                        mTextLocalMixSound.setText(R.string.start_local_mix_sound);
+                        mImgRemoteMixSound.setVisibility(View.VISIBLE);
+                        mTextRemoteMixSound.setVisibility(View.VISIBLE);
+                        mIsLocalMixingSound = false;
+                    }
+                    else if (mIsRemoteMixingSound) {
+                        // 远端混音中
+                        mImgLocalMixSound.setVisibility(View.VISIBLE);
+                        mTextLocalMixSound.setVisibility(View.VISIBLE);
+                        mImgRemoteMixSound.setImageResource(R.mipmap.remote_mix_sound);
+                        mTextRemoteMixSound.setText(R.string.start_remote_mix_sound);
+                        mIsRemoteMixingSound = false;
+                    }
+                    mIsPauseMixingSound = false;
+                    mImgControlMixSound.setImageResource(R.mipmap.pause);
+                    mTextControlMixSound.setText(R.string.pause_mixing_sound);
+                    mImgControlMixSound.setVisibility(View.GONE);
+                    mTextControlMixSound.setVisibility(View.GONE);
+                }
+            });
+        }
     };
 
     private UCloudRtcSdkSurfaceVideoView.RemoteOpTrigger mOnRemoteOpTrigger = new UCloudRtcSdkSurfaceVideoView.RemoteOpTrigger() {
