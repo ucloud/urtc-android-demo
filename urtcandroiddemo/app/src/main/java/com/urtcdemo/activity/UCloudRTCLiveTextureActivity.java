@@ -180,6 +180,12 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     private TextView mTextManualPubVideo;
     private ImageView mImgManualPubScreen;
     private TextView mTextManualPubScreen;
+    private ImageView mImgLocalMixSound;
+    private TextView mTextLocalMixSound;
+    private ImageView mImgRemoteMixSound;
+    private TextView mTextRemoteMixSound;
+    private ImageView mImgControlMixSound;
+    private TextView mTextControlMixSound;
     private TextView mTextRoomId;
     private ImageView mImgPreview;
     private TextView mTextPreview;
@@ -194,6 +200,9 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     private final Object mSync = new Object();
     private boolean isActive, isPreview;
     private boolean mLeaveRoomFlag;
+    private boolean mIsLocalMixingSound = false;
+    private boolean mIsRemoteMixingSound = false;
+    private boolean mIsPauseMixingSound = false;
 
     //外部摄像数据读取
     private ArrayBlockingQueue<ByteBuffer> mQueueByteBuffer = new ArrayBlockingQueue(8);
@@ -274,6 +283,12 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         mTextResolution = findViewById(R.id.resolution_text);
         mImgPreview = findViewById(R.id.preview_pic);
         mTextPreview = findViewById(R.id.preview_text);
+        mImgLocalMixSound = findViewById(R.id.local_mix_pic);
+        mTextLocalMixSound = findViewById(R.id.local_mix_text);
+        mImgRemoteMixSound = findViewById(R.id.remote_mix_pic);
+        mTextRemoteMixSound = findViewById(R.id.remote_mix_text);
+        mImgControlMixSound = findViewById(R.id.control_mix_pic);
+        mTextControlMixSound = findViewById(R.id.control_mix_text);
 
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
@@ -356,6 +371,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         if (mPublishMode == CommonUtils.AUTO_MODE) {
             mImgPreview.setVisibility(View.GONE);
             mTextPreview.setVisibility(View.GONE);
+            mImgControlMixSound.setVisibility(View.GONE);
+            mTextControlMixSound.setVisibility(View.GONE);
         } else {
             //手动发布时，按钮隐藏
             //mImgManualPub.setVisibility(View.VISIBLE);
@@ -563,6 +580,27 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                     mTextPreview.setText(R.string.start_preview);
                     mLocalVideoView.setVisibility(View.INVISIBLE);
                 }
+            }
+        });
+
+        mImgLocalMixSound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleMixingSound(false);
+            }
+        });
+
+        mImgRemoteMixSound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleMixingSound(true);
+            }
+        });
+
+        mImgControlMixSound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleControlMixingSound();
             }
         });
 
@@ -807,6 +845,12 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                             }
                             mVideoIsPublished = false;
                             mLocalVideoView.setVisibility(View.INVISIBLE);
+                            if (mIsLocalMixingSound) {
+                                toggleMixingSound(false);
+                            }
+                            if (mIsRemoteMixingSound) {
+                                toggleMixingSound(true);
+                            }
                         } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
                             mScreenIsPublished = false;
                             if (mPublishMode == CommonUtils.AUTO_MODE) {
@@ -821,6 +865,9 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 //                                if (localrenderview != null) {
 //                                    localrenderview.refresh();
 //                                }
+                            }
+                            if (mIsLocalMixingSound) {
+                                toggleMixingSound(false);
                             }
                         }
                         if (!mScreenIsPublished && !mVideoIsPublished) {
@@ -1267,7 +1314,34 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
         @Override
         public void onAudioFileFinish() {
-            Log.d(TAG, "onAudioFileFinish" );
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d(TAG, "onAudioFileFinish" );
+
+                    if ( mIsLocalMixingSound){
+                        // 本地混音中
+                        mImgLocalMixSound.setImageResource(R.mipmap.local_mix_sound);
+                        mTextLocalMixSound.setText(R.string.start_local_mix_sound);
+                        mImgRemoteMixSound.setVisibility(View.VISIBLE);
+                        mTextRemoteMixSound.setVisibility(View.VISIBLE);
+                        mIsLocalMixingSound = false;
+                    }
+                    else if (mIsRemoteMixingSound) {
+                        // 远端混音中
+                        mImgLocalMixSound.setVisibility(View.VISIBLE);
+                        mTextLocalMixSound.setVisibility(View.VISIBLE);
+                        mImgRemoteMixSound.setImageResource(R.mipmap.remote_mix_sound);
+                        mTextRemoteMixSound.setText(R.string.start_remote_mix_sound);
+                        mIsRemoteMixingSound = false;
+                    }
+                    mIsPauseMixingSound = false;
+                    mImgControlMixSound.setImageResource(R.mipmap.pause);
+                    mTextControlMixSound.setText(R.string.pause_mixing_sound);
+                    mImgControlMixSound.setVisibility(View.GONE);
+                    mTextControlMixSound.setVisibility(View.GONE);
+                }
+            });
         }
     };
 
@@ -1769,6 +1843,84 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
     }
 
+    // 播放本地或远端混音
+    private void toggleMixingSound(boolean isRemotePlay) {
+        if (!isRemotePlay) {
+            // 本地混音
+            if (!mIsLocalMixingSound) {
+                if (!sdkEngine.startPlayAudioFile(sdkEngine.copyAssetsFileToSdcard("water.mp3"))) {
+                    return;
+                }
+                else {
+                    mImgLocalMixSound.setImageResource(R.mipmap.stop);
+                    mTextLocalMixSound.setText(R.string.local_sound_mixing);
+                    mImgRemoteMixSound.setVisibility(View.GONE);
+                    mTextRemoteMixSound.setVisibility(View.GONE);
+                    mImgControlMixSound.setVisibility(View.VISIBLE);
+                    mTextControlMixSound.setVisibility(View.VISIBLE);
+                }
+            } else {
+                sdkEngine.stopPlayAudioFile();
+                mIsPauseMixingSound = false;
+                mImgLocalMixSound.setImageResource(R.mipmap.local_mix_sound);
+                mTextLocalMixSound.setText(R.string.start_local_mix_sound);
+                mImgRemoteMixSound.setVisibility(View.VISIBLE);
+                mTextRemoteMixSound.setVisibility(View.VISIBLE);
+                mImgControlMixSound.setImageResource(R.mipmap.pause);
+                mTextControlMixSound.setText(R.string.pause_mixing_sound);
+                mImgControlMixSound.setVisibility(View.GONE);
+                mTextControlMixSound.setVisibility(View.GONE);
+            }
+            mIsLocalMixingSound = !mIsLocalMixingSound;
+        }
+        else if (mVideoIsPublished && isRemotePlay){
+            // 本地+远端混音
+            if (!mIsRemoteMixingSound) {
+                if (!sdkEngine.startPlayAudioFile(sdkEngine.copyAssetsFileToSdcard("water.mp3"), true, false)) {
+                    return;
+                }
+                else {
+                    mImgRemoteMixSound.setImageResource(R.mipmap.stop);
+                    mTextRemoteMixSound.setText(R.string.remote_sound_mixing);
+                    mImgLocalMixSound.setVisibility(View.GONE);
+                    mTextLocalMixSound.setVisibility(View.GONE);
+                    mImgControlMixSound.setVisibility(View.VISIBLE);
+                    mTextControlMixSound.setVisibility(View.VISIBLE);
+                }
+            } else {
+                sdkEngine.stopPlayAudioFile();
+                mIsPauseMixingSound = false;
+                mImgRemoteMixSound.setImageResource(R.mipmap.remote_mix_sound);
+                mTextRemoteMixSound.setText(R.string.start_remote_mix_sound);
+                mImgLocalMixSound.setVisibility(View.VISIBLE);
+                mTextLocalMixSound.setVisibility(View.VISIBLE);
+                mImgControlMixSound.setImageResource(R.mipmap.pause);
+                mTextControlMixSound.setText(R.string.pause_mixing_sound);
+                mImgControlMixSound.setVisibility(View.GONE);
+                mTextControlMixSound.setVisibility(View.GONE);
+            }
+            mIsRemoteMixingSound = !mIsRemoteMixingSound;
+        }
+        else {
+            Log.e(TAG, " Wrong mixing status.");
+        }
+    }
+
+    private void toggleControlMixingSound() {
+        if (mIsLocalMixingSound || mIsRemoteMixingSound) {
+            if (mIsPauseMixingSound) {
+                sdkEngine.resumeAudioFile();
+                mImgControlMixSound.setImageResource(R.mipmap.pause);
+                mTextControlMixSound.setText(R.string.pause_mixing_sound);
+            } else {
+                sdkEngine.pauseAudioFile();
+                mImgControlMixSound.setImageResource(R.mipmap.play);
+                mTextControlMixSound.setText(R.string.resume_mixing_sound);
+            }
+            mIsPauseMixingSound = !mIsPauseMixingSound;
+        }
+    }
+
     /**
      * 根据音量大小设置录音时的音量动画
      */
@@ -2058,6 +2210,12 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
             mImgBtnMuteVideo.setVisibility(View.INVISIBLE);
             mImgBtnMirror.setVisibility(View.INVISIBLE);
             mTextResolution.setVisibility(View.INVISIBLE);
+            mImgLocalMixSound.setVisibility(View.GONE);
+            mTextLocalMixSound.setVisibility(View.GONE);
+            mImgRemoteMixSound.setVisibility(View.GONE);
+            mTextRemoteMixSound.setVisibility(View.GONE);
+            mImgControlMixSound.setVisibility(View.GONE);
+            mTextControlMixSound.setVisibility(View.GONE);
         }
         else {
             mImgBtnMuteMic.setVisibility(View.VISIBLE);
@@ -2072,8 +2230,12 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
             mTextScreenshot.setVisibility(View.VISIBLE);
             mImgRemoteRecord.setVisibility(View.VISIBLE);
             mTextRemoteRecord.setVisibility(View.VISIBLE);
-            mImgPreview.setVisibility(View.INVISIBLE);
-            mTextPreview.setVisibility(View.INVISIBLE);
+            mImgPreview.setVisibility(View.GONE);
+            mTextPreview.setVisibility(View.GONE);
+            mImgLocalMixSound.setVisibility(View.VISIBLE);
+            mTextLocalMixSound.setVisibility(View.VISIBLE);
+            mImgRemoteMixSound.setVisibility(View.VISIBLE);
+            mTextRemoteMixSound.setVisibility(View.VISIBLE);
         }
     }
 

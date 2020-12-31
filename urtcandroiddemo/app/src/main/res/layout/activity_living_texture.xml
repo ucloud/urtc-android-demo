@@ -12,7 +12,7 @@
         android:id="@+id/drawer_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@mipmap/videooff">
+        android:background="@drawable/video_close_bg">
 
         <TextureView
             android:id="@+id/localvideoview"
@@ -128,7 +128,8 @@
 
             <ImageButton
                 android:id="@+id/img_btn_endcall"
-                android:background="@mipmap/end"
+                android:background="@drawable/publish_layer"
+                android:src="@mipmap/end"
                 android:contentDescription="@string/disconnect_call"
                 android:layout_width="32dp"
                 android:layout_height="fill_parent"
