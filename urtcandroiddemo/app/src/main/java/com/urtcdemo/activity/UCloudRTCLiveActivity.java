@@ -127,8 +127,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     @CommonUtils.PubScribeMode
     private int mScribeMode;
     private int mVideoProfileSelect;
-    private int localViewWidth;
-    private int localViewHeight;
+    private int localViewWidth_portrait;
+    private int localViewHeight_portrait;
+    private int localViewWidth_landscape;
+    private int localViewHeight_landscape;
     private int screenWidth;
     private int screenHeight;
     private boolean mExtendCameraCapture;
@@ -154,7 +156,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private DrawerLayout mDrawer;
     private ViewGroup mDrawerContent;
     private FrameLayout mDrawerMenu;
-    private FrameLayout mTitleBar;
+    private LinearLayout mTitleBar;
     private LinearLayout mToolBar;
     private ImageButton mImgBtnMore;
     private ImageButton mImgBtnSwitchCam;
@@ -183,6 +185,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private ImageView mImgControlMixSound;
     private TextView mTextControlMixSound;
     private TextView mTextRoomId;
+    private TextView mTextUserId;
     private ImageView mImgPreview;
     private TextView mTextPreview;
     private TextView mTextResolution;
@@ -306,13 +309,17 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         //房间号
         mTextRoomId = findViewById(R.id.roomid_text);
-        mTextRoomId.setText("RoomID:" + mRoomid);
+        mTextRoomId.setText("房间号:" + mRoomid);
         mMirror = UCloudRtcSdkEnv.isFrontCameraMirror();
         mImgBtnMirror.setImageResource(mMirror ? R.mipmap.mirror_on :
                 R.mipmap.mirror);
         //分辨率选择菜单
         String[] resolutions = getResources().getStringArray(R.array.videoResolutions);
         mResolutionOption.addAll(Arrays.asList(resolutions));
+
+        //用户ID
+        mTextUserId = findViewById(R.id.userid_text);
+        mTextUserId.setText("用户ID:" + mUserid);
 
         Log.d(TAG, " Camera enable is: " + mCameraEnable + " Mic enable is: " + mMicEnable + " ScreenShare enable is: " + mScreenEnable);
         if (!mScreenEnable && !mCameraEnable && mMicEnable) {
@@ -778,8 +785,24 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                                 // 回显view布局设置
                                 mLocalVideoView.setBackgroundColor(Color.TRANSPARENT);
                                 mLocalVideoView.setVisibility(View.VISIBLE);
-                                localViewWidth = mLocalVideoView.getMeasuredWidth();
-                                localViewHeight = mLocalVideoView.getMeasuredHeight();
+                                // 获取当前横竖屏模式
+                                if (UCloudRTCLiveActivity.this.getResources().getConfiguration().orientation
+                                        == Configuration.ORIENTATION_LANDSCAPE) {
+                                    Log.i("info", "landscape"); // 横屏
+                                    localViewWidth_landscape = mLocalVideoView.getMeasuredWidth();
+                                    localViewHeight_landscape = mLocalVideoView.getMeasuredHeight();
+                                    localViewWidth_portrait = screenWidth;
+                                    localViewHeight_portrait = screenWidth - mToolBar.getHeight() - mTitleBar.getHeight();
+                                }
+                                else if (UCloudRTCLiveActivity.this.getResources().getConfiguration().orientation
+                                        == Configuration.ORIENTATION_PORTRAIT) {
+                                    Log.i("info", "portrait"); // 竖屏
+                                    localViewWidth_portrait = mLocalVideoView.getMeasuredWidth();
+                                    localViewHeight_portrait = mLocalVideoView.getMeasuredHeight();
+                                    localViewWidth_landscape = screenHeight;
+                                    localViewHeight_landscape = screenWidth - mTitleBar.getHeight() - mToolBar.getHeight();
+                                }
+
                                 if (!mIsPreview) {
                                     if (mExtendCameraCapture) { // 扩展摄像头开启渲染
                                         sdkEngine.renderLocalView(info,
@@ -1583,64 +1606,6 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 v.setTag(mSwapStreamInfo);
                 mVideoAdapter.updateSwapInfo(clickStreamInfo,mSwapStreamInfo);
                 mSwapStreamInfo = clickStreamInfo;
-
-
-
-//                String key = ((URTCVideoViewInfo) v.getTag(R.id.index)).getKey();
-//                if (mVideoAdapter.checkCanSwap(key)) {
-//                    boolean state = mVideoAdapter.checkState(key);
-//                    if (!state) {
-//                        UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
-//                        sdkEngine.stopRemoteView(remoteStreamInfo);
-//                        if (mLocalStreamInfo != null) {
-//                            sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
-//                            sdkEngine.renderLocalView(mLocalStreamInfo, (UCloudRtcSdkSurfaceVideoView) v, null, null);
-//                            v.setTag(R.id.swap_info, mLocalStreamInfo);
-//                        }
-//                        sdkEngine.startRemoteView(remoteStreamInfo, mLocalVideoView, null, null);
-//                        ((UCloudRtcSdkSurfaceVideoView) v).refreshRemoteOp(View.INVISIBLE);
-//                        //((UCloudRtcSdkSurfaceVideoView) mLocalVideoView).refreshRemoteOp(View.VISIBLE);
-//                        mLocalVideoView.setTag(R.id.swap_info, remoteStreamInfo);
-//                        if (mClass == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE) {
-//                            mLocalVideoView.setVisibility(View.VISIBLE);
-//                            mLocalVideoView.setTag(R.id.view_info, v);
-//                            mLocalVideoView.setBackgroundColor(Color.TRANSPARENT);
-//                            v.setVisibility(View.INVISIBLE);
-////和本地view截图功能触发重叠，App使用者可以另行定义触发
-//                            mLocalVideoView.setOnClickListener(new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    if (v instanceof UCloudRtcSdkSurfaceVideoView) {
-//                                        mLocalVideoView.setVisibility(View.INVISIBLE);
-//                                        UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag(R.id.swap_info);
-//                                        sdkEngine.stopRemoteView(remoteStreamInfo);
-//                                        UCloudRtcSdkSurfaceVideoView view = (UCloudRtcSdkSurfaceVideoView) v.getTag(R.id.view_info);
-//                                        view.setVisibility(View.VISIBLE);
-//                                        view.refreshRemoteOp(View.VISIBLE);
-//                                        sdkEngine.startRemoteView(remoteStreamInfo, view, null, null);
-//                                        mVideoAdapter.reverseState(key);
-//                                    }
-//                                }
-//                            });
-//                        }
-//                    } else {
-//                        //有交换过
-//                        UCloudRtcSdkStreamInfo remoteStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
-//                        //停止交换过的大窗渲染远端
-//                        sdkEngine.stopRemoteView(remoteStreamInfo);
-//                        //停止本地视频渲染
-//                        sdkEngine.stopPreview(mLocalStreamInfo.getMediaType());
-//                        sdkEngine.renderLocalView(mLocalStreamInfo, mLocalVideoView, null, null);
-//                        sdkEngine.startRemoteView(remoteStreamInfo, (UCloudRtcSdkSurfaceVideoView) v, null, null);
-//                        ((UCloudRtcSdkSurfaceVideoView) v).refreshRemoteOp(View.VISIBLE);
-//                        //((UCloudRtcSdkSurfaceVideoView) mLocalVideoView).refreshRemoteOp(View.INVISIBLE);
-//                        v.setTag(R.id.swap_info, null);
-//                        mLocalVideoView.setTag(R.id.swap_info, null);
-//                    }
-//                    mVideoAdapter.reverseState(key);
-//                } else {
-//                    ToastUtils.shortShow(UCloudRTCLiveActivity.this, "其它窗口已经交换过，请先交换回来");
-//                }
             }
         }
     };
@@ -1799,6 +1764,38 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         timeShow.stop();
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d(TAG, "onConfigurationChanged");
+        int tempScreen = 0;
+        // 呼唤全屏参数
+        tempScreen = screenHeight;
+        screenHeight = screenWidth;
+        screenWidth = tempScreen;
+
+        if (mLocalViewFullScreen) {
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(screenWidth, screenHeight + mToolBar.getHeight());
+            params.setMargins(0, 0, 0, 0);
+            mLocalVideoView.setLayoutParams(params);
+        } else {
+            if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(localViewWidth_portrait, localViewHeight_portrait);
+                params.setMargins(0, mTitleBar.getHeight(), 0, mToolBar.getHeight());
+                mLocalVideoView.setLayoutParams(params);
+                Log.d(TAG, "PORTRAIT screen. localViewWidth: " + localViewWidth_portrait + " localViewHeight: " + localViewHeight_portrait);
+            }
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(localViewWidth_landscape, localViewHeight_landscape);
+                params.setMargins(0, mTitleBar.getHeight(), 0, mToolBar.getHeight());
+                mLocalVideoView.setLayoutParams(params);
+                Log.d(TAG, "LANDSCAPE screen. localViewWidth: " + localViewWidth_landscape + " localViewHeight: " + localViewHeight_landscape);
+            }
+
+
+        }
+    }
+
     public void toggleFullScreen() {
         if (!mLocalViewFullScreen) {
             setSystemUIVisible(false);
@@ -1820,8 +1817,16 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             Log.d(TAG, "Switch full screen width: " + params.width + " height: " + params.height);
         } else {
             setSystemUIVisible(true);
+            FrameLayout.LayoutParams params = null;
             //退出全屏
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(localViewWidth, localViewHeight);
+            // 获取当前横竖屏模式
+            if (UCloudRTCLiveActivity.this.getResources().getConfiguration().orientation
+                    == Configuration.ORIENTATION_LANDSCAPE) {
+                params = new FrameLayout.LayoutParams(localViewWidth_landscape, localViewHeight_landscape);
+            }
+            else {
+                params = new FrameLayout.LayoutParams(localViewWidth_portrait, localViewHeight_portrait);
+            }
             params.setMargins(0, mTitleBar.getHeight(), 0, mToolBar.getHeight());
             mLocalVideoView.setLayoutParams(params);
             //显示顶部标题和底部工具栏

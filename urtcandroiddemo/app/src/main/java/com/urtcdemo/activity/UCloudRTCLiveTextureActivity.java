@@ -158,7 +158,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     private DrawerLayout mDrawer;
     private ViewGroup mDrawerContent;
     private FrameLayout mDrawerMenu;
-    private FrameLayout mTitleBar;
+    private LinearLayout mTitleBar;
     private LinearLayout mToolBar;
     private ImageButton mImgBtnMore;
     private ImageButton mImgBtnSwitchCam;
@@ -187,6 +187,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     private ImageView mImgControlMixSound;
     private TextView mTextControlMixSound;
     private TextView mTextRoomId;
+    private TextView mTextUserId;
     private ImageView mImgPreview;
     private TextView mTextPreview;
     private TextView mTextResolution;
@@ -309,13 +310,17 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
         //房间号
         mTextRoomId = findViewById(R.id.roomid_text);
-        mTextRoomId.setText("RoomID:" + mRoomid);
+        mTextRoomId.setText("房间号:" + mRoomid);
         mMirror = UCloudRtcSdkEnv.isFrontCameraMirror();
         mImgBtnMirror.setImageResource(mMirror ? R.mipmap.mirror_on :
                 R.mipmap.mirror);
         //分辨率选择菜单
         String[] resolutions = getResources().getStringArray(R.array.videoResolutions);
         mResolutionOption.addAll(Arrays.asList(resolutions));
+
+        //用户ID
+        mTextUserId = findViewById(R.id.userid_text);
+        mTextUserId.setText("用户ID:" + mUserid);
 
         Log.d(TAG, " Camera enable is: " + mCameraEnable + " Mic enable is: " + mMicEnable + " ScreenShare enable is: " + mScreenEnable);
         if (!mScreenEnable && !mCameraEnable && mMicEnable) {
