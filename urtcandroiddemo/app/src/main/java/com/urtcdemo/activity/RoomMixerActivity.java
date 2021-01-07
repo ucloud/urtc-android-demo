@@ -138,7 +138,9 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private RemoteVideoAdapter mVideoAdapter;
     RecyclerView mRemoteGridView = null;
     UCloudRtcSdkEngine sdkEngine = null;
+    //手动发布按钮
     ImageButton mPublish = null;
+    //挂断
     ImageButton mHangup = null;
     ImageButton mSwitchcam = null;
     ImageButton mMuteMic = null;
@@ -204,7 +206,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
     private boolean turnHdmiOnlyVoiceOff = false;
     private boolean turnHeadSetOff = false;
     private boolean driverEarReturn = false;
-    private boolean mixSourceWithRtsp = false;
+    private boolean mixSourceWithRtsp = true;
     private ViewGroup mViewGroup;
     private String RTSP_BACKUP_URL = "rtsp://192.168.161.148:554/ch3";
     private String RTSP_BACKUP_UR_MIXED = "rtsp://192.168.165.121:554/ch3";
@@ -613,6 +615,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             });
         }
 
+        //发布结果回调，code = 0 即成功
         @Override
         public void onLocalPublish(int code, String msg, UCloudRtcSdkStreamInfo info) {
             runOnUiThread(new Runnable() {
@@ -733,7 +736,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                     if (!mUserid.equals(info.getUId())) {
                         mSteamList.add(info);
                         if (!sdkEngine.isAutoSubscribe()) {
-//                            sdkEngine.subscribe(info);
+                            sdkEngine.subscribe(info);
                         } else {
                             mSpinnerPopupWindowScribe.notifyUpdate();
                             refreshStreamInfoText();
@@ -861,6 +864,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             });
         }
 
+        //订阅结果回调
         @Override
         public void onUnSubscribeResult(int code, String msg, UCloudRtcSdkStreamInfo info) {
             runOnUiThread(new Runnable() {
@@ -1411,7 +1415,6 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         testT = findViewById(R.id.test_t);
         testB = findViewById(R.id.test_bottom);
         mSeekBar = findViewById(R.id.seek_volume);
-
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -1541,13 +1544,13 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
             @Override
             public void onClick(View v) {
                 if(!driverEarReturn) {
-//                    sdkEngine.enableEarBack(true);
+                    sdkEngine.enableEarBack(true);
 //                    mEarReturnBtn.setText("EarBackOff");
-                    sdkEngine.hackVideoChannel();
+//                    sdkEngine.hackVideoChannel();
                 }else{
-//                    sdkEngine.enableEarBack(false);
+                    sdkEngine.enableEarBack(false);
 //                    mEarReturnBtn.setText("EarBackOn");
-                    sdkEngine.recoverVideoChannel();
+//                    sdkEngine.recoverVideoChannel();
                 }
                 driverEarReturn = !driverEarReturn;
             }
@@ -1783,6 +1786,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
         mPublish = findViewById(R.id.button_call_pub);
         UcloudRtcCameraMixConfig.RTSP_URL_MIX = preferences.getString(CommonUtils.RTSP_URL_KEY_MIXED,CommonUtils.RTST_URL_MIXED);
         UcloudRtcCameraMixConfig.RTSP_URL = preferences.getString(CommonUtils.RTSP_URL_KEY,CommonUtils.RTST_URL);
+        //手动发布流程
         mPublish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1790,7 +1794,8 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                     sdkEngine.setStreamRole(UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH);
                     List<Integer> results = new ArrayList<>();
                     StringBuffer errorMessage = new StringBuffer();
-                    mCaptureMode = CommonUtils.multi_capture_mode;
+                    //设置了单流rtsp发布
+                    mCaptureMode = CommonUtils.screen_capture_mode;
                     switch (mCaptureMode) {
                         //音频
                         case CommonUtils.audio_capture_mode:
@@ -1800,7 +1805,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                         case CommonUtils.camera_capture_mode:
                             results.add(sdkEngine.publish(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, true, true,false,mixSourceWithRtsp).getErrorCode());
                             break;
-                        //屏幕捕捉
+                        //rtsp发布单流
                         case CommonUtils.screen_capture_mode:
                             String rtspurl = preferences.getString(CommonUtils.RTSP_URL_KEY, CommonUtils.RTST_URL);
                             UcloudRtcCameraMixConfig.RTSP_URL = rtspurl;
@@ -2062,7 +2067,7 @@ public class RoomMixerActivity extends AppCompatActivity implements VideoListene
                     UcloudRtcCameraMixConfig.RTSP_URL_MIX = preferences.getString(CommonUtils.RTSP_URL_KEY_MIXED,CommonUtils.RTST_URL_MIXED);
                     UcloudRtcCameraMixConfig.RTSP_URL = preferences.getString(CommonUtils.RTSP_URL_KEY,CommonUtils.RTST_URL);
                 }
-                sdkEngine.changeRTSPUrlMixed();
+//                sdkEngine.changeRTSPUrlMixed();
                 sdkEngine.changeRTSPUrl();
                 changeRTSPFlag = !changeRTSPFlag;
 

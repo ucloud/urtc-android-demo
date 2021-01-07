@@ -39,21 +39,11 @@
                             android:id="@+id/LocalMixView"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"/>
-<!--                           <TextureView-->
-<!--                               android:layout_width="match_parent"-->
-<!--                               android:layout_height="match_parent"-->
-<!--                               android:id="@+id/LocalMixView"></TextureView>-->
-
 
                         <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
                             android:id="@+id/TestRemoteView"
                             android:layout_width="200dp"
                             android:layout_height="150dp"/>
-<!--                        <TextureView-->
-<!--                            android:layout_width="match_parent"-->
-<!--                            android:layout_height="match_parent"-->
-<!--                            android:id="@+id/TestRemoteView"-->
-<!--                            android:visibility="gone"></TextureView>-->
 
                     </FrameLayout>
 
