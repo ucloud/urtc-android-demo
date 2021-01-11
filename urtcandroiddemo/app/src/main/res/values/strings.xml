@@ -280,4 +280,11 @@
     <string name="pub_cancel_video">取消音视频发布</string>
     <string name="pub_cancel_screen">取消屏幕发布</string>
     <string name="extend_camera">外接扩展摄像</string>
+
+    <string name="start_local_mix_sound">本地混音</string>
+    <string name="local_sound_mixing">本地混音中</string>
+    <string name="start_remote_mix_sound">远端混音</string>
+    <string name="remote_sound_mixing">远端混音中</string>
+    <string name="pause_mixing_sound">暂停混音</string>
+    <string name="resume_mixing_sound">恢复混音</string>
 </resources>

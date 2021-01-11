@@ -143,6 +143,60 @@
                 android:textSize="12sp"
                 android:gravity="center"
                 android:maxLines="1"/>
+            <ImageView
+                android:id="@+id/local_mix_pic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/lsq_color_transparent"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:src="@mipmap/local_mix_sound" />
+            <TextView
+                android:id="@+id/local_mix_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/start_local_mix_sound"
+                android:textColor="@color/lsq_color_white"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:maxLines="1"/>
+            <ImageView
+                android:id="@+id/remote_mix_pic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/lsq_color_transparent"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:src="@mipmap/remote_mix_sound" />
+            <TextView
+                android:id="@+id/remote_mix_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/start_remote_mix_sound"
+                android:textColor="@color/lsq_color_white"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:maxLines="1"/>
+            <ImageView
+                android:id="@+id/control_mix_pic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@color/lsq_color_transparent"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:src="@mipmap/pause" />
+            <TextView
+                android:id="@+id/control_mix_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/pause_mixing_sound"
+                android:textColor="@color/lsq_color_white"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:maxLines="1"/>
         </LinearLayout>
     </ScrollView>
 </FrameLayout>
