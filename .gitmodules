@@ -1,0 +1,7 @@
+[submodule "urtcandroiddemo/urtc-sdk-android"]
+	path = urtcandroiddemo/urtc-sdk-android
+	url = https://git.ucloudadmin.com/urtc/urtc-sdk-android.git
+
+[submodule "urtcandroiddemo/ucloud_business_sdk"]
+	path = urtcandroiddemo/ucloud_business_sdk
+	url = https://git.ucloudadmin.com/urtc/sdk/urtc-sdk-business-android.git

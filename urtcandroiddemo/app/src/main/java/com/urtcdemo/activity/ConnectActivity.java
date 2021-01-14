@@ -260,7 +260,15 @@ public class ConnectActivity extends AppCompatActivity {
     private void startLivingActivity() {
         if (!mStartSuccess) {
             mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+            SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
+                    Context.MODE_PRIVATE);
+            boolean extendCameraCapture = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
+            final Intent intent;
+            if (extendCameraCapture) {
+                intent = new Intent(ConnectActivity.this, UCloudRTCLiveTextureCustomActivity.class);
+            }else {
+                intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+            }
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
 //            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;

@@ -10,6 +10,8 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 
+import com.faceunity.nama.ui.BeautyParameterModel;
+import com.faceunity.nama.utils.PreferenceUtil;
 import com.github.moduth.blockcanary.BlockCanaryContext;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
@@ -39,6 +41,8 @@ public class UCloudRtcApplication extends Application {
 //            Log.d(TAG, "init: ");
             init();//判断成功后才执行初始化代码
         }
+        PreferenceUtil.init(this);
+        BeautyParameterModel.init();
     }
 
     public UCloudRtcSdkEngine createRtcEngine(UCloudRtcSdkEventListener eventListener){

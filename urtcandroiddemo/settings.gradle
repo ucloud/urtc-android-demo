@@ -1,1 +1,1 @@
-include ':app' ,'urtc-sdk-android', 'libuvccamera'
+include ':app' ,'urtc-sdk-android', 'libuvccamera','faceunity'
