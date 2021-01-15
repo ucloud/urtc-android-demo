@@ -658,6 +658,7 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
     protected void onDestroy() {
         Log.d(TAG, "activity destory");
         super.onDestroy();
+        releaseExtendCamera();
         System.gc();
     }
 
@@ -1454,6 +1455,28 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
         UCloudRtcSdkEnv.setFrontCameraMirror(mMirror);
         mImgBtnMirror.setImageResource(mMirror ? R.mipmap.mirror_on :
                 R.mipmap.mirror);
+    }
+
+    private void releaseExtendCamera() { // 释放扩展摄像头资源
+        if (mUCloudRTCDataProvider != null) {
+            mUCloudRTCDataProvider.releaseBuffer();
+            mUCloudRTCDataProvider = null;
+        }
+        if (mCameraRenderer != null) {
+            mCameraRenderer.releaseBuffer();
+            mCameraRenderer = null;
+        }
+        if (UCloudRtcSdkEnv.getCaptureMode() == UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND) {
+            //这里回收一遍
+            while (mQueueByteBuffer.size() != 0) {
+                ByteBuffer videoData = mQueueByteBuffer.poll();
+                if (videoData != null) {
+                    Log.d("UCloudRTCLiveActivity", "videoData clear");
+                    videoData.clear();
+                    videoData = null;
+                }
+            }
+        }
     }
 
     private void endCall() {

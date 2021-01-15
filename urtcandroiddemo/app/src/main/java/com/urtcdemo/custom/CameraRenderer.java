@@ -14,10 +14,16 @@ import android.widget.Toast;
 
 import com.faceunity.nama.FURenderer;
 import com.faceunity.nama.IFURenderer;
+import com.serenegiant.io.ByteBufferOutputStream;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataProvider;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.List;
 
 /**
@@ -46,6 +52,7 @@ public class CameraRenderer implements Camera.PreviewCallback, UCloudRTCDataProv
     private int mSkippedFrames;
     private FURenderer mFURenderer;
     private UCloudRtcSdkEngine mRtcSdkEngine;
+    private final Object syncObject = new Object();
 
     public CameraRenderer(Activity activity, UCloudRtcSdkEngine sdkEngine, FURenderer.OnDebugListener listener) {
         mActivity = activity;
@@ -118,14 +125,42 @@ public class CameraRenderer implements Camera.PreviewCallback, UCloudRTCDataProv
         });
     }
 
+    private int limit = 1;
+    private int limitPreview = 1;
+    private boolean mHasData = false;
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
-        mCamera.addCallbackBuffer(data);
-        mSurfaceTexture.updateTexImage();
-        long start = System.nanoTime();
-        mFURenderer.onDrawFrameDualInput(data, mCameraTextureId, mCameraWidth, mCameraHeight,
-                mReadbackByte, mCameraHeight, mCameraWidth);
-        long time = System.nanoTime() - start;
+
+        synchronized (syncObject){
+            mCamera.addCallbackBuffer(data);
+            mSurfaceTexture.updateTexImage();
+            long start = System.nanoTime();
+
+            mFURenderer.onDrawFrameDualInput(data, mCameraTextureId, mCameraWidth, mCameraHeight,
+                    mReadbackByte, mCameraHeight, mCameraWidth);
+            if(!mHasData){
+                mHasData = true;
+            }
+//            if (limitPreview++ < 4) {
+//                String name = "/mnt/sdcard/urtcyuv/"+System.currentTimeMillis() +".yuv";
+//                String dirName = "/mnt/sdcard/urtcyuv";
+//                File dir = new File(dirName);
+//                if(!dir.exists()){
+//                    dir.mkdirs();
+//                }
+//                File file = new File(name);
+//                try {
+//                    FileOutputStream out = new FileOutputStream(file);
+//                    out.write(mReadbackByte);
+//                    out.flush();
+//                    Log.d(TAG, "write yuv: " + name);
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
+//            }
+
+                long time = System.nanoTime() - start;
+        }
     }
 
     private void openCamera(int cameraFacing) {
@@ -181,6 +216,7 @@ public class CameraRenderer implements Camera.PreviewCallback, UCloudRTCDataProv
         }
         try {
             mCamera.stopPreview();
+            mHasData = false;
             if (mPreviewCallbackBuffer == null) {
                 mPreviewCallbackBuffer = new byte[PREVIEW_BUFFER_COUNT][mCameraWidth * mCameraHeight
                         * ImageFormat.getBitsPerPixel(ImageFormat.NV21) / 8];
@@ -243,26 +279,59 @@ public class CameraRenderer implements Camera.PreviewCallback, UCloudRTCDataProv
     private ByteBuffer mCacheBuffer;
 
     private int time = 1;
-
     @Override
     public ByteBuffer provideRGBData(List<Integer> params) {
 
-        if (mReadbackByte == null) {
+        if (mReadbackByte == null || !mHasData) {
+            Log.d(TAG, "provideRGBData: no data yet");
             return null;
         }
 
         if (mCacheBuffer == null) {
-            mCacheBuffer = ByteBuffer.allocateDirect(mReadbackByte.length);
+            mCacheBuffer = mRtcSdkEngine.getNativeOpInterface().createNativeByteBuffer(mReadbackByte.length);
         } else {
             mCacheBuffer.clear();
         }
         params.add(UCloudRTCDataProvider.NV21);
         params.add(mCameraHeight);
         params.add(mCameraWidth);
+        synchronized (syncObject){
+            mCacheBuffer.put(mReadbackByte);
+            mCacheBuffer.position(0);
+//            if (limit++ < 4) {
+//                String name = "/mnt/sdcard/urtcyuv/cache_"+System.currentTimeMillis() +".yuv";
+//                String dirName = "/mnt/sdcard/urtcyuv";
+//                File dir = new File(dirName);
+//                if(!dir.exists()){
+//                    dir.mkdirs();
+//                }
+//                File file = new File(name);
+//                RandomAccessFile store = null;
+//                try {
+//                    if(!file.exists()){
+//                        file.createNewFile();
+//                    }
+//                     store = new RandomAccessFile(name, "rw");
+//                    // getting FileChannel from file
+//                    FileChannel channel = store.getChannel();
+//                    Log.d(TAG, "cache position: " + mCacheBuffer.position());
+////                    mCacheBuffer.flip();
+//                    channel.write(mCacheBuffer);
+//                    Log.d(TAG, "write yuv_cache: " + name);
+//                    store.close();
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                    if(store!= null){
+//                        try {
+//                            store.close();
+//                        } catch (IOException ex) {
+//                            ex.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }
 
-        mCacheBuffer.put(mReadbackByte);
-        mCacheBuffer.position(0);
-
+        }
         return mCacheBuffer;
     }
 
