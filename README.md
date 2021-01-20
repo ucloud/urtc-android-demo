@@ -21,28 +21,19 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
 * 支持获取sdk版本
 * 支持大班小班切换功能
 
-## 2.2 增值功能
-* 终端智能测试（摄像头、麦克风、网络、播放器）
-* 视频录制/视频存储
-* 视频水印
-* 视频直播CDN分发
-* 美颜
-* 贴纸/滤镜/哈哈镜
-* 背景分割
-* 手势
-* 虚拟形象
-* 变声
 * 自定义的外部输入和输出扩展接口
 
 ## 2.3 文档地址
-* https://docs.ucloud.cn/video/urtc/index.html 
+* sdk通用功能使用请参考 https://docs.ucloud.cn/urtc/sdk/index
+
+* android api 文档 请参考 demo 所附 的ucloud_rtc_android_api_xxx.zip  javadoc文档
+
+* 快速使用只阐述了最基本的demo使用方式，更多详细的功能使用请参考
+
+  https://docs.ucloud.cn/urtc/sdk/index 中的常用功能列表 以及 demo 所附URTC Android_master.docx 文档
 
 # 3 方案优势
 
-## 3.1 方案架构
-![](http://urtcwater.cn-bj.ufileos.com/%E5%9B%BE%E7%89%871.png)
-
-## 3.2 方案优势
 * 利用边缘节点就近接入
 * 可用性99.99%
 * 智能链路调度
@@ -78,9 +69,27 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
 提供云端存储空间及海量数据的处理能力，提供高可用的技术和高稳定的平台
 
 # 5 快速使用
-## 5.1 初始化
-### 5.1.1 引擎环境初始化
-主要配置日志等级，android context，sdkmode，AppID以及测试用的SEC_KEY(AppKey)
+
+- ### APP_ID&APP_KEY
+
+demo运行支持 两种token模式，测试模式，正式模式，通过sdk环境变量来控制
+
+```
+//测试模式
+UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
+//正式模式
+UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_NORMAL);
+```
+
+测试模式下适合快速浏览开发 demo功能，此模式下引用的 sdk 根据APP_ID & APP_KEY 自动生成 测试token，因此运行在测试模式下的话需要先配置下CommonUtils.java 文件中 APP_ID & APP_KEY 字段，APP_ID & APP_KEY 字段的获取请参考 https://docs.ucloud.cn/urtc/quick 
+
+正式模式下的 token 一般由sdk使用方的 业务服务端生成，生成算法请参考
+
+https://docs.ucloud.cn/urtc/sdk/token
+
+- ### 引擎环境初始化
+
+主要配置日志等级，android context，sdkmode
 ~~~
 public class UCloudRtcApplication extends Application {
     @Override
@@ -107,19 +116,12 @@ public class UCloudRtcApplication extends Application {
 		//重连次数
 		UCloudRtcSdkEnv.setReConnectTimes(60);
 		//设置测试模式的用户私有秘钥
-		UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.SEC_KEY);
-
-		WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-		DisplayMetrics outMetrics = new DisplayMetrics();
-		windowManager.getDefaultDisplay().getMetrics(outMetrics);
-		CommonUtils.mItemWidth = (outMetrics.widthPixels - UiHelper.dipToPx(this, 15)) / 3;
-		CommonUtils.mItemHeight = CommonUtils.mItemWidth;
-		//初始化bugly日志
-		CrashReport.initCrashReport(getApplicationContext(), "9a51ae062a", true);
+		UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.APP_KEY);
 	}
 }
 ~~~
-### 5.1.2 继承实现UCloudRtcSdkEventListener 实现事件处理
+- ### 继承实现UCloudRtcSdkEventListener 实现事件处理
+
 ~~~
 UCloudRtcSdkEventListener eventListener = new UCloudRtcSdkEventListener() {
     @Override
@@ -155,7 +157,8 @@ UCloudRtcSdkEventListener eventListener = new UCloudRtcSdkEventListener() {
         });
     }
 ~~~
-### 5.1.3 获取SDK 引擎 并进行基础配置
+- ### 获取SDK 引擎 并进行基础配置
+
 ~~~
 sdkEngine = UCloudRtcSdkEngine.createEngnine(eventListener) ;
 sdkEngine.setAudioOnlyMode(true) ; // 设置纯音频模式
@@ -168,121 +171,17 @@ sdkEngine.setAutoSubscribe(true) ;// 是否自动订阅
 sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfile)) ;// 摄像头输出等级
 ~~~
 
-## 5.2 加入房间
-~~~
+- ### 加入房间
+
+```
 UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo();
-info.setAppId(mAppid); // UCloud控制台创建项目获取到的AppID
-info.setToken(mRoomToken); // 客户端向后台服务器申请得到的Token
+info.setAppId(mAppid);
+info.setToken(mRoomToken);
 info.setRoomId(mRoomid);
 info.setUId(mUserid);
 Log.d(TAG, " roomtoken = " + mRoomToken);
 sdkEngine.joinChannel(info);
-~~~
-Appid在开通URTC服务后从UCloud控制台获取，开通服务参考：https://docs.ucloud.cn/urtc/quick
+```
 
-Token生成指导参考：https://docs.ucloud.cn/urtc/sdk/token
-## 5.3 自动/手动发布
-如果配置了自动发布无需调用发布视频接口，SDK会在用户成功加入房间后自动发布，只需要监听事件调用渲染接口即可。
-如果配置了手动发布需要调用sdkEngine引擎的publish接口 配置手动/自动发布
-### 5.3.1 媒体发布类型
-现在的类型包括两大类，需要传入publish接口的mtype,hasvideo,hasaudio参数各不相同，混合类型是单一类型的组合，具体代码可参阅UCloudRtcdemo的RoomActvity中的处理。
-1.	混合类型 音频+屏幕，视频+屏幕
 
-2.	单一类型 音频 （mtype:UCloudRtc_sdk_media_type_video,hasvideo:false,hasaudio:true），视频（mtype:UCloudRtc_sdk_media_type_video,hasvideo:true,hasaudio:true），屏幕 （mtype:UCloudRtc_sdk_media_type_screen,hasvideo:true,hasaudio:false）
-### 5.3.2 渲染媒体流
-在onLocalPublish 回调成功后，再函数中可以调用视频渲染
-~~~
-localrenderview.setBackgroundColor(Color.TRANSPARENT);
-sdkEngine.startPreview(info.getmMediatype(), localrenderview);
-//不想渲染时可以调用停止渲染接口
-sdkEngine.stopPreview(UCloudRtcSdkMediaType mediatype)
-~~~
-### 5.3.3 取消媒体发布流
-~~~
-sdkEngine.unPublish(UCloudRtcSdkMediaType mtype)
-//回调事件
-public void onLocalUnPublish(int code, String msg, UCloudRtcSdkStreamInfo info) 
-~~~
-
-## 5.4 自动/手动订阅
-### 5.4.1 订阅媒体流
-~~~
-sdkEngine.subscribe(UCloudRtcSdkStreamInfo info)
-//回调事件
-public void onSubscribeResult(int code, String msg, UCloudRtcSdkStreamInfo info) 
-~~~
-### 5.4.2 取消媒体发布流
-在onSubscribeResult回调成功后，再函数中可以调用视频渲染
-~~~
-sdkEngine. startRemoteView(UCloudRtcSdkStreamInfo info, UCloudRtcSdkSurfaceVideoView renderview)
-//不想渲染时可以调用定制渲染接口
-sdkEngine.stopPreview(UCloudRtcSdkMediaType mediatype)
-~~~
-### 5.4.3 取消订阅媒体流
-~~~
-sdkEngine. subscribe(UCloudRtcSdkStreamInfo info) 
-//回调事件
-public void onUnSubscribeResult(int code, String msg, UCloudRtcSdkStreamInfo info)
-~~~
-
-## 5.5 权限控制
-权限分为发布，订阅，全部权限，全部权限包括了发布和订阅
-~~~
-//接口
-public int setStreamRole(UCloudRtcSdkStreamRole role)
-~~~
-## 5.6 录像
-### 5.6.1 录像开始
-录像目前只支持摄像头录制，不支持桌面录制，region和bucket这两个参数默认用了ucloud自己的region和bucket，如果用自己的需要上ucloud控制台申请自己的录像存储空间，服务器会通过UCloudRtcSdkEventListener 的onRecordStart()接口作为回调返回录像开始结果。
-
-需要特别注意的是，录像可以指定主界面是哪个用户，当非均衡模式的情况下，主界面是哪个用户，哪个用户就占据大窗口。同时，这里的用户可以是当前App中推流的用户，也可以是当前App中被订阅的用户，这个参数只要靠mainviewuid去实现，如果是上述第一种情况，可以不指定，sdk自动获取，如果是第二种，就需要App SDK使用者拿到当前订阅的用户id，用这个id去设置录像的mainviewuid
-
-更多的录像的参数说明可以参照sdk文档以及https://github.com/UCloudDocs/urtc/blob/master/cloudRecord/RecordLaylout.md
-
-~~~
-//                如果主窗口是当前用户
-UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-                        .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
-                        .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-                        .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
-                        .Average(UcloudRtcSdkRecordProfile.RECORD_UNEVEN)
-                        .WaterType(UcloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
-                        .WaterPosition(UcloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
-                        .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
-                        .Template(UcloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
-                        .build();
-                sdkEngine.startRecord(recordProfile);
-                //如果主窗口不是当前推流用户，而是被订阅的用户
-//                UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo = mVideoAdapter.getStreamInfo(0);
-//                if(uCloudRtcSdkStreamInfo != null){
-//                    UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-//                            .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
-//                            .mainViewUserId(uCloudRtcSdkStreamInfo.getUId())
-//                            .mainViewMediaType(uCloudRtcSdkStreamInfo.getMediaType().ordinal())
-//                            .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
-//                            .Average(UcloudRtcSdkRecordProfile.RECORD_UNEVEN)
-//                            .WaterType(UcloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
-//                            .WaterPosition(UcloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
-//                            .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
-//                            .Template(UcloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
-//                            .build();
-//                    sdkEngine.startRecord(recordProfile);
-//                }
-//UCloudRtcSdkEventListener
-void onRecordStart(int code,String fileName);
-~~~
-
-### 5.6.2录像结束
-服务器会通过UCloudRtcSdkEventListener 的onRecordStop()接口作为回调返回录像结束结果。
-~~~
-sdkEngine.stopRecord();
-~~~
-## 5.7 外部扩展输入与输出
-sdk支持rgba系列数据（rgba，abgr，rgb565，）以及yuv420p的外部自定义输入，能够产出拉流的rgba,abgr的数据供使用者自行扩展使用，具体使用方式请参考demo内部的rgb转yuv接口使用说明.md 和 yuv转rgb接口使用说明.md
-## 5.8 离开房间
-~~~
-sdkEngine.leaveChannel() ;
-~~~
-
-## 5.9 编译运行
 
