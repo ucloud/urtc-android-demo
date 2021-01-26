@@ -38,11 +38,13 @@ public class CommonUtils {
     public static final String SDK_STREAM_ROLE = "SDK_STREAM_ROLE";
     public static final String SDK_CLASS_TYPE = "SDK_CLASS_TYPE";
     public static final String CAMERA_CAPTURE_MODE = "CAMERA_CAPTURE_MODE";
+    public static final String PRIVATISATION_MODE = "PRIVATISATION_MODE";
     public static final String EXTEND_CAMERA_VIDEO_FORMAT = "EXTEND_CAMERA_VIDEO_FORMAT";
 
     public static final String APP_ID_TAG = "APPID";
     public static final String APP_ID = "";
     public static final String APP_KEY = "";
+    public static final String PRIVATISATION_ADDRESS = "PRIVATISATION_ADDRESS";
 
     @IntDef({AUTO_MODE, MANUAL_MODE})
     public @interface  PubScribeMode {}

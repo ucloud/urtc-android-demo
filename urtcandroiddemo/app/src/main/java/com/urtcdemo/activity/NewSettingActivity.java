@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -33,6 +34,7 @@ public class NewSettingActivity extends AppCompatActivity {
     private int mSelectPos = 1;
     private ArrayAdapter<String> mAdapter;
     private VideoProfilePopupWindow mSpinnerPopupWindow;
+    private EditText mPriDeployEditText;
     private RadioGroupFlow mExtendVideoFormatRadioGroup;
     private RadioButton mNV21Format;
     private RadioButton mNV12Format;
@@ -52,6 +54,7 @@ public class NewSettingActivity extends AppCompatActivity {
 
     private List<String> mDefaultConfiguration = new ArrayList<>();
     private String mAppid;
+    private String mPriAddr;
 
     private LSwitch mCameraSwitch;
     private LSwitch mMicSwitch;
@@ -59,12 +62,14 @@ public class NewSettingActivity extends AppCompatActivity {
     private LSwitch mAutoPubSwitch;
     private LSwitch mAutoSubSwitch;
     private LSwitch mBroadcastSwitch;
+    private LSwitch mPriDeploySwitch;
     private LSwitch mExtendCameraSwitch;
 
     private boolean mEnableCamera;
     private boolean mEnableMic;
     private boolean mEnableScreen;
     private boolean mExtendCamera;
+    private boolean mPriDeploy;
     private int mExtendVideoFormat;
 
     @Override
@@ -74,6 +79,7 @@ public class NewSettingActivity extends AppCompatActivity {
         mEnableMic = true;
         mEnableScreen = false;
         mExtendCamera = false;
+        mPriDeploy = false;
 
         setContentView(R.layout.activity_setting_new);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -109,6 +115,8 @@ public class NewSettingActivity extends AppCompatActivity {
         mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
         mSubScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
         mExtendCamera = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
+        mPriDeploy = preferences.getBoolean(CommonUtils.PRIVATISATION_MODE, false);
+        mPriAddr = preferences.getString(CommonUtils.PRIVATISATION_ADDRESS, "");
         int roomInt = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL.ordinal());
         mRoomType = UCloudRtcSdkRoomType.valueOf(roomInt);
         StatusBarUtils.setAndroidNativeLightStatusBar(this,true);
@@ -160,6 +168,21 @@ public class NewSettingActivity extends AppCompatActivity {
             public void onChecked(boolean isChecked) {
                 mRoomType = isChecked ? UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE : UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL;
 
+            }
+        });
+        mPriDeployEditText = findViewById(R.id.privatisation_edittext);
+        mPriDeployEditText.setText(mPriAddr);
+        mPriDeploySwitch = findViewById(R.id.privatisation_switch);
+        mPriDeploySwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
+            @Override
+            public void onChecked(boolean isChecked) {
+                mPriDeploy = isChecked;
+                if (!isChecked) {
+                    mPriDeployEditText.setVisibility(View.GONE);
+                }
+                else {
+                    mPriDeployEditText.setVisibility(View.VISIBLE);
+                }
             }
         });
         mExtendCameraSwitch = findViewById(R.id.extend_camera_switch);
@@ -219,6 +242,7 @@ public class NewSettingActivity extends AppCompatActivity {
         mAutoPubSwitch.setChecked(mPublishMode == CommonUtils.AUTO_MODE);
         mAutoSubSwitch.setChecked(mSubScribeMode == CommonUtils.AUTO_MODE);
         mBroadcastSwitch.setChecked(mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE);
+        mPriDeploySwitch.setChecked(mPriDeploy);
         mExtendCameraSwitch.setChecked(mExtendCamera);
 
         mExtendVideoFormat = preferences.getInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, CommonUtils.i420_format);
@@ -291,6 +315,9 @@ public class NewSettingActivity extends AppCompatActivity {
         editor.putInt(CommonUtils.PUBLISH_MODE, mPublishMode);
         editor.putInt(CommonUtils.SUBSCRIBE_MODE, mSubScribeMode);
         editor.putInt(CommonUtils.SDK_CLASS_TYPE, mRoomType.ordinal());
+        editor.putBoolean(CommonUtils.PRIVATISATION_MODE, mPriDeploy);
+        mPriAddr = mPriDeployEditText.getText().toString();
+        editor.putString(CommonUtils.PRIVATISATION_ADDRESS, mPriAddr);
         editor.putBoolean(CommonUtils.CAMERA_CAPTURE_MODE, mExtendCamera);
         editor.putInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, mExtendVideoFormat);
 

@@ -102,6 +102,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private String mRoomid = "urtc1";
     private String mRoomToken = "test token";
     private String mAppid = "";
+    private String mPriAddr = "";
 
     private boolean mSwitchCamera = false;
     private boolean mMuteMic = false;
@@ -122,6 +123,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private boolean mRemoteVideoMute;
     private boolean mRemoteAudioMute;
     private boolean mIsPreview = false;
+    private boolean mIsPriDeploy = false;
     @CommonUtils.PubScribeMode
     private int mPublishMode;
     @CommonUtils.PubScribeMode
@@ -294,6 +296,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
         mAppid = getIntent().getStringExtra("app_id");
+
         isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture();
         mCameraEnable = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
         mMicEnable = preferences.getBoolean(CommonUtils.MIC_ENABLE, CommonUtils.MIC_ON);
@@ -302,6 +305,14 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mClass = UCloudRtcSdkRoomType.valueOf(classType);
         mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
         mScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
+
+        mIsPriDeploy = preferences.getBoolean(CommonUtils.PRIVATISATION_MODE, false);
+        UCloudRtcSdkEnv.setPrivateDeploy(mIsPriDeploy);
+        mPriAddr = preferences.getString(CommonUtils.PRIVATISATION_ADDRESS, "");
+        if (mIsPriDeploy) {
+            UCloudRtcSdkEnv.setPrivateDeployRoomURL(mPriAddr);
+        }
+
         mExtendCameraCapture = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
         mExtendVideoFormat = preferences.getInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, CommonUtils.i420_format);
         updateVideoFormat(mExtendVideoFormat);
