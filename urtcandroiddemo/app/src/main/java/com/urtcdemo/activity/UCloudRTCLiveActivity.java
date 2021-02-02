@@ -1004,16 +1004,16 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 public void run() {
                     if (code == 0) { // 订阅成功
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
-//                        UCloudRtcSdkSurfaceVideoView videoView = null;
-                        UCloudRtcRenderView videoView = null;
+                        UCloudRtcSdkSurfaceVideoView videoView = null;
+//                        UCloudRtcRenderView videoView = null;
                         Log.d(TAG, " subscribe info: " + info);
                         latestRemoteInfo = info;
                         if (info.isHasVideo()) { // 订阅流是否包含视频
-                            //UCloudRtcSdkSurfaceVideoView 定义的viewgroup,内含UcloudRtcRenderView
-//                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
-//                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
-                            videoView = new UCloudRtcRenderView(getApplicationContext());// 初始化渲染界面
-                            videoView.init();
+//                            UCloudRtcSdkSurfaceVideoView 定义的viewgroup,内含UcloudRtcRenderView
+                            videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
+                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
+//                            videoView = new UCloudRtcRenderView(getApplicationContext());// 初始化渲染界面
+//                            videoView.init();
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
 
