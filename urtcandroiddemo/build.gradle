@@ -39,7 +39,7 @@ ext {
     targetSdkVersion = 26
     compileSdkVersion = 26
     buildToolsVersion ="27.0.3"
-    versionName = "1.8.9"
+    versionName = "1.9.0"
     //Dependencies
     supportLibraryVersion = "27.0.0"
 

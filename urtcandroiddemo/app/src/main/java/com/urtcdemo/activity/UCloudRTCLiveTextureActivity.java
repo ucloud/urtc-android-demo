@@ -1592,7 +1592,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 //        releaseExtendCamera();
 //        onMediaServerDisconnect();
 //        startActivity(intent);
-//        finish();
+        finish();
     }
     private void onMediaServerDisconnect() {
         //mLocalVideoView.release();
