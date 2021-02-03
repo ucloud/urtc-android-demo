@@ -621,7 +621,12 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         info.setUId(mUserid);
         Log.d(TAG, " roomtoken = " + mRoomToken + "appid : "+ mAppid + " userid :"+ mUserid);
         initRecordManager();
-        sdkEngine.joinChannel(info); // 加入房间
+        // 加入房间
+        if (sdkEngine.joinChannel(info) == UCloudRtcSdkErrorCode.NET_ERR_SECKEY_NULL
+                || mAppid.length() == 0) {
+            ToastUtils.shortShow(UCloudRTCLiveActivity.this, "加入房间失败，AppKey或AppId没有设置");
+            endCall();
+        }
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
     }
 
@@ -2049,8 +2054,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             // 本地混音
             if (!mIsLocalMixingSound) {
                 if (!sdkEngine.startPlayAudioFile(
-                        //"/sdcard/light.mp3",
-                        sdkEngine.copyAssetsFileToSdcard("water.mp3"),
+                        "/sdcard/light.mp3",
+                        //sdkEngine.copyAssetsFileToSdcard("water.mp3"),
                         false, false)) {
                     return;
                 }
@@ -2082,8 +2087,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             // 本地+远端混音
             if (!mIsRemoteMixingSound) {
                 if (!sdkEngine.startPlayAudioFile(
-                        //"/sdcard/light.mp3",
-                        sdkEngine.copyAssetsFileToSdcard("water.mp3"),
+                        "/sdcard/light.mp3",
+                        //sdkEngine.copyAssetsFileToSdcard("water.mp3"),
                         true, false)) {
                     return;
                 }
