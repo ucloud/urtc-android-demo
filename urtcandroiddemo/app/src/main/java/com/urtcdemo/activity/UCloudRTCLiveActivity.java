@@ -204,7 +204,6 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private UCloudRtcSdkStreamInfo latestRemoteInfo;
     private UCloudRtcSdkStreamInfo mSwapStreamInfo;
     //外部摄像数据读取
-    private ArrayBlockingQueue<ByteBuffer> mQueueByteBuffer = new ArrayBlockingQueue(8);
     private ByteBuffer videoSourceData = null;
     private final Object extendByteBufferSync = new Object();
     private boolean mIsLocalMixingSound = false;
@@ -1760,17 +1759,6 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             mUCloudRTCDataReceiver.releaseBuffer();
             mUCloudRTCDataReceiver = null;
         }
-        if (UCloudRtcSdkEnv.getCaptureMode() == UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_EXTEND) {
-            //这里回收一遍
-            while (mQueueByteBuffer.size() != 0) {
-                ByteBuffer videoData = mQueueByteBuffer.poll();
-                if (videoData != null) {
-                    Log.d("UCloudRTCLiveActivity", "videoData clear");
-                    videoData.clear();
-                    videoData = null;
-                }
-            }
-        }
     }
 
     private void startTimeShow() {
@@ -2241,8 +2229,6 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public ByteBuffer provideRGBData(List<Integer> params) {
-            //Log.d("UCloudRTCLiveActivity", "poll video byteBuffer! queue size is: " + mQueueByteBuffer.size());
-            //videoSourceData = mQueueByteBuffer.poll();
             if (videoSourceData == null ) {
                 Log.d("UCloudRTCLiveActivity", "provideRGBData byteBuffer data is null");
                 return null;
@@ -2266,8 +2252,6 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     videoSourceData.rewind();
                 }
 
-                //videoSourceData.clear();
-                //videoSourceData = null;
                 //cacheBuffer.position(0);
                 cacheBuffer.flip();
 
@@ -2300,7 +2284,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         @Override
         public void onReceiveRGBAData(ByteBuffer rgbBuffer, int width, int height) {
-            Log.d("MainActivity", "onReceiveRGBAData!");
+            Log.d("UCloudRTCLiveActivity", "onReceiveRGBAData!");
 
 /*            final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
             bitmap.copyPixelsFromBuffer(rgbBuffer);
