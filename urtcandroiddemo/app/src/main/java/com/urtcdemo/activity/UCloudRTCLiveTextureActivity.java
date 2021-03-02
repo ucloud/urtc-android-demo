@@ -2185,12 +2185,13 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
     private void setPreview(boolean onOff) {
         if (onOff) {
+            mLocalRender.init();
             if (mExtendCameraCapture) {
                 sdkEngine.startCameraPreview(
-                        mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+                        mLocalRender, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
             } else {
                 sdkEngine.startCameraPreview(
-                        mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                        mLocalRender, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
             }
         }
         else {
