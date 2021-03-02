@@ -616,7 +616,12 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         info.setUId(mUserid);
         Log.d(TAG, " roomtoken = " + mRoomToken);
         initRecordManager();
-        sdkEngine.joinChannel(info);
+        // 加入房间
+        if (sdkEngine.joinChannel(info) == UCloudRtcSdkErrorCode.NET_ERR_SECKEY_NULL
+                || mAppid.length() == 0) {
+            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "加入房间失败，AppKey或AppId没有设置");
+            endCall();
+        }
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
     }
 
