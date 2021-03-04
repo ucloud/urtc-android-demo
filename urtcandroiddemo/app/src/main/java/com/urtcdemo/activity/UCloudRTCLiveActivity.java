@@ -792,6 +792,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) { // 音视频流
                             mImgManualPubVideo.setImageResource(R.mipmap.stop); // 修改界面图标
                             mTextManualPubVideo.setText(R.string.pub_cancel_video); // 修改界面文字
+                            mVideoIsPublished = true;
                             if (!sdkEngine.isAudioOnlyMode()) {  // 非单音频流
                                 // UCloudRtcSdkSurfaceVideoView打开
                                 //mLocalVideoView.init(false);
@@ -833,7 +834,6 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                                     //setIconStats(true);
                                 }
                                 // 状态记录
-                                mVideoIsPublished = true;
                                 mLocalStreamInfo = info;
                                 mSwapStreamInfo = info;
                                 mLocalVideoView.setTag(mLocalStreamInfo);
