@@ -1,10 +1,15 @@
 package com.urtcdemo.activity;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
@@ -36,6 +41,7 @@ import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
+import com.ucloudrtclib.common.URTCCommonUtil;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
@@ -60,6 +66,7 @@ import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataProvider;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataReceiver;
+import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCNotification;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
@@ -80,7 +87,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
@@ -341,6 +347,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         sdkEngine.configLocalAudioPublish(mMicEnable);
         if (isScreenCaptureSupport) {
             sdkEngine.configLocalScreenPublish(mScreenEnable);
+            if (mScreenEnable && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                UCloudRtcSdkEngine.regScreenCaptureNotification(mScreenCaptureNotification);
+            }
         } else {
             sdkEngine.configLocalScreenPublish(false);
             mImgManualPubScreen.setVisibility(View.GONE);
@@ -701,8 +710,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     protected void onDestroy() {
         Log.d(TAG, "activity destory");
         super.onDestroy();
+        Intent service = new Intent(this, UCloudRtcForeGroundService.class);
+        stopService(service);
+        endCall();
         releaseExtendCamera();
-        onMediaServerDisconnect();
+        //onMediaServerDisconnect();
         System.gc();
     }
 
@@ -2327,6 +2339,39 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             if (cache != null)
                 sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cache);
             cache = null;
+        }
+    };
+
+    //自定义前台通知
+    private UCloudRTCNotification mScreenCaptureNotification = new UCloudRTCNotification() {
+        @Override
+        public Notification createNotificationChannel() {
+            Notification.Builder builder = new Notification.Builder(URTCCommonUtil.getContext()); //获取一个Notification构造器
+            Intent nfIntent = new Intent(URTCCommonUtil.getContext(), UCloudRTCLiveActivity.class); //点击后跳转的界面，可以设置跳转数据
+
+            builder.setContentIntent(PendingIntent.getActivity(URTCCommonUtil.getContext(), 0, nfIntent, 0)) // 设置PendingIntent
+                    .setLargeIcon(BitmapFactory.decodeResource(URTCCommonUtil.getContext().getResources(), R.mipmap.ic_launcher)) // 设置下拉列表中的图标(大图标)
+                    //.setContentTitle("SMI InstantView") // 设置下拉列表里的标题
+                    .setSmallIcon(R.mipmap.ic_launcher) // 设置状态栏内的小图标
+                    .setContentText("screen capturing") // 设置上下文内容
+                    .setWhen(System.currentTimeMillis()); // 设置该通知发生的时间
+
+            //以下是对Android 8.0的适配
+            //普通notification适配
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                builder.setChannelId("notification_id");
+            }
+            //前台服务notification适配
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+                NotificationChannel channel = new NotificationChannel("notification_id", "notification_name", NotificationManager.IMPORTANCE_LOW);
+                notificationManager.createNotificationChannel(channel);
+            }
+
+            Notification notification = builder.build(); // 获取构建好的Notification
+            notification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
+
+            return notification;
         }
     };
 
