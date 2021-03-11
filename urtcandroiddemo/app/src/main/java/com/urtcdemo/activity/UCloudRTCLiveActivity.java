@@ -2054,8 +2054,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             // 本地混音
             if (!mIsLocalMixingSound) {
                 if (!sdkEngine.startPlayAudioFile(
-                        "/sdcard/light.mp3",
-                        //sdkEngine.copyAssetsFileToSdcard("water.mp3"),
+                        //"/sdcard/light.mp3",
+                        sdkEngine.copyAssetsFileToSdcard("water.mp3"),
                         false, false)) {
                     return;
                 }
@@ -2087,8 +2087,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             // 本地+远端混音
             if (!mIsRemoteMixingSound) {
                 if (!sdkEngine.startPlayAudioFile(
-                        "/sdcard/light.mp3",
-                        //sdkEngine.copyAssetsFileToSdcard("water.mp3"),
+                        //"/sdcard/light.mp3",
+                        sdkEngine.copyAssetsFileToSdcard("water.mp3"),
                         true, false)) {
                     return;
                 }
