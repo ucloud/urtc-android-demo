@@ -1733,7 +1733,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 //        Intent intent = new Intent(UCloudRTCLiveActivity.this, ConnectActivity.class);
 //        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 //        releaseExtendCamera();
-//        onMediaServerDisconnect();
+        onMediaServerDisconnect();
 //        startActivity(intent);
         finish();
     }
