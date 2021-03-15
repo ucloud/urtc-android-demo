@@ -820,7 +820,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                                     localViewWidth_landscape = mLocalVideoView.getMeasuredWidth();
                                     localViewHeight_landscape = mLocalVideoView.getMeasuredHeight();
                                     localViewWidth_portrait = screenWidth;
-                                    localViewHeight_portrait = screenWidth - mToolBar.getHeight() - mTitleBar.getHeight();
+                                    localViewHeight_portrait = screenHeight - mToolBar.getHeight() - mTitleBar.getHeight();
                                 }
                                 else if (UCloudRTCLiveActivity.this.getResources().getConfiguration().orientation
                                         == Configuration.ORIENTATION_PORTRAIT) {
@@ -837,7 +837,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                                                 mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
                                     } else { // 自带摄像头开启渲染
                                         sdkEngine.renderLocalView(info,
-                                                mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                                                mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
                                     }
                                     //if (mPublishMode != CommonUtils.AUTO_MODE) {
                                     // setIconStats(true);
@@ -1021,6 +1021,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     if (code == 0) { // 订阅成功
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
                         UCloudRtcSdkSurfaceVideoView videoView = null;
+                        // UCloudRtcSdkSurfaceVideoView videoViewCallBack = null; // 用于外部扩展输出
 //                        UCloudRtcRenderView videoView = null;
                         Log.d(TAG, " subscribe info: " + info);
                         latestRemoteInfo = info;
@@ -1032,7 +1033,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 //                            videoView.init();
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
-
+                            //外部扩展输出，和默认输出二选一
+                            //videoViewCallBack = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
+                            //videoViewCallBack.setFrameCallBack(mUCloudRTCDataReceiver);
+                            //videoViewCallBack.init(false);
                             //远端截图
                             //videoView.setOnClickListener(mScreenShotOnClickListener);
                             //设置交换
@@ -1055,6 +1059,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                             sdkEngine.startRemoteView(info, videoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null); // 渲染订阅流
                             //videoView.refreshRemoteOp(View.VISIBLE);
                         }
+                        //if (videoViewCallBack != null) {
+                            // sdkEngine.startRemoteView(info, videoViewCallBack, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null); // 渲染订阅流，同时从回调输出
+                        //}
                         //如果订阅成功就删除待订阅列表中的数据
                         //mSpinnerPopupWindowScribe.removeStreamInfoByUid(info.getUId());
                         //refreshStreamInfoText();
@@ -2449,7 +2456,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 sdkEngine.startCameraPreview(
                         mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
             } else {
-                sdkEngine.startCameraPreview(mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                sdkEngine.startCameraPreview(mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
             }
         } else {
             sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
