@@ -41,7 +41,6 @@ import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
-import com.ucloudrtclib.common.URTCCommonUtil;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
@@ -2353,11 +2352,11 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private UCloudRTCNotification mScreenCaptureNotification = new UCloudRTCNotification() {
         @Override
         public Notification createNotificationChannel() {
-            Notification.Builder builder = new Notification.Builder(URTCCommonUtil.getContext()); //获取一个Notification构造器
-            Intent nfIntent = new Intent(URTCCommonUtil.getContext(), UCloudRTCLiveActivity.class); //点击后跳转的界面，可以设置跳转数据
+            Notification.Builder builder = new Notification.Builder(getApplicationContext()); //获取一个Notification构造器
+            Intent nfIntent = new Intent(getApplicationContext(), UCloudRTCLiveActivity.class); //点击后跳转的界面，可以设置跳转数据
 
-            builder.setContentIntent(PendingIntent.getActivity(URTCCommonUtil.getContext(), 0, nfIntent, 0)) // 设置PendingIntent
-                    .setLargeIcon(BitmapFactory.decodeResource(URTCCommonUtil.getContext().getResources(), R.mipmap.ic_launcher)) // 设置下拉列表中的图标(大图标)
+            builder.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, nfIntent, 0)) // 设置PendingIntent
+                    .setLargeIcon(BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_launcher)) // 设置下拉列表中的图标(大图标)
                     //.setContentTitle("SMI InstantView") // 设置下拉列表里的标题
                     .setSmallIcon(R.mipmap.ic_launcher) // 设置状态栏内的小图标
                     .setContentText("screen capturing") // 设置上下文内容
