@@ -16,6 +16,8 @@ import android.hardware.usb.UsbDevice;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
@@ -1021,15 +1023,17 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
                         UCloudRtcSdkSurfaceVideoView videoView = null;
                         // UCloudRtcSdkSurfaceVideoView videoViewCallBack = null; // 用于外部扩展输出
-//                        UCloudRtcRenderView videoView = null;
+
+                        //UCloudRtcRenderView videoView = null;
                         Log.d(TAG, " subscribe info: " + info);
                         latestRemoteInfo = info;
                         if (info.isHasVideo()) { // 订阅流是否包含视频
-//                            UCloudRtcSdkSurfaceVideoView 定义的viewgroup,内含UcloudRtcRenderView
+//                            UCloudRtcSdkSurfaceVideoView 定义的viewgroup,URTCVideoViewInfo
                             videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
                             videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
-//                            videoView = new UCloudRtcRenderView(getApplicationContext());// 初始化渲染界面
-//                            videoView.init();
+                            // UCloudRtcRenderView
+                            //videoView = new UCloudRtcRenderView(getApplicationContext());// 初始化渲染界面
+                            //videoView.init();
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
                             //外部扩展输出，和默认输出二选一
@@ -1054,8 +1058,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                             mVideoAdapter.addStreamView(mkey, vinfo, info);
                         }
 
-                        if (vinfo != null && videoView != null) {
-                            sdkEngine.startRemoteView(info, videoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null); // 渲染订阅流
+                        if (videoView != null) {
+                            sdkEngine.startRemoteView(info, videoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null); // 渲染订阅流
                             //videoView.refreshRemoteOp(View.VISIBLE);
                         }
                         //if (videoViewCallBack != null) {
@@ -1792,35 +1796,82 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.d(TAG, "onConfigurationChanged");
-        int tempScreen = 0;
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            int tempScreen = 0;
+            FrameLayout.LayoutParams params = null;
+            // 呼唤全屏参数
+            tempScreen = screenHeight;
+            screenHeight = screenWidth;
+            screenWidth = tempScreen;
+
+            if (mLocalViewFullScreen) {
+                if (mLocalVideoView.getScaleType() == UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT.ordinal()) {
+                    mLocalVideoView.resetSurface();
+                }
+                else {
+                    params = new FrameLayout.LayoutParams(screenWidth, screenHeight + mToolBar.getHeight());
+                    params.setMargins(0, 0, 0, 0);
+                    mLocalVideoView.setLayoutParams(params);
+                }
+            } else {
+                if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    if (mLocalVideoView.getScaleType() == UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT.ordinal()) {
+                        mLocalVideoView.resetSurface();
+                    }
+                    else {
+                        params = new FrameLayout.LayoutParams(localViewWidth_portrait, localViewHeight_portrait);
+                        params.setMargins(0, mTitleBar.getHeight(), 0, mToolBar.getHeight());
+                        mLocalVideoView.setLayoutParams(params);
+                        Log.d(TAG, "PORTRAIT screen. localViewWidth: " + localViewWidth_portrait + " localViewHeight: " + localViewHeight_portrait);
+                    }
+                }
+                if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    if (mLocalVideoView.getScaleType() == UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT.ordinal()) {
+                        mLocalVideoView.resetSurface();
+                    }
+                    else {
+                        params = new FrameLayout.LayoutParams(localViewWidth_landscape, localViewHeight_landscape);
+                        params.setMargins(0, mTitleBar.getHeight(), 0, mToolBar.getHeight());
+                        mLocalVideoView.setLayoutParams(params);
+                        Log.d(TAG, "LANDSCAPE screen. localViewWidth: " + localViewWidth_landscape + " localViewHeight: " + localViewHeight_landscape);
+                    }
+                }
+            }
+            }
+        }, 50);
+/*        int tempScreen = 0;
+        FrameLayout.LayoutParams params = null;
         // 呼唤全屏参数
         tempScreen = screenHeight;
         screenHeight = screenWidth;
         screenWidth = tempScreen;
 
         if (mLocalViewFullScreen) {
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(screenWidth, screenHeight + mToolBar.getHeight());
+            params = new FrameLayout.LayoutParams(screenWidth, screenHeight + mToolBar.getHeight());
             params.setMargins(0, 0, 0, 0);
             mLocalVideoView.setLayoutParams(params);
         } else {
             if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(localViewWidth_portrait, localViewHeight_portrait);
+                params = new FrameLayout.LayoutParams(localViewWidth_portrait, localViewHeight_portrait);
                 params.setMargins(0, mTitleBar.getHeight(), 0, mToolBar.getHeight());
                 mLocalVideoView.setLayoutParams(params);
                 Log.d(TAG, "PORTRAIT screen. localViewWidth: " + localViewWidth_portrait + " localViewHeight: " + localViewHeight_portrait);
             }
             if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(localViewWidth_landscape, localViewHeight_landscape);
+                params = new FrameLayout.LayoutParams(localViewWidth_landscape, localViewHeight_landscape);
                 params.setMargins(0, mTitleBar.getHeight(), 0, mToolBar.getHeight());
                 mLocalVideoView.setLayoutParams(params);
                 Log.d(TAG, "LANDSCAPE screen. localViewWidth: " + localViewWidth_landscape + " localViewHeight: " + localViewHeight_landscape);
             }
-
-
-        }
+        }*/
     }
 
     public void toggleFullScreen() {
+        FrameLayout.LayoutParams params = null;
+
         if (!mLocalViewFullScreen) {
             setSystemUIVisible(false);
             //隐藏顶部标题和底部工具栏
@@ -1828,9 +1879,15 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             mToolBar.setVisibility(View.GONE);
             StatusBarUtils.removeStatusView(this);
 
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(screenWidth, screenHeight + mToolBar.getHeight());
-            params.setMargins(0, 0, 0, 0);
-            mLocalVideoView.setLayoutParams(params);
+            if (mLocalVideoView.getScaleType() == UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT.ordinal()) {
+                mLocalVideoView.resetSurface();
+            }
+            else {
+                params = new FrameLayout.LayoutParams(screenWidth, screenHeight + mToolBar.getHeight());
+                params.setMargins(0, 0, 0, 0);
+                mLocalVideoView.setLayoutParams(params);
+                Log.d(TAG, "Switch full screen in ASPECT_FILL width: " + params.width + " height: " + params.height);
+            }
             //抽屉随回显拉长
             DrawerLayout.LayoutParams dl_params = (DrawerLayout.LayoutParams) mDrawerMenu.getLayoutParams();
             dl_params.topMargin = 0;
@@ -1838,10 +1895,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             //隐藏麦克风状态图标
             mImgSoundVolume.setVisibility(View.INVISIBLE);
             mImgMicSts.setVisibility(View.INVISIBLE);
-            Log.d(TAG, "Switch full screen width: " + params.width + " height: " + params.height);
         } else {
             setSystemUIVisible(true);
-            FrameLayout.LayoutParams params = null;
+            //FrameLayout.LayoutParams params = null;
             //退出全屏
             // 获取当前横竖屏模式
             if (UCloudRTCLiveActivity.this.getResources().getConfiguration().orientation
@@ -1851,8 +1907,13 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             else {
                 params = new FrameLayout.LayoutParams(localViewWidth_portrait, localViewHeight_portrait);
             }
-            params.setMargins(0, mTitleBar.getHeight(), 0, mToolBar.getHeight());
-            mLocalVideoView.setLayoutParams(params);
+            if (mLocalVideoView.getScaleType() == UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT.ordinal()) {
+                mLocalVideoView.resetSurface();
+            }
+            else {
+                params.setMargins(0, mTitleBar.getHeight(), 0, mToolBar.getHeight());
+                mLocalVideoView.setLayoutParams(params);
+            }
             //显示顶部标题和底部工具栏
             mTitleBar.setVisibility(View.VISIBLE);
             mToolBar.setVisibility(View.VISIBLE);

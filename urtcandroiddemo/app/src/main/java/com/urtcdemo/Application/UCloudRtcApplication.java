@@ -69,7 +69,10 @@ public class UCloudRtcApplication extends Application {
         UCloudRtcSdkEnv.setReConnectTimes(60);
         UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.APP_KEY);
         //UCloudRtcSdkEnv.setDeviceChannelType(UCloudRtcSdkChannelType.UCLOUD_RTC_SDK_CHANNEL_TYPE_VOICE);
+        //推流方向
         //UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_LANDSCAPE_MODE);
+        //视频输出模式
+        //UCloudRtcSdkEnv.setVideoOutputOrientation(UCloudRtcSdkVideoOutputOrientationMode.UCLOUD_RTC_VIDEO_OUTPUT_FIXED_LANDSCAPE_MODE);
         //私有化部署
 //        UCloudRtcSdkEnv.setPrivateDeploy(true);
 //        UCloudRtcSdkEnv.setPrivateDeployRoomURL("wss://xxx:5005/ws");
