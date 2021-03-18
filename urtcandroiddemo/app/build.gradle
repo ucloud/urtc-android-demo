@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 29
     defaultConfig {
         applicationId "com.urtcdemo"
         minSdkVersion rootProject.minSdkVersion
@@ -12,6 +12,7 @@ android {
         versionCode 31
         ndk {
             abiFilters  "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+//            abiFilters  "armeabi-v7a"
         }
     }
 
@@ -75,17 +76,17 @@ dependencies {
     implementation 'com.github.markzhai:blockcanary-android:1.5.0'
     testImplementation 'junit:junit:4.12'
 
-    implementation (name: 'ucloudrtclib-1.9.0', ext: 'aar')
+//    implementation (name: 'ucloudrtclib-1.9.0', ext: 'aar')
     implementation(name: 'libuvccamera-release', ext: 'aar')
     implementation(name: 'common-2.12.4', ext: 'aar')
 //    implementation 'com.ucloud:ucloudrtclib:1.9.0'
-//    implementation project(':urtc-sdk-android')
+    implementation project(':urtc-sdk-android')
 //    implementation project(':libuvccamera')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     //bugly
     implementation 'com.tencent.bugly:crashreport:latest.release'
-    implementation 'com.tencent.bugly:nativecrashreport:latest.release'
+    implementation 'com.tencent.bugly:nativecrashreport:3.8.0'
     implementation 'tv.danmaku.ijk.media:ijkplayer-java:0.8.8'
     implementation 'tv.danmaku.ijk.media:ijkplayer-armv7a:0.8.8'
     implementation 'tv.danmaku.ijk.media:ijkplayer-exo:0.8.8'

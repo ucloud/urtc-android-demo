@@ -97,6 +97,7 @@ public class ConnectActivity extends AppCompatActivity {
         setButton = findViewById(R.id.setting_btn);
         userEditText = findViewById(R.id.user_edittext);
         roomEditText = findViewById(R.id.room_edittext);
+        roomEditText.setText("ucar");
         roomEditText.requestFocus();
         mTextSDKVersion = findViewById(R.id.tv_sdk_version);
         mTextSDKVersion.setText(getString(R.string.app_name) + "\n" + UCloudRtcSdkEngine.getSdkVersion());
