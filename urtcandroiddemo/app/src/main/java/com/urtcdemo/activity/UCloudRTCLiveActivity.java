@@ -1037,8 +1037,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
                             //外部扩展输出，和默认输出二选一
-                            //videoViewCallBack = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
-                            //videoViewCallBack.setFrameCallBack(mUCloudRTCDataReceiver);
+                            videoView.setFrameCallBack(mUCloudRTCDataReceiver);
                             //videoViewCallBack.init(false);
                             //远端截图
                             //videoView.setOnClickListener(mScreenShotOnClickListener);
