@@ -43,8 +43,11 @@ import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
+import com.ucloudrtclib.common.URTCLogUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcRawByteData;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcRawByteVideoData;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
@@ -63,10 +66,12 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcUnityRenderView;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataProvider;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataReceiver;
+import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCNotification;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
 import com.urtcdemo.R;
@@ -88,6 +93,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
@@ -450,7 +457,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             public void onClick(View v) {
 //                update(UCloudRtcSdkMixProfile.MIX_TYPE_UPDATE);
 //                sdkEngine.queryMix();
-                muteVideo();
+//                muteVideo();
+                setUnityRender();
             }
         });
 
@@ -837,8 +845,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                                         sdkEngine.renderLocalView(info,
                                                 mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
                                     } else { // 自带摄像头开启渲染
-                                        sdkEngine.renderLocalView(info,
-                                                mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+//                                        sdkEngine.renderLocalView(info,
+//                                                mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
                                     }
                                     //if (mPublishMode != CommonUtils.AUTO_MODE) {
                                     // setIconStats(true);
@@ -1662,6 +1670,26 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             ToastUtils.shortShow(UCloudRTCLiveActivity.this, "打开麦克风");
         }
         return false;
+    }
+
+    private void setUnityRender(){
+        UCloudRtcUnityRenderView unityViewRenderer = new UCloudRtcUnityRenderView(mLocalStreamInfo.getUId());
+        unityViewRenderer.setFrameRenderedCallBack(new UCloudRTCFirstFrameRendered() {
+            @Override
+            public void onFirstFrameRender(UCloudRtcSdkStreamInfo info, View view) {
+//                URTCLogUtils.d(TAG,"onFirstFrameRender : "+ info);
+//                Timer timer = new Timer("testRender");
+//                timer.schedule(new TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        UCloudRtcRawByteVideoData data = (UCloudRtcRawByteVideoData)sdkEngine.updateRawVideoData(mLocalStreamInfo,true,1);
+//                        URTCLogUtils.d(TAG,"rgba length" + data.getLength()+ "width "+ data.getWidth() + "height "+ data.getHeight());
+//                    }
+//                }, 0, 60);
+            }
+        });
+        unityViewRenderer.init();
+        sdkEngine.setRawDataRender(mLocalStreamInfo,unityViewRenderer);
     }
 
     private boolean muteVideo() { // 关闭打开本端视频
