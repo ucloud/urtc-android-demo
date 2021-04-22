@@ -46,7 +46,6 @@ import com.serenegiant.usb.UVCCamera;
 import com.ucloudrtclib.common.URTCLogUtils;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcRawByteData;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRawByteVideoData;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
@@ -334,6 +333,13 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         //房间号
         mTextRoomId = findViewById(R.id.roomid_text);
         mTextRoomId.setText("房间号:" + mRoomid);
+        mTextRoomId.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setUnityRender(mLocalStreamInfo);
+                setUnityRender(latestRemoteInfo);
+            }
+        });
         mMirror = UCloudRtcSdkEnv.isFrontCameraMirror();
         mImgBtnMirror.setImageResource(mMirror ? R.mipmap.mirror_on :
                 R.mipmap.mirror);
@@ -457,8 +463,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             public void onClick(View v) {
 //                update(UCloudRtcSdkMixProfile.MIX_TYPE_UPDATE);
 //                sdkEngine.queryMix();
-//                muteVideo();
-                setUnityRender();
+                muteVideo();
             }
         });
 
@@ -1066,7 +1071,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                         }
 
                         if (videoView != null) {
-                            sdkEngine.startRemoteView(info, videoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null); // 渲染订阅流
+//                            sdkEngine.startRemoteView(info, videoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null); // 渲染订阅流
                             //videoView.refreshRemoteOp(View.VISIBLE);
                         }
                         //if (videoViewCallBack != null) {
@@ -1672,24 +1677,45 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         return false;
     }
 
-    private void setUnityRender(){
-        UCloudRtcUnityRenderView unityViewRenderer = new UCloudRtcUnityRenderView(mLocalStreamInfo.getUId());
+    public static int testPic = 0;
+    public static int testLimit = 2;
+
+    private void setUnityRender(UCloudRtcSdkStreamInfo info){
+        UCloudRtcUnityRenderView unityViewRenderer = new UCloudRtcUnityRenderView(info.getUId());
         unityViewRenderer.setFrameRenderedCallBack(new UCloudRTCFirstFrameRendered() {
             @Override
             public void onFirstFrameRender(UCloudRtcSdkStreamInfo info, View view) {
-//                URTCLogUtils.d(TAG,"onFirstFrameRender : "+ info);
-//                Timer timer = new Timer("testRender");
-//                timer.schedule(new TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        UCloudRtcRawByteVideoData data = (UCloudRtcRawByteVideoData)sdkEngine.updateRawVideoData(mLocalStreamInfo,true,1);
-//                        URTCLogUtils.d(TAG,"rgba length" + data.getLength()+ "width "+ data.getWidth() + "height "+ data.getHeight());
-//                    }
-//                }, 0, 60);
+                URTCLogUtils.d(TAG,"onFirstFrameRender : "+ info);
+                Timer timer = new Timer("testRender");
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        UCloudRtcRawByteVideoData data = (UCloudRtcRawByteVideoData)sdkEngine.updateRawVideoData(info,true,1,0);
+//                        if(++testPic <= testLimit){
+//                            final Bitmap bitmap = Bitmap.createBitmap(data.getWidth() * 1, data.getHeight() * 1, Bitmap.Config.ARGB_8888);
+//                            bitmap.copyPixelsFromBuffer(data.getRawBuffer());
+//                            String name = "/mnt/sdcard/Android/data/com.urtcdemo/urtctest_"+System.currentTimeMillis() +".jpg";
+//                            File file = new File(name);
+//                            try {
+//                                FileOutputStream out = new FileOutputStream(file);
+//                                if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
+//                                    out.flush();
+//                                    out.close();
+//                                }
+//                            } catch (FileNotFoundException e) {
+//                                e.printStackTrace();
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                            Log.d(TAG, "screen shoot : " + name);
+//                            URTCLogUtils.d(TAG,"rgba length" + data.getLength()+ "width "+ data.getWidth() + "height "+ data.getHeight());
+//                        }
+                    }
+                }, 0, 60);
             }
         });
         unityViewRenderer.init();
-        sdkEngine.setRawDataRender(mLocalStreamInfo,unityViewRenderer);
+        sdkEngine.setRawDataRender(info,unityViewRenderer);
     }
 
     private boolean muteVideo() { // 关闭打开本端视频
