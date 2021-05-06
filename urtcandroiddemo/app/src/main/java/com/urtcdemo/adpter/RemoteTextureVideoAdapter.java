@@ -13,12 +13,10 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
+import com.cmcc.sdkengine.define.CMCCStreamInfo;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCTextureVideoViewInfo;
-import com.urtcdemo.view.URTCVideoViewInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -130,7 +128,7 @@ public class RemoteTextureVideoAdapter extends RecyclerView.Adapter<RemoteTextur
         }
     }
 
-    public void addStreamView(String mkey, URTCTextureVideoViewInfo videoView, UCloudRtcSdkStreamInfo streamInfo) {
+    public void addStreamView(String mkey, URTCTextureVideoViewInfo videoView, CMCCStreamInfo streamInfo) {
         removeStreamView(mkey);
         if (!mStreamViews.containsKey(mkey)) {
             mStreamViews.put(mkey, videoView);
@@ -142,10 +140,10 @@ public class RemoteTextureVideoAdapter extends RecyclerView.Adapter<RemoteTextur
         notifyDataSetChanged();
     }
 
-    public UCloudRtcSdkStreamInfo getStreamInfo(int position){
-        UCloudRtcSdkStreamInfo streamInfo = null;
+    public CMCCStreamInfo getStreamInfo(int position){
+        CMCCStreamInfo streamInfo = null;
         if(medialist.size() > position && mStreamViews.size() > position){
-            streamInfo = new UCloudRtcSdkStreamInfo();
+            streamInfo = new CMCCStreamInfo();
             streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getmMediatype());
             streamInfo.setHasAudio(mStreamViews.get(medialist.get(position)).isEnableAudio());
             streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).ismEanbleVideo());

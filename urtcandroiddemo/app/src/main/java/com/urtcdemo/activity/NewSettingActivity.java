@@ -15,7 +15,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
+import com.cmcc.sdkengine.define.CMCCChannelProfile;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.RadioGroupFlow;
@@ -50,7 +50,7 @@ public class NewSettingActivity extends AppCompatActivity {
     private int mPublishMode;
     @CommonUtils.PubScribeMode
     private int mSubScribeMode;
-    private UCloudRtcSdkRoomType mRoomType;
+    private CMCCChannelProfile mRoomType;
 
     private List<String> mDefaultConfiguration = new ArrayList<>();
     private String mAppid;
@@ -117,8 +117,8 @@ public class NewSettingActivity extends AppCompatActivity {
         mExtendCamera = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
         mPriDeploy = preferences.getBoolean(CommonUtils.PRIVATISATION_MODE, false);
         mPriAddr = preferences.getString(CommonUtils.PRIVATISATION_ADDRESS, "");
-        int roomInt = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL.ordinal());
-        mRoomType = UCloudRtcSdkRoomType.valueOf(roomInt);
+        int roomInt = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, CMCCChannelProfile.CHANNEL_PROFILE_COMMUNICATION.ordinal());
+        mRoomType = CMCCChannelProfile.valueOf(roomInt);
         StatusBarUtils.setAndroidNativeLightStatusBar(this,true);
 
         mConfigTextView.setText(mDefaultConfiguration.get(mSelectPos));
@@ -166,7 +166,7 @@ public class NewSettingActivity extends AppCompatActivity {
         mBroadcastSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
             @Override
             public void onChecked(boolean isChecked) {
-                mRoomType = isChecked ? UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE : UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL;
+                mRoomType = isChecked ? CMCCChannelProfile.CHANNEL_PROFILE_LIVE_BROADCASTING : CMCCChannelProfile.CHANNEL_PROFILE_COMMUNICATION;
 
             }
         });
@@ -241,7 +241,7 @@ public class NewSettingActivity extends AppCompatActivity {
         mScreenShareSwitch.setChecked(mEnableScreen);
         mAutoPubSwitch.setChecked(mPublishMode == CommonUtils.AUTO_MODE);
         mAutoSubSwitch.setChecked(mSubScribeMode == CommonUtils.AUTO_MODE);
-        mBroadcastSwitch.setChecked(mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE);
+        mBroadcastSwitch.setChecked(mRoomType == CMCCChannelProfile.CHANNEL_PROFILE_LIVE_BROADCASTING);
         mPriDeploySwitch.setChecked(mPriDeploy);
         mExtendCameraSwitch.setChecked(mExtendCamera);
 

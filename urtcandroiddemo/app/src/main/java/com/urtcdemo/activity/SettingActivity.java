@@ -17,10 +17,10 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkRoomType;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamRole;
+import com.cmcc.sdkengine.CMCCRtcEnv;
+import com.cmcc.sdkengine.define.CMCCSDKMode;
+import com.cmcc.sdkengine.define.CMCCChannelProfile;
+import com.cmcc.sdkengine.define.CMCCClientRole;
 import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.BuildConfig;
 import com.urtcdemo.R;
@@ -76,8 +76,8 @@ public class SettingActivity extends AppCompatActivity {
     private int mPublishMode;
     @CommonUtils.PubScribeMode
     private int mScribeMode;
-    private UCloudRtcSdkStreamRole mRole;
-    private UCloudRtcSdkRoomType mRoomType;
+    private CMCCClientRole mRole;
+    private CMCCChannelProfile mRoomType;
     private boolean mTestMode;
     private List<String> mDefaultConfiguration = new ArrayList<>();
     private String mAppid;
@@ -216,35 +216,35 @@ public class SettingActivity extends AppCompatActivity {
                 break;
         }
 
-        int roleInt = preferences.getInt(CommonUtils.SDK_STREAM_ROLE, UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH.ordinal());
-        mRole = UCloudRtcSdkStreamRole.valueOf(roleInt);
+        int roleInt = preferences.getInt(CommonUtils.SDK_STREAM_ROLE, CMCCClientRole.CLIENT_ROLE_BROADCASTER.ordinal());
+        mRole = CMCCClientRole.valueOf(roleInt);
         switch (mRole) {
-            case UCLOUD_RTC_SDK_STREAM_ROLE_BOTH:
+            case CLIENT_ROLE_BROADCASTER:
                 mRBRoleBoth.setChecked(true);
                 break;
-            case UCLOUD_RTC_SDK_STREAM_ROLE_PUB:
+            case CLIENT_ROLE_PUBLISHER:
                 mRBRolePublish.setChecked(true);
                 break;
-            case UCLOUD_RTC_SDK_STREAM_ROLE_SUB:
+            case CLIENT_ROLE_AUDIENCE:
                 mRBRoleScribe.setChecked(true);
                 break;
         }
 
 
-        int roomInt = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL.ordinal());
-        mRoomType = UCloudRtcSdkRoomType.valueOf(roomInt);
+        int roomInt = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, CMCCChannelProfile.CHANNEL_PROFILE_COMMUNICATION.ordinal());
+        mRoomType = CMCCChannelProfile.valueOf(roomInt);
         switch (mRoomType) {
-            case UCLOUD_RTC_SDK_ROOM_SMALL:
+            case CHANNEL_PROFILE_COMMUNICATION:
                 mRBRoomSmall.setChecked(true);
                 mRBRoleBoth.setEnabled(true);
                 break;
-            case UCLOUD_RTC_SDK_ROOM_LARGE:
+            case CHANNEL_PROFILE_LIVE_BROADCASTING:
                 mRBRoomLarge.setChecked(true);
                 mRBRoleBoth.setEnabled(true);
                 break;
         }
 
-        if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL) {
+        if (CMCCRtcEnv.getSdkMode() == CMCCSDKMode.MODE_TRIVIAL) {
             mDevenv.setChecked(false);
             mTestenv.setChecked(true);
         } else {
@@ -257,10 +257,10 @@ public class SettingActivity extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (group.getCheckedRadioButtonId()) {
                     case R.id.dev_env:
-                        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_NORMAL);
+                        CMCCRtcEnv.setSdkMode(CMCCSDKMode.MODE_NORMAL);
                         break;
                     case R.id.test_env:
-                        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
+                        CMCCRtcEnv.setSdkMode(CMCCSDKMode.MODE_TRIVIAL);
                         break;
                 }
             }
@@ -294,13 +294,13 @@ public class SettingActivity extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (group.getCheckedRadioButtonId()) {
                     case R.id.rb_role_pub:
-                        mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_PUB;
+                        mRole = CMCCClientRole.CLIENT_ROLE_PUBLISHER;
                         break;
                     case R.id.rb_role_scribe:
-                        mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_SUB;
+                        mRole = CMCCClientRole.CLIENT_ROLE_AUDIENCE;
                         break;
                     case R.id.rb_role_both:
-                        mRole = UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH;
+                        mRole = CMCCClientRole.CLIENT_ROLE_BROADCASTER;
 //                    if (mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE) {
 //                        ToastUtils.shortShow(this, "大班课模式不能选择全部");
 //                    } else {
@@ -316,11 +316,11 @@ public class SettingActivity extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (group.getCheckedRadioButtonId()) {
                     case R.id.rb_type_small_room:
-                        mRoomType = UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL;
+                        mRoomType = CMCCChannelProfile.CHANNEL_PROFILE_COMMUNICATION;
                         mRBRoleBoth.setEnabled(true);
                         break;
                     case R.id.rb_type_large_room:
-                        mRoomType = UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE;
+                        mRoomType = CMCCChannelProfile.CHANNEL_PROFILE_LIVE_BROADCASTING;
                         mRBRoleBoth.setEnabled(true);
                         checkRole();
                         break;
@@ -388,7 +388,7 @@ public class SettingActivity extends AppCompatActivity {
     }
 
     private void checkRole() {
-        if (mRole == UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH) {
+        if (mRole == CMCCClientRole.CLIENT_ROLE_BROADCASTER) {
 //            ToastUtils.shortShow(this, "大班课模式不能选择全部权限,默认重新选择下行权限");
         }
 //        SettingActivity.this.mRBRolePublish.setChecked(false);

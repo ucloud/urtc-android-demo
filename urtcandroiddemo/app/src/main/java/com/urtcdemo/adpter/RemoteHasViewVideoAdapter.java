@@ -11,15 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderTextureView;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
-import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
+import com.cmcc.sdkengine.CMCCRtcEngine;
+import com.cmcc.sdkengine.define.CMCCTextureViewRenderer;
+import com.cmcc.sdkengine.define.CMCCStreamInfo;
+import com.cmcc.sdkengine.openinterface.CMCCFirstFrameRendered;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
-
-import org.webrtc.TextureViewRenderer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,10 +38,10 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
     private Context mContext;
     private List<ViewHolder> mCacheHolder;
     private SwapInterface mSwapInterface;
-    private UCloudRtcSdkEngine mSdkEngine;
+    private CMCCRtcEngine mSdkEngine;
 
 
-    public RemoteHasViewVideoAdapter(Context context, UCloudRtcSdkEngine sdkEngine,SwapInterface provider) {
+    public RemoteHasViewVideoAdapter(Context context, CMCCRtcEngine sdkEngine, SwapInterface provider) {
         mContext = context;
         mSdkEngine = sdkEngine;
         mSwapInterface = provider;
@@ -131,14 +129,14 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                     }
                 });
             }
-            UCloudRtcRenderTextureView render = null;
+            CMCCTextureViewRenderer render = null;
             Object viewInfoRender = viewInfo.getmRenderview();
             Log.d(TAG, "onBindViewHolder: video info render "+ viewInfo.getmRenderview());
             if(videoView.getTag(R.id.render)!= null){
-                render = (UCloudRtcRenderTextureView)videoView.getTag(R.id.render);
+                render = (CMCCTextureViewRenderer)videoView.getTag(R.id.render);
                 Log.d(TAG, "onBindViewHolder: view "+ videoView +" has render "+ render);
             }else{
-                render = new UCloudRtcRenderTextureView(videoView);
+                render = new CMCCTextureViewRenderer(videoView);
                 render.init();
                 videoView.setTag(R.id.render,render);
                 Log.d(TAG, "onBindViewHolder: new render "+ render);
@@ -159,17 +157,17 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                 }
             }
             if(isLocal){
-                mSdkEngine.renderLocalView(viewInfo.getStreamInfo(), render, null, new UCloudRTCFirstFrameRendered(){
+                mSdkEngine.setupLocalVideo(viewInfo.getStreamInfo(), render, null, new CMCCFirstFrameRendered(){
                     @Override
-                    public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
+                    public void onFirstFrameRender(CMCCStreamInfo CMCCStreamInfo, View view) {
                         Log.d(TAG, "onlocal first frame render: " + "view: " + view);
                     }
                 });
             }else{
-                mSdkEngine.startRemoteView(viewInfo.getStreamInfo(), render, null, new UCloudRTCFirstFrameRendered(){
+                mSdkEngine.setupRemoteVideo(viewInfo.getStreamInfo(), render, null, new CMCCFirstFrameRendered(){
 
                     @Override
-                    public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
+                    public void onFirstFrameRender(CMCCStreamInfo CMCCStreamInfo, View view) {
                         Log.d(TAG, "onRemoteFirstFrameRender: " + "view: " + view);
                     }
                 });
@@ -195,7 +193,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         notifyDataSetChanged();
     }
 
-    public void updateSwapInfo(UCloudRtcSdkStreamInfo clickInfo,UCloudRtcSdkStreamInfo swapInfo){
+    public void updateSwapInfo(CMCCStreamInfo clickInfo, CMCCStreamInfo swapInfo){
         String clickKey = clickInfo.getUId() + clickInfo.getMediaType().toString();
         String swapKey = swapInfo.getUId() + swapInfo.getMediaType().toString();
         URTCVideoViewInfo oldBean = mStreamViews.remove(clickKey);

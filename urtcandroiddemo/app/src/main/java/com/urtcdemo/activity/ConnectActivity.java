@@ -29,9 +29,9 @@ import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.PermissionUtils;
 import com.urtcdemo.utils.StatusBarUtils;
 import com.urtcdemo.utils.ToastUtils;
-import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
-import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
+import com.cmcc.sdkengine.CMCCRtcEngine;
+import com.cmcc.sdkengine.CMCCRtcEnv;
+import com.cmcc.sdkengine.define.CMCCSDKMode;
 import com.urtcdemo.utils.URTCFileUtil;
 
 
@@ -67,12 +67,12 @@ public class ConnectActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
             return;
         }
-        if (requestCode != UCloudRtcSdkEngine.SCREEN_CAPTURE_REQUEST_CODE) {
+        if (requestCode != CMCCRtcEngine.SCREEN_CAPTURE_REQUEST_CODE) {
             Toast.makeText(this, "获取桌面采集权限失败",
                     Toast.LENGTH_LONG).show();
             return;
         }
-        UCloudRtcSdkEngine.onScreenCaptureResult(data);
+        CMCCRtcEngine.onScreenCaptureResult(data);
 //        startRoomActivity();
         startLivingActivity();
 //        startRoomTextureActivity();
@@ -90,7 +90,7 @@ public class ConnectActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
         mAppid = preferences.getString(CommonUtils.APP_ID_TAG, CommonUtils.APP_ID);
-        UCloudRtcSdkEnv.setLogReport(true);
+        CMCCRtcEnv.setLogReport(true);
         mAnimal = findViewById(R.id.userporta);
         //((AnimationDrawable) mAnimal.getBackground()).start();
 
@@ -99,7 +99,7 @@ public class ConnectActivity extends AppCompatActivity {
         roomEditText = findViewById(R.id.room_edittext);
         roomEditText.requestFocus();
         mTextSDKVersion = findViewById(R.id.tv_sdk_version);
-        mTextSDKVersion.setText(getString(R.string.app_name) + "\n" + UCloudRtcSdkEngine.getSdkVersion());
+        mTextSDKVersion.setText(getString(R.string.app_name) + "\n" + CMCCRtcEngine.getSdkVersion());
         connectButton = findViewById(R.id.connect_button);
         exportButton = findViewById(R.id.log_output_button);
         exportButton.setVisibility(View.GONE);
@@ -113,11 +113,11 @@ public class ConnectActivity extends AppCompatActivity {
                     ToastUtils.shortShow(getApplicationContext(), "房间id 不能为空");
                 } else {
                     //测试环境下SDK自动生成token
-                    if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL) {
+                    if (CMCCRtcEnv.getSdkMode() == CMCCSDKMode.MODE_TRIVIAL) {
                         mRoomToken = "testoken";
                         Log.d(TAG, " appid " + mAppid);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
+                            CMCCRtcEngine.requestScreenCapture(ConnectActivity.this);
 
                         } else {
                             startRoomActivity();
@@ -321,8 +321,8 @@ public class ConnectActivity extends AppCompatActivity {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if (UCloudRtcSdkEnv.getApplication() != null) {
-                                ToastUtils.shortShow(UCloudRtcSdkEnv.getApplication(), "default mix file copy success");
+                            if (CMCCRtcEnv.getApplication() != null) {
+                                ToastUtils.shortShow(CMCCRtcEnv.getApplication(), "default mix file copy success");
                             }
                         }
                     });

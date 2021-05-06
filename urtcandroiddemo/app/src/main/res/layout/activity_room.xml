@@ -21,7 +21,7 @@
 <!--                android:layout_width="match_parent"-->
 <!--                android:layout_height="match_parent" />-->
 
-            <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
+            <com.cmcc.sdkengine.define.CMCCSurfaceViewRenderer
                 android:id="@+id/localview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

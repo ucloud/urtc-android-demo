@@ -1,34 +1,32 @@
 package com.urtcdemo.view;
 
-import android.view.View;
-
-import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderTextureView;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
+import com.cmcc.sdkengine.define.CMCCTextureViewRenderer;
+import com.cmcc.sdkengine.define.CMCCSurfaceViewRenderer;
+import com.cmcc.sdkengine.define.CMCCMediaType;
+import com.cmcc.sdkengine.define.CMCCStreamInfo;
+import com.cmcc.sdkengine.define.CMCCSurfaceViewGroup;
 
 public class URTCVideoViewInfo {
     private Object mRenderview ;
     private String mUid ;
     private boolean mEanbleVideo ;
     private boolean mEnableAudio;
-    private UCloudRtcSdkMediaType mMediatype ;
+    private CMCCMediaType mMediatype ;
     private String key;
-    private UCloudRtcSdkStreamInfo mStreamInfo;
+    private CMCCStreamInfo mStreamInfo;
     public URTCVideoViewInfo(){
         mUid = "" ;
         mEanbleVideo = false ;
-        mMediatype = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
+        mMediatype = CMCCMediaType.MEDIA_TYPE_NULL;
     }
-    public URTCVideoViewInfo(UCloudRtcSdkSurfaceVideoView view) {
+    public URTCVideoViewInfo(CMCCSurfaceViewGroup view) {
         mRenderview = view ;
         mUid = "" ;
         mEanbleVideo = false ;
-        mMediatype = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
+        mMediatype = CMCCMediaType.MEDIA_TYPE_NULL;
     }
 
-    public URTCVideoViewInfo(UCloudRtcSdkStreamInfo info) {
+    public URTCVideoViewInfo(CMCCStreamInfo info) {
         mRenderview = null ;
         mUid = info.getUId() ;
         mEanbleVideo = info.isHasVideo() ;
@@ -69,11 +67,11 @@ public class URTCVideoViewInfo {
         this.mUid = mUid;
     }
 
-    public UCloudRtcSdkMediaType getmMediatype() {
+    public CMCCMediaType getmMediatype() {
         return mMediatype;
     }
 
-    public void setmMediatype(UCloudRtcSdkMediaType mMediatype) {
+    public void setmMediatype(CMCCMediaType mMediatype) {
         this.mMediatype = mMediatype;
     }
 
@@ -85,24 +83,24 @@ public class URTCVideoViewInfo {
         this.key = key;
     }
 
-    public void setStreamInfo(UCloudRtcSdkStreamInfo streamInfo) {
+    public void setStreamInfo(CMCCStreamInfo streamInfo) {
         mStreamInfo = streamInfo;
     }
 
-    public UCloudRtcSdkStreamInfo getStreamInfo() {
+    public CMCCStreamInfo getStreamInfo() {
         return mStreamInfo;
     }
 
     public Object release() {
         if (mRenderview != null) {
-            if(mRenderview instanceof UCloudRtcSdkSurfaceVideoView){
-                ((UCloudRtcSdkSurfaceVideoView)mRenderview).refresh();
-                ((UCloudRtcSdkSurfaceVideoView)mRenderview).release();
-            }else if(mRenderview instanceof UCloudRtcRenderView){
-                ((UCloudRtcRenderView)mRenderview).release();
+            if(mRenderview instanceof CMCCSurfaceViewGroup){
+                ((CMCCSurfaceViewGroup)mRenderview).refresh();
+                ((CMCCSurfaceViewGroup)mRenderview).release();
+            }else if(mRenderview instanceof CMCCSurfaceViewRenderer){
+                ((CMCCSurfaceViewRenderer)mRenderview).release();
             }
-            else if(mRenderview instanceof UCloudRtcRenderTextureView){
-                ((UCloudRtcRenderTextureView)mRenderview).release();
+            else if(mRenderview instanceof CMCCTextureViewRenderer){
+                ((CMCCTextureViewRenderer)mRenderview).release();
             }
 //            mRenderview = null ;
 

@@ -2,22 +2,21 @@ package com.urtcdemo.view;
 
 import android.view.TextureView;
 
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
+import com.cmcc.sdkengine.define.CMCCMediaType;
 
 public class URTCTextureVideoViewInfo {
     private TextureView mRenderview ;
     private String mUid ;
     private boolean mEanbleVideo ;
     private boolean mEnableAudio;
-    private UCloudRtcSdkMediaType mMediatype ;
+    private CMCCMediaType mMediatype ;
     private String key;
 
     public URTCTextureVideoViewInfo(TextureView view) {
         mRenderview = view ;
         mUid = "" ;
         mEanbleVideo = false ;
-        mMediatype = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
+        mMediatype = CMCCMediaType.MEDIA_TYPE_NULL;
     }
 
     public TextureView getmRenderview() {
@@ -52,11 +51,11 @@ public class URTCTextureVideoViewInfo {
         this.mUid = mUid;
     }
 
-    public UCloudRtcSdkMediaType getmMediatype() {
+    public CMCCMediaType getmMediatype() {
         return mMediatype;
     }
 
-    public void setmMediatype(UCloudRtcSdkMediaType mMediatype) {
+    public void setmMediatype(CMCCMediaType mMediatype) {
         this.mMediatype = mMediatype;
     }
 

@@ -12,12 +12,12 @@ import android.view.WindowManager;
 
 import com.github.moduth.blockcanary.BlockCanaryContext;
 import com.tencent.bugly.crashreport.CrashReport;
-import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
-import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkLogLevel;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkPushEncode;
-import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
+import com.cmcc.sdkengine.CMCCRtcEngine;
+import com.cmcc.sdkengine.CMCCRtcEnv;
+import com.cmcc.sdkengine.define.CMCCLogLevel;
+import com.cmcc.sdkengine.define.CMCCSDKMode;
+import com.cmcc.sdkengine.define.CMCCPushEncode;
+import com.cmcc.sdkengine.listener.ICMCCRtcEngineEventHandler;
 import com.urtcdemo.BuildConfig;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.UiHelper;
@@ -29,7 +29,7 @@ public class UCloudRtcApplication extends Application {
     private static final String TAG = "UCloudRtcApplication";
     private static Context sContext;
     private static String sUserId;
-    private static UCloudRtcSdkEngine rtcSdkEngine;
+    private static CMCCRtcEngine rtcSdkEngine;
 
     @Override
     public void onCreate() {
@@ -41,9 +41,9 @@ public class UCloudRtcApplication extends Application {
         }
     }
 
-    public UCloudRtcSdkEngine createRtcEngine(UCloudRtcSdkEventListener eventListener){
+    public CMCCRtcEngine createRtcEngine(ICMCCRtcEngineEventHandler eventListener){
         if(rtcSdkEngine == null){
-            rtcSdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
+            rtcSdkEngine = CMCCRtcEngine.create(eventListener);
         }else{
             rtcSdkEngine.setEventListener(eventListener);
         }
@@ -53,21 +53,21 @@ public class UCloudRtcApplication extends Application {
     public void destroyEngine(){
         if(rtcSdkEngine != null){
             Log.d(TAG, "destroyEngine: ");
-            UCloudRtcSdkEngine.destory();
+            CMCCRtcEngine.destroy();
             rtcSdkEngine = null;
         }
     }
 
     private void init(){
         sContext = this;
-        UCloudRtcSdkEnv.initEnv(getApplicationContext());
-        UCloudRtcSdkEnv.setWriteToLogCat(true);
-        UCloudRtcSdkEnv.setLogReport(true);
-        UCloudRtcSdkEnv.setEncodeMode(UCloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);
-        UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo);
-        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
-        UCloudRtcSdkEnv.setReConnectTimes(60);
-        UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.APP_KEY);
+        CMCCRtcEnv.initEnv(getApplicationContext());
+        CMCCRtcEnv.setWriteToLogCat(true);
+        CMCCRtcEnv.setLogReport(true);
+        CMCCRtcEnv.setEncodeMode(CMCCPushEncode.PUSH_ENCODE_MODE_H264);
+        CMCCRtcEnv.setLogLevel(CMCCLogLevel.LOG_LEVEL_INFO);
+        CMCCRtcEnv.setSdkMode(CMCCSDKMode.MODE_TRIVIAL);
+        CMCCRtcEnv.setReConnectTimes(60);
+        CMCCRtcEnv.setTokenSeckey(CommonUtils.APP_KEY);
         //UCloudRtcSdkEnv.setDeviceChannelType(UCloudRtcSdkChannelType.UCLOUD_RTC_SDK_CHANNEL_TYPE_VOICE);
         //推流方向
         //UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_LANDSCAPE_MODE);

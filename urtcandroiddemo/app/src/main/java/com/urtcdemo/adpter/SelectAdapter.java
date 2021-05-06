@@ -9,33 +9,33 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.urtcdemo.R;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
+import com.cmcc.sdkengine.define.CMCCStreamInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SelectAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<UCloudRtcSdkStreamInfo> mList;
+    private List<CMCCStreamInfo> mList;
 
     private SparseBooleanArray mSelectedPositions = new SparseBooleanArray();
     private boolean mIsSelectable = false;
 
 
-    public SelectAdapter(List<UCloudRtcSdkStreamInfo> list) {
+    public SelectAdapter(List<CMCCStreamInfo> list) {
         if (list == null) {
             throw new IllegalArgumentException("model Data must not be null");
         }
         mList = list;
     }
 
-    public void addStreamInfo(UCloudRtcSdkStreamInfo info,boolean needNotify){
+    public void addStreamInfo(CMCCStreamInfo info, boolean needNotify){
         mList.add(info);
         if(needNotify)notifyDataSetChanged();
     }
 
     //更新adpter的数据和选择状态
-    public void updateDataSet(ArrayList<UCloudRtcSdkStreamInfo> list) {
+    public void updateDataSet(ArrayList<CMCCStreamInfo> list) {
         this.mList = list;
         mSelectedPositions = new SparseBooleanArray();
 //            ab.setTitle("已选择" + 0 + "项");
@@ -43,8 +43,8 @@ public class SelectAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
 
     //获得选中条目的结果
-    public ArrayList<UCloudRtcSdkStreamInfo> getSelectedItem() {
-        ArrayList<UCloudRtcSdkStreamInfo> selectList = new ArrayList<>();
+    public ArrayList<CMCCStreamInfo> getSelectedItem() {
+        ArrayList<CMCCStreamInfo> selectList = new ArrayList<>();
         for (int i = 0; i < mList.size(); i++) {
             if (isItemChecked(i)) {
                 selectList.add(mList.get(i));
@@ -54,15 +54,15 @@ public class SelectAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void removeStreamInfoByUId(String uid){
-        UCloudRtcSdkStreamInfo info = findStreamInfoByUId(uid);
+        CMCCStreamInfo info = findStreamInfoByUId(uid);
         if(info != null){
             mList.remove(info);
             notifyDataSetChanged();
         }
     }
 
-    public UCloudRtcSdkStreamInfo findStreamInfoByUId(String uid){
-        UCloudRtcSdkStreamInfo info = null;
+    public CMCCStreamInfo findStreamInfoByUId(String uid){
+        CMCCStreamInfo info = null;
         for (int i = 0; i < mList.size(); i++) {
             if(mList.get(i).getUId().equals(uid)){
                 info = mList.get(i);
@@ -103,7 +103,7 @@ public class SelectAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int i) {
         //设置条目状态
-        UCloudRtcSdkStreamInfo streamInfo = mList.get(i);
+        CMCCStreamInfo streamInfo = mList.get(i);
         ((ListItemViewHolder) holder).mainTitle.setText(streamInfo.getUId());
         ((ListItemViewHolder) holder).checkBox.setChecked(isItemChecked(i));
 

@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/video_close_bg">
 
-        <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
+        <com.cmcc.sdkengine.define.CMCCSurfaceViewRenderer
             android:id="@+id/localvideoview"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

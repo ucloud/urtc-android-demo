@@ -12,14 +12,14 @@ import android.widget.PopupWindow;
 
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.SelectAdapter;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
+import com.cmcc.sdkengine.define.CMCCStreamInfo;
 
 import java.util.List;
 
 public class SteamScribePopupWindow extends PopupWindow {
 
     private Context mContext;
-    private List<UCloudRtcSdkStreamInfo> mSteamList;
+    private List<CMCCStreamInfo> mSteamList;
     RecyclerView mRecyclerview;
     Button mBtnScrbie;
     LinearLayoutManager layoutManager;
@@ -27,10 +27,10 @@ public class SteamScribePopupWindow extends PopupWindow {
     private OnSubscribeListener mOnSubScribeListener;
 
     public interface OnSubscribeListener {
-        void onSubscribe(List<UCloudRtcSdkStreamInfo> selectStream);
+        void onSubscribe(List<CMCCStreamInfo> selectStream);
     }
 
-    public SteamScribePopupWindow(Context context,List<UCloudRtcSdkStreamInfo> streamInfos) {
+    public SteamScribePopupWindow(Context context,List<CMCCStreamInfo> streamInfos) {
         super(context);
         mContext = context;
         mSteamList = streamInfos;
@@ -45,11 +45,11 @@ public class SteamScribePopupWindow extends PopupWindow {
         mAdapter.notifyDataSetChanged();
     }
 
-    public void addStreamInfo(UCloudRtcSdkStreamInfo info,boolean notify){
+    public void addStreamInfo(CMCCStreamInfo info, boolean notify){
         mAdapter.addStreamInfo(info,notify);
     }
 
-    public UCloudRtcSdkStreamInfo findStreamInfoByUid(String uid){
+    public CMCCStreamInfo findStreamInfoByUid(String uid){
        return mAdapter.findStreamInfoByUId(uid);
     }
 
@@ -73,7 +73,7 @@ public class SteamScribePopupWindow extends PopupWindow {
         mBtnScrbie.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<UCloudRtcSdkStreamInfo> data = mAdapter.getSelectedItem();
+                List<CMCCStreamInfo> data = mAdapter.getSelectedItem();
                 if(mOnSubScribeListener !=null ){
                     mOnSubScribeListener.onSubscribe(data);
                 }

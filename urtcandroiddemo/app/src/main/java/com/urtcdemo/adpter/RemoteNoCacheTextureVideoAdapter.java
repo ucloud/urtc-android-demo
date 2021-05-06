@@ -11,10 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderTextureView;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
-import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
+import com.cmcc.sdkengine.CMCCRtcEngine;
+import com.cmcc.sdkengine.define.CMCCTextureViewRenderer;
+import com.cmcc.sdkengine.define.CMCCStreamInfo;
+import com.cmcc.sdkengine.openinterface.CMCCFirstFrameRendered;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
@@ -38,10 +38,10 @@ public class RemoteNoCacheTextureVideoAdapter extends RecyclerView.Adapter<Remot
     private Context mContext;
     private List<ViewHolder> mCacheHolder;
     private SwapInterface mSwapInterface;
-    private UCloudRtcSdkEngine mSdkEngine;
+    private CMCCRtcEngine mSdkEngine;
 
 
-    public RemoteNoCacheTextureVideoAdapter(Context context, UCloudRtcSdkEngine sdkEngine, SwapInterface provider) {
+    public RemoteNoCacheTextureVideoAdapter(Context context, CMCCRtcEngine sdkEngine, SwapInterface provider) {
         mContext = context;
         mSdkEngine = sdkEngine;
         mSwapInterface = provider;
@@ -77,11 +77,11 @@ public class RemoteNoCacheTextureVideoAdapter extends RecyclerView.Adapter<Remot
                 View view = holderView.getChildAt(0);
                 if(view instanceof TextureView){
                     if(view.getTag(R.id.render)!= null) {
-                        UCloudRtcRenderTextureView render = (UCloudRtcRenderTextureView)view.getTag(R.id.render);
-                        if(view.getTag()!= null && view.getTag() instanceof UCloudRtcSdkStreamInfo){
+                        CMCCTextureViewRenderer render = (CMCCTextureViewRenderer)view.getTag(R.id.render);
+                        if(view.getTag()!= null && view.getTag() instanceof CMCCStreamInfo){
                             URTCVideoViewInfo oldInfo = new URTCVideoViewInfo();
                             oldInfo.setmRenderview(render);
-                            oldInfo.setStreamInfo((UCloudRtcSdkStreamInfo)view.getTag());
+                            oldInfo.setStreamInfo((CMCCStreamInfo)view.getTag());
                             Log.d(TAG, "onBindViewHolder: clean old cache view ,it's info " + view.getTag() + " render" + render);
                             mSwapInterface.stopRender(oldInfo);
                         }
@@ -99,7 +99,7 @@ public class RemoteNoCacheTextureVideoAdapter extends RecyclerView.Adapter<Remot
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         holderView.addView(videoView, layoutParams);
-        UCloudRtcRenderTextureView render = new UCloudRtcRenderTextureView(videoView);
+        CMCCTextureViewRenderer render = new CMCCTextureViewRenderer(videoView);
         render.init();
         videoView.setTag(R.id.render,render);
         if (videoView != null) {
@@ -150,17 +150,17 @@ public class RemoteNoCacheTextureVideoAdapter extends RecyclerView.Adapter<Remot
 //
             viewInfo.setmRenderview(render);
             if(isLocal){
-                mSdkEngine.renderLocalView(viewInfo.getStreamInfo(), render, null, new UCloudRTCFirstFrameRendered(){
+                mSdkEngine.setupLocalVideo(viewInfo.getStreamInfo(), render, null, new CMCCFirstFrameRendered(){
                     @Override
-                    public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
+                    public void onFirstFrameRender(CMCCStreamInfo CMCCStreamInfo, View view) {
                         Log.d(TAG, "onlocal first frame render: " + "view: " + view);
                     }
                 });
             }else{
-                mSdkEngine.startRemoteView(viewInfo.getStreamInfo(), render, null, new UCloudRTCFirstFrameRendered(){
+                mSdkEngine.setupRemoteVideo(viewInfo.getStreamInfo(), render, null, new CMCCFirstFrameRendered(){
 
                     @Override
-                    public void onFirstFrameRender(UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo, View view) {
+                    public void onFirstFrameRender(CMCCStreamInfo CMCCStreamInfo, View view) {
                         Log.d(TAG, "onRemoteFirstFrameRender: " + "view: " + view);
                     }
                 });
@@ -186,7 +186,7 @@ public class RemoteNoCacheTextureVideoAdapter extends RecyclerView.Adapter<Remot
         notifyDataSetChanged();
     }
 
-    public void updateSwapInfo(UCloudRtcSdkStreamInfo clickInfo,UCloudRtcSdkStreamInfo swapInfo){
+    public void updateSwapInfo(CMCCStreamInfo clickInfo, CMCCStreamInfo swapInfo){
         String clickKey = clickInfo.getUId() + clickInfo.getMediaType().toString();
         String swapKey = swapInfo.getUId() + swapInfo.getMediaType().toString();
         URTCVideoViewInfo oldBean = mStreamViews.remove(clickKey);
