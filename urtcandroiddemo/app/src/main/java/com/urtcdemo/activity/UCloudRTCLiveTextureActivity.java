@@ -33,7 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cmcc.sdkengine.define.CMCCSurfaceViewRenderer;
-import com.cmcc.sdkengine.listener.CMCCRecordListener;
+import com.cmcc.sdkengine.listener.ICMCCRecordListener;
 import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.USBMonitor;
@@ -1355,7 +1355,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
     };
 
-    CMCCRecordListener mLocalRecordListener = new CMCCRecordListener() {
+    ICMCCRecordListener mLocalRecordListener = new ICMCCRecordListener() {
         @Override
         public void onLocalRecordStart(String path, int code,String msg) {
             Log.d(TAG, "onLocalRecordStart: " + path + " code: "+ code + " msg: " + msg);

@@ -51,7 +51,7 @@ import com.cmcc.sdkengine.define.CMCCStreamType;
 import com.cmcc.sdkengine.define.CMCCSurfaceViewGroup;
 import com.cmcc.sdkengine.define.CMCCTrackType;
 import com.cmcc.sdkengine.define.CMCCVideoProfile;
-import com.cmcc.sdkengine.listener.CMCCRecordListener;
+import com.cmcc.sdkengine.listener.ICMCCRecordListener;
 import com.cmcc.sdkengine.listener.ICMCCRtcEngineEventHandler;
 import com.cmcc.sdkengine.openinterface.CMCCDataProvider;
 import com.cmcc.sdkengine.openinterface.CMCCDataReceiver;
@@ -512,7 +512,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
     }
 
-    CMCCRecordListener mLocalRecordListener = new CMCCRecordListener() {
+    ICMCCRecordListener mLocalRecordListener = new ICMCCRecordListener() {
         @Override
         public void onLocalRecordStart(String path, int code,String msg) {
             Log.d(TAG, "onLocalRecordStart: " + path + " code: "+ code + " msg: " + msg);
