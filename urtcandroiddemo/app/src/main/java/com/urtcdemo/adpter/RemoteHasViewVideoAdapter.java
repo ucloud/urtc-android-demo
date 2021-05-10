@@ -159,7 +159,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
             if(isLocal){
                 mSdkEngine.setupLocalVideo(viewInfo.getStreamInfo(), render, null, new CMCCFirstFrameRendered(){
                     @Override
-                    public void onFirstFrameRender(CMCCStreamInfo CMCCStreamInfo, View view) {
+                    public void onFirstFrameRender(CMCCStreamInfo streamInfo, View view) {
                         Log.d(TAG, "onlocal first frame render: " + "view: " + view);
                     }
                 });
@@ -167,7 +167,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                 mSdkEngine.setupRemoteVideo(viewInfo.getStreamInfo(), render, null, new CMCCFirstFrameRendered(){
 
                     @Override
-                    public void onFirstFrameRender(CMCCStreamInfo CMCCStreamInfo, View view) {
+                    public void onFirstFrameRender(CMCCStreamInfo streamInfo, View view) {
                         Log.d(TAG, "onRemoteFirstFrameRender: " + "view: " + view);
                     }
                 });

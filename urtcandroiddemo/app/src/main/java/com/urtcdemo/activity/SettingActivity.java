@@ -17,7 +17,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.cmcc.sdkengine.CMCCRtcEnv;
+import com.cmcc.sdkengine.CMCCEnvHelper;
 import com.cmcc.sdkengine.define.CMCCSDKMode;
 import com.cmcc.sdkengine.define.CMCCChannelProfile;
 import com.cmcc.sdkengine.define.CMCCClientRole;
@@ -244,7 +244,7 @@ public class SettingActivity extends AppCompatActivity {
                 break;
         }
 
-        if (CMCCRtcEnv.getSdkMode() == CMCCSDKMode.MODE_TRIVIAL) {
+        if (CMCCEnvHelper.getSdkMode() == CMCCSDKMode.MODE_TRIVIAL) {
             mDevenv.setChecked(false);
             mTestenv.setChecked(true);
         } else {
@@ -257,10 +257,10 @@ public class SettingActivity extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (group.getCheckedRadioButtonId()) {
                     case R.id.dev_env:
-                        CMCCRtcEnv.setSdkMode(CMCCSDKMode.MODE_NORMAL);
+                        CMCCEnvHelper.setSdkMode(CMCCSDKMode.MODE_NORMAL);
                         break;
                     case R.id.test_env:
-                        CMCCRtcEnv.setSdkMode(CMCCSDKMode.MODE_TRIVIAL);
+                        CMCCEnvHelper.setSdkMode(CMCCSDKMode.MODE_TRIVIAL);
                         break;
                 }
             }

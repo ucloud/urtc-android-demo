@@ -30,7 +30,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.cmcc.sdkengine.CMCCRtcEngine;
-import com.cmcc.sdkengine.CMCCRtcEnv;
+import com.cmcc.sdkengine.CMCCEnvHelper;
 import com.cmcc.sdkengine.define.CMCCSurfaceViewRenderer;
 import com.cmcc.sdkengine.define.CMCCAudioDevice;
 import com.cmcc.sdkengine.define.CMCCAuthInfo;
@@ -40,11 +40,10 @@ import com.cmcc.sdkengine.define.CMCCMediaServiceStatus;
 import com.cmcc.sdkengine.define.CMCCMediaType;
 import com.cmcc.sdkengine.define.CMCCMixProfile;
 import com.cmcc.sdkengine.define.CMCCNetWorkQuality;
-import com.cmcc.sdkengine.define.CMCCRecordProfile;
 import com.cmcc.sdkengine.define.CMCCRecordType;
 import com.cmcc.sdkengine.define.CMCCChannelProfile;
 import com.cmcc.sdkengine.define.CMCCScaleType;
-import com.cmcc.sdkengine.define.CMCCStats;
+import com.cmcc.sdkengine.define.CMCCStreamStatus;
 import com.cmcc.sdkengine.define.CMCCStreamInfo;
 import com.cmcc.sdkengine.define.CMCCClientRole;
 import com.cmcc.sdkengine.define.CMCCStreamType;
@@ -86,6 +85,7 @@ import java.util.Timer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import core.renderer.SurfaceViewGroup;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 import static com.cmcc.sdkengine.define.CMCCErrorCode.NET_ERR_CODE_OK;
@@ -324,12 +324,12 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                 rgbSourceData = null;
             }
             if(cacheBuffer != null){
-                sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cacheBuffer);
+                sdkEngine.getNativeOpInterface().releaseNativeByteBuffer(cacheBuffer);
             }
         }
     };
 
-    private CMCCDataReceiver mCMCCDataReceiver = new CMCCDataReceiver() {
+    private CMCCDataReceiver mDataReceiver = new CMCCDataReceiver() {
         private int limit = 0;
         private ByteBuffer cache;
 
@@ -374,7 +374,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         @Override
         public void releaseBuffer() {
             if(cache != null)
-            sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cache);
+            sdkEngine.getNativeOpInterface().releaseNativeByteBuffer(cache);
             cache = null;
         }
     };
@@ -465,7 +465,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 
     private CMCCSurfaceViewGroup.RemoteOpTrigger mOnRemoteOpTrigger = new CMCCSurfaceViewGroup.RemoteOpTrigger() {
         @Override
-        public void onRemoteVideo(View v, CMCCSurfaceViewGroup parent) {
+        public void onRemoteVideo(View v, SurfaceViewGroup parent) {
             if (parent.getTag(R.id.swap_info) != null) {
                 CMCCStreamInfo swapStreamInfo = (CMCCStreamInfo) parent.getTag(R.id.swap_info);
                 sdkEngine.muteRemoteVideoStream(swapStreamInfo.getUId(), !mRemoteVideoMute);
@@ -473,11 +473,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                 CMCCStreamInfo streamInfo = (CMCCStreamInfo) parent.getTag();
                 sdkEngine.muteRemoteVideoStream(streamInfo.getUId(), !mRemoteVideoMute);
             }
-            mMuteView = parent;
+            mMuteView = (CMCCSurfaceViewGroup)parent;
         }
 
         @Override
-        public void onRemoteAudio(View v, CMCCSurfaceViewGroup parent) {
+        public void onRemoteAudio(View v, SurfaceViewGroup parent) {
             if (parent.getTag(R.id.swap_info) != null) {
                 CMCCStreamInfo swapStreamInfo = (CMCCStreamInfo) parent.getTag(R.id.swap_info);
                 sdkEngine.muteRemoteAudioStream(swapStreamInfo.getUId(), !mRemoteAudioMute);
@@ -485,7 +485,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                 CMCCStreamInfo streamInfo = (CMCCStreamInfo) parent.getTag();
                 sdkEngine.muteRemoteAudioStream(streamInfo.getUId(), !mRemoteAudioMute);
             }
-            mMuteView = parent;
+            mMuteView = (CMCCSurfaceViewGroup)parent;
         }
     };
 
@@ -544,24 +544,23 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onJoinChannel(int code, String msg, String roomid) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (code == 0) {
-                        ToastUtils.shortShow(RoomActivity.this, " 加入房间成功");
-//                        mOpBtn.setVisibility(View.VISIBLE);
-                        startTimeShow();
-                    } else {
-                        ToastUtils.shortShow(RoomActivity.this, " 加入房间失败 " +
-                                code + " errmsg " + msg);
-                        Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
-                        onMediaServerDisconnect();
-                        startActivity(intent);
-                        finish();
-                    }
+        public void onJoinChannelSuccess(String joinChannel, String userId) {
+            runOnUiThread(() -> {
+                ToastUtils.shortShow(RoomActivity.this, " 加入房间成功");
+                startTimeShow();
+            });
+        }
 
-                }
+        @Override
+        public void onError(int error, String msg) {
+            //to do leave room
+            runOnUiThread(() -> {
+                ToastUtils.shortShow(RoomActivity.this, " 加入房间失败 " +
+                        error + " errmsg " + msg);
+                Intent intent = new Intent(RoomActivity.this, ConnectActivity.class);
+                onMediaServerDisconnect();
+                startActivity(intent);
+                finish();
             });
         }
 
@@ -594,7 +593,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onRejoinRChannelSuccess(String roomid) {
+        public void onRejoinChannelSuccess(String roomid) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -696,14 +695,14 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onUserOffline(String uid, int reason) {
+        public void onUserOffline(String uid) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "remote user " + uid + "leave ,reason: " + reason);
+                    Log.d(TAG, "remote user " + uid);
                     onUserLeave(uid);
                     ToastUtils.shortShow(RoomActivity.this, " 用户 " +
-                            uid + " 离开房间，离开原因： " + reason);
+                            uid);
                 }
             });
         }
@@ -767,7 +766,8 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 
 //                             UCloudRtcSdkSurfaceVideoView 定义的viewgroup,内含UcloudRtcRenderView
                             videoView = new CMCCSurfaceViewGroup(getApplicationContext());
-                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
+                            CMCCSurfaceViewRenderer cmccSurfaceViewRenderer = new CMCCSurfaceViewRenderer(getApplicationContext());
+                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio},cmccSurfaceViewRenderer);
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
                             //设置交换
@@ -842,19 +842,19 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onLocalStreamMuteRsp(int code, String msg, CMCCMediaType mediatype, CMCCTrackType tracktype, boolean mute) {
-            Log.d(TAG, " code " + code + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
+        public void onLocalStreamMuteRsp(int code, String msg, CMCCMediaType mediaType, CMCCTrackType trackType, boolean mute) {
+            Log.d(TAG, " code " + code + " mediatype " + mediaType + " ttype " + trackType + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (code == 0) {
-                        if (mediatype == MEDIA_TYPE_VIDEO) {
-                            if (tracktype == CMCCTrackType.TRACK_TYPE_AUDIO) {
+                        if (mediaType == MEDIA_TYPE_VIDEO) {
+                            if (trackType == CMCCTrackType.TRACK_TYPE_AUDIO) {
                                 onMuteMicResult(mute);
-                            } else if (tracktype == CMCCTrackType.TRACK_TYPE_VIDEO) {
+                            } else if (trackType == CMCCTrackType.TRACK_TYPE_VIDEO) {
                                 onMuteCamResult(mute);
                             }
-                        } else if (mediatype == CMCCMediaType.MEDIA_TYPE_SCREEN) {
+                        } else if (mediaType == CMCCMediaType.MEDIA_TYPE_SCREEN) {
                             onMuteCamResult(mute);
                         }
                     }
@@ -932,7 +932,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onSendRTCStats(CMCCStats rtstats) {
+        public void onSendStreamStatus(CMCCStreamStatus streamStatus) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -942,7 +942,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onRemoteRTCStats(CMCCStats rtstats) {
+        public void onRemoteStreamStatus(CMCCStreamStatus rtstats) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1001,20 +1001,6 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                 public void run() {
                     if (error == CMCCErrorCode.NET_ERR_SDP_SWAP_FAIL.ordinal()) {
                         ToastUtils.shortShow(RoomActivity.this, "sdp swap failed");
-                    }
-                }
-            });
-        }
-
-        @Override
-        public void onRecordStop(int code) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ToastUtils.longShow(RoomActivity.this, "录制结束: " + (code == NET_ERR_CODE_OK.ordinal()?"成功":"失败: "+ code));
-                    if(mIsRecording){
-                        mIsRecording = false;
-                        mOpBtn.setText("start record");
                     }
                 }
             });
@@ -1090,7 +1076,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onMsgNotify(int code, String msg) {
+        public void onMessageNotify(int code, String msg) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1105,12 +1091,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onRecordStart(int code, String fileName) {
-
-        }
-
-        @Override
-        public void onServerBroadCastMsg(String uid, String msg) {
+        public void onServerBroadcastMessage(String uid, String msg) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1244,11 +1225,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         mAddDelBtn.setText("add_st");
         mAddDelBtn.setVisibility(View.VISIBLE);
         mCheckBoxMirror = findViewById(R.id.cb_mirror);
-        mCheckBoxMirror.setChecked(CMCCRtcEnv.isFrontCameraMirror());
+        mCheckBoxMirror.setChecked(CMCCEnvHelper.isFrontCameraMirror());
         mCheckBoxMirror.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                CMCCRtcEnv.setFrontCameraMirror(isChecked);
+                CMCCEnvHelper.setFrontCameraMirror(isChecked);
             }
         });
         mOpBtn.setOnClickListener(new View.OnClickListener() {
@@ -1274,40 +1255,35 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                     case OP_REMOTE_RECORD:
                         if (!mIsRecording) {
                             mAtomOpStart = true;
-//                如果主窗口是当前用户
-//                UCloudRtcSdkRecordProfile recordProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-//                        .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
-//                        .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-//                        .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
-//                        .Average(UCloudRtcSdkRecordProfile.RECORD_UNEVEN)
-//                        .WaterType(UCloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
-//                        .WaterPosition(UCloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
-//                        .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
-//                        .Template(UCloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
-//                        .build();
-//                sdkEngine.startRecord(recordProfile);
-                            CMCCRecordProfile recordAudioProfile = CMCCRecordProfile.getInstance().assembleRecordBuilder()
-                                    .recordType(CMCCRecordProfile.RECORD_TYPE_AUDIO)
+                            // 生成录制配置
+                            CMCCMixProfile mixProfile = (CMCCMixProfile)CMCCMixProfile.getInstance().assembleRecordMixParamsBuilder()
+                                    .type(CMCCMixProfile.MIX_TYPE_RECORD)
+                                    //画面模式
+                                    .layout(CMCCMixProfile.LAYOUT_AVERAGE_1)
+                                    //画面分辨率
+                                    .resolution(1280, 720)
+                                    //背景色
+                                    .bgColor(0, 0, 0)
+                                    //画面帧率
+                                    .frameRate(15)
+                                    //画面码率
+                                    .bitRate(1000)
+                                    //h264视频编码
+                                    .videoCodec(CMCCMixProfile.VIDEO_CODEC_H264)
+                                    //编码质量
+                                    .qualityLevel(CMCCMixProfile.QUALITY_H264_CB)
+                                    //音频编码
+                                    .audioCodec(CMCCMixProfile.AUDIO_CODEC_AAC)
+                                    //主讲人ID
+                                    .mainViewUserId(mUserid)
+                                    //主讲人媒体类型
                                     .mainViewMediaType(MEDIA_TYPE_VIDEO.ordinal())
+                                    //加流方式手动
+                                    .addStreamMode(CMCCMixProfile.ADD_STREAM_MODE_AUTO)
+                                    //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
+                                    .addStream(mUserid, MEDIA_TYPE_VIDEO.ordinal())
                                     .build();
-                            sdkEngine.startRecord(recordAudioProfile);
-
-                            //如果主窗口不是当前推流用户，而是被订阅的用户
-//                UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo = mVideoAdapter.getStreamInfo(0);
-//                if(uCloudRtcSdkStreamInfo != null){
-//                    UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-//                            .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
-//                            .mainViewUserId(uCloudRtcSdkStreamInfo.getUId())
-//                            .mainViewMediaType(uCloudRtcSdkStreamInfo.getMediaType().ordinal())
-//                            .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
-//                            .Average(UcloudRtcSdkRecordProfile.RECORD_UNEVEN)
-//                            .WaterType(UcloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
-//                            .WaterPosition(UcloudRtcSdkRecordProfile.RECORD_WATER_POS_LEFTTOP)
-//                            .WarterUrl("http://urtc-living-test.cn-bj.ufileos.com/test.png")
-//                            .Template(UcloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
-//                            .build();
-//                    sdkEngine.startRecord(recordProfile);
-//                }
+                            sdkEngine.startRecord(mixProfile); // 开始录制
                         } else if(!mAtomOpStart){
                             mAtomOpStart = true;
                             sdkEngine.stopRecord();
@@ -1316,59 +1292,58 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                     case OP_MIX:
                         if (!mIsMixing) {
                             mAtomOpStart = true;
-                            //默认mix类型是3 MIX_TYPE_BOTH
-                            JSONArray pushURL = new JSONArray();
-//                        pushURL.put("rtmp://push.urtc.com.cn/" + mAppid + "/"+ mUserid);
-//                        pushURL.put("rtmp://push.urtc.com.cn/live/URtc-h4r1txxy123131");
-                            pushURL.put("rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
-                            CMCCMixProfile mixProfile = CMCCMixProfile.getInstance().assembleRelayMixParamsBuilder()
-                                    .pushUrl(pushURL)
+                            // 生成转推配置
+                            CMCCMixProfile mixProfile = (CMCCMixProfile)CMCCMixProfile.getInstance().assembleUpdateMixParamsBuilder()
+                                    .type(CMCCMixProfile.MIX_TYPE_RELAY)
+                                    //画面模式
+                                    .layout(CMCCMixProfile.LAYOUT_CLASS_ROOM_2)
+                                    //画面分辨率
+                                    .resolution(1280, 720)
+                                    //背景色
+                                    .bgColor(0, 0, 0)
+                                    //画面帧率
+                                    .frameRate(15)
+                                    //画面码率
+                                    .bitRate(1000)
+                                    //h264视频编码
+                                    .videoCodec(CMCCMixProfile.VIDEO_CODEC_H264)
+                                    //编码质量
+                                    .qualityLevel(CMCCMixProfile.QUALITY_H264_CB)
+                                    //音频编码
+                                    .audioCodec(CMCCMixProfile.AUDIO_CODEC_AAC)
+                                    //主讲人ID
                                     .mainViewUserId(mUserid)
+                                    //主讲人媒体类型
                                     .mainViewMediaType(MEDIA_TYPE_VIDEO.ordinal())
-                                    .addStreamMode(CMCCMixProfile.ADD_STREAM_MODE_AUTO)
-//                                    .mimeType(UCloudRtcSdkMixProfile.MIME_TYPE_AUDIO)
+                                    //加流方式手动
+                                    .addStreamMode(CMCCMixProfile.ADD_STREAM_MODE_MANUAL)
+                                    //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
+                                    .addStream(mUserid, MEDIA_TYPE_VIDEO.ordinal())
+                                    //设置转推cdn 的地址
+                                    .addPushUrl("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid)
+                                    //关键用户
+                                    .keyUser(mUserid)
+                                    //流上限
+                                    .layoutUserLimit(2)
+                                    //房间没流多久结束任务
+                                    .taskTimeOut(70)
                                     .build();
-                            sdkEngine.startRelay(mixProfile);
+                            sdkEngine.startRelay(mixProfile); // 开始转推
                         } else if (!mAtomOpStart) {
                             mAtomOpStart = true;
                             JSONArray jsonArray = new JSONArray();
                             jsonArray.put("");
-                            //sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_BOTH,"rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
                         }
                         break;
                     case OP_MIX_MANUAL:
                         if (!mIsMixing) {
                             mAtomOpStart = true;
-                            //如果主窗口是当前用户
-                            JSONArray pushURL = new JSONArray();
-//                        pushURL.put("rtmp://push.urtc.com.cn/" + mAppid + "/"+ mUserid);
-//                        pushURL.put("rtmp://push.urtc.com.cn/live/URtc-h4r1txxy123131");
-                            pushURL.put("rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
-                            JSONArray streams = new JSONArray();
-                            JSONObject local = new JSONObject();
-                            try {
-                                local.put("user_id",mUserid);
-                                local.put("media_type", MEDIA_TYPE_VIDEO.ordinal());
-                                streams.put(local);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                            CMCCMixProfile mixProfile = CMCCMixProfile.getInstance().assembleRelayMixParamsBuilder()
-                                    .pushUrl(pushURL)
-                                    .streams(streams)
-                                    .mainViewUserId(mUserid)
-                                    .mainViewMediaType(MEDIA_TYPE_VIDEO.ordinal())
-                                    .addStreamMode(CMCCMixProfile.ADD_STREAM_MODE_MANUAL)
-                                    .build();
-                            sdkEngine.startRelay(mixProfile);
                         } else if (!mAtomOpStart) {
                             mAtomOpStart = true;
                             JSONArray jsonArray = new JSONArray();
                             jsonArray.put("");
                             //sdkEngine.stopMix(UCloudRtcSdkMixProfile.MIX_TYPE_BOTH,"rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
                         }
-//                    mVideoPlayer.start();
                         break;
                 }
             }
@@ -1569,7 +1544,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         localrenderview.setZOrderMediaOverlay(false);
         localrenderview.setMirror(true);
         localprocess = findViewById(R.id.processlocal);
-        isScreenCaptureSupport = CMCCRtcEnv.isSuportScreenCapture();
+        isScreenCaptureSupport = CMCCEnvHelper.isSupportScreenCapture();
         mCameraEnable = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
         mMicEnable = preferences.getBoolean(CommonUtils.MIC_ENABLE, CommonUtils.MIC_ON);
         mScreenEnable = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
@@ -1677,7 +1652,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         info.setUId(mUserid);
         Log.d(TAG, " roomtoken = " + mRoomToken);
         //普通摄像头捕获方式，与扩展模式二选一
-        CMCCRtcEnv.setCaptureMode(
+        CMCCEnvHelper.setCaptureMode(
                 CMCCCaptureMode.CAPTURE_MODE_LOCAL);
         //rgb数据捕获，与普通捕获模式二选一
 //        UCloudRtcSdkEnv.setCaptureMode(
@@ -1777,7 +1752,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
             }
         };
 
-        if(CMCCRtcEnv.getCaptureMode() == CMCCCaptureMode.CAPTURE_MODE_EXTEND &&
+        if(CMCCEnvHelper.getCaptureMode() == CMCCCaptureMode.CAPTURE_MODE_EXTEND &&
                 (mRole == CMCCClientRole.CLIENT_ROLE_BROADCASTER ||
                         mRole == CMCCClientRole.CLIENT_ROLE_PUBLISHER)){
 
@@ -1968,9 +1943,9 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         mVideoAdapter.setRemoveRemoteStreamReceiver(null);
         mCMCCDataProvider.releaseBuffer();
         mCMCCDataProvider = null;
-        mCMCCDataReceiver.releaseBuffer();
-        mCMCCDataReceiver = null;
-        if(CMCCRtcEnv.getCaptureMode() == CMCCCaptureMode.CAPTURE_MODE_EXTEND &&
+        mDataReceiver.releaseBuffer();
+        mDataReceiver = null;
+        if(CMCCEnvHelper.getCaptureMode() == CMCCCaptureMode.CAPTURE_MODE_EXTEND &&
                 (mRole == CMCCClientRole.CLIENT_ROLE_BROADCASTER ||
                         mRole == CMCCClientRole.CLIENT_ROLE_PUBLISHER)) {
             startCreateImg = false;

@@ -13,7 +13,7 @@ import android.view.WindowManager;
 import com.github.moduth.blockcanary.BlockCanaryContext;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.cmcc.sdkengine.CMCCRtcEngine;
-import com.cmcc.sdkengine.CMCCRtcEnv;
+import com.cmcc.sdkengine.CMCCEnvHelper;
 import com.cmcc.sdkengine.define.CMCCLogLevel;
 import com.cmcc.sdkengine.define.CMCCSDKMode;
 import com.cmcc.sdkengine.define.CMCCPushEncode;
@@ -60,14 +60,14 @@ public class UCloudRtcApplication extends Application {
 
     private void init(){
         sContext = this;
-        CMCCRtcEnv.initEnv(getApplicationContext());
-        CMCCRtcEnv.setWriteToLogCat(true);
-        CMCCRtcEnv.setLogReport(true);
-        CMCCRtcEnv.setEncodeMode(CMCCPushEncode.PUSH_ENCODE_MODE_H264);
-        CMCCRtcEnv.setLogLevel(CMCCLogLevel.LOG_LEVEL_INFO);
-        CMCCRtcEnv.setSdkMode(CMCCSDKMode.MODE_TRIVIAL);
-        CMCCRtcEnv.setReConnectTimes(60);
-        CMCCRtcEnv.setTokenSeckey(CommonUtils.APP_KEY);
+        CMCCEnvHelper.initEnv(getApplicationContext());
+        CMCCEnvHelper.setWriteToLogCat(true);
+        CMCCEnvHelper.setLogReport(true);
+        CMCCEnvHelper.setEncodeMode(CMCCPushEncode.PUSH_ENCODE_MODE_H264);
+        CMCCEnvHelper.setLogLevel(CMCCLogLevel.LOG_LEVEL_INFO);
+        CMCCEnvHelper.setSdkMode(CMCCSDKMode.MODE_TRIVIAL);
+        CMCCEnvHelper.setReConnectTimes(60);
+        CMCCEnvHelper.setTokenSecKey(CommonUtils.APP_KEY);
         //UCloudRtcSdkEnv.setDeviceChannelType(UCloudRtcSdkChannelType.UCLOUD_RTC_SDK_CHANNEL_TYPE_VOICE);
         //推流方向
         //UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_LANDSCAPE_MODE);
@@ -144,7 +144,7 @@ public class UCloudRtcApplication extends Application {
                 .getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningAppProcessInfo appProcess : mActivityManager
                 .getRunningAppProcesses()) {
-            if (appProcess.pid == pid) {
+            if (appProcess.pid ==  pid) {
                 return appProcess.processName;
             }
         }

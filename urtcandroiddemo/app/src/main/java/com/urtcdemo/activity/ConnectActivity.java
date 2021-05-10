@@ -30,7 +30,7 @@ import com.urtcdemo.utils.PermissionUtils;
 import com.urtcdemo.utils.StatusBarUtils;
 import com.urtcdemo.utils.ToastUtils;
 import com.cmcc.sdkengine.CMCCRtcEngine;
-import com.cmcc.sdkengine.CMCCRtcEnv;
+import com.cmcc.sdkengine.CMCCEnvHelper;
 import com.cmcc.sdkengine.define.CMCCSDKMode;
 import com.urtcdemo.utils.URTCFileUtil;
 
@@ -90,7 +90,7 @@ public class ConnectActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
         mAppid = preferences.getString(CommonUtils.APP_ID_TAG, CommonUtils.APP_ID);
-        CMCCRtcEnv.setLogReport(true);
+        CMCCEnvHelper.setLogReport(true);
         mAnimal = findViewById(R.id.userporta);
         //((AnimationDrawable) mAnimal.getBackground()).start();
 
@@ -113,7 +113,7 @@ public class ConnectActivity extends AppCompatActivity {
                     ToastUtils.shortShow(getApplicationContext(), "房间id 不能为空");
                 } else {
                     //测试环境下SDK自动生成token
-                    if (CMCCRtcEnv.getSdkMode() == CMCCSDKMode.MODE_TRIVIAL) {
+                    if (CMCCEnvHelper.getSdkMode() == CMCCSDKMode.MODE_TRIVIAL) {
                         mRoomToken = "testoken";
                         Log.d(TAG, " appid " + mAppid);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -321,8 +321,8 @@ public class ConnectActivity extends AppCompatActivity {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            if (CMCCRtcEnv.getApplication() != null) {
-                                ToastUtils.shortShow(CMCCRtcEnv.getApplication(), "default mix file copy success");
+                            if (CMCCEnvHelper.getApplication() != null) {
+                                ToastUtils.shortShow(CMCCEnvHelper.getApplication(), "default mix file copy success");
                             }
                         }
                     });

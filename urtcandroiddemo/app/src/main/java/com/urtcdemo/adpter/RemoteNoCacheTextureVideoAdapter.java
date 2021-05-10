@@ -152,7 +152,7 @@ public class RemoteNoCacheTextureVideoAdapter extends RecyclerView.Adapter<Remot
             if(isLocal){
                 mSdkEngine.setupLocalVideo(viewInfo.getStreamInfo(), render, null, new CMCCFirstFrameRendered(){
                     @Override
-                    public void onFirstFrameRender(CMCCStreamInfo CMCCStreamInfo, View view) {
+                    public void onFirstFrameRender(CMCCStreamInfo streamInfo, View view) {
                         Log.d(TAG, "onlocal first frame render: " + "view: " + view);
                     }
                 });
@@ -160,7 +160,7 @@ public class RemoteNoCacheTextureVideoAdapter extends RecyclerView.Adapter<Remot
                 mSdkEngine.setupRemoteVideo(viewInfo.getStreamInfo(), render, null, new CMCCFirstFrameRendered(){
 
                     @Override
-                    public void onFirstFrameRender(CMCCStreamInfo CMCCStreamInfo, View view) {
+                    public void onFirstFrameRender(CMCCStreamInfo streamInfo, View view) {
                         Log.d(TAG, "onRemoteFirstFrameRender: " + "view: " + view);
                     }
                 });
