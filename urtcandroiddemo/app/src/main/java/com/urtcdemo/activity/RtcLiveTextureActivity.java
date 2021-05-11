@@ -33,7 +33,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cmcc.sdkengine.define.CMCCSurfaceViewRenderer;
-import com.cmcc.sdkengine.listener.ICMCCRecordListener;
+import com.cmcc.sdkengine.openinterface.CMCCRecordListener;
 import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.USBMonitor;
@@ -1329,7 +1329,7 @@ public class RtcLiveTextureActivity extends AppCompatActivity
         }
     };
 
-    ICMCCRecordListener mLocalRecordListener = new ICMCCRecordListener() {
+    CMCCRecordListener mLocalRecordListener = new CMCCRecordListener() {
         @Override
         public void onLocalRecordStart(String path, int code,String msg) {
             Log.d(TAG, "onLocalRecordStart: " + path + " code: "+ code + " msg: " + msg);
