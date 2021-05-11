@@ -19,7 +19,7 @@ import com.urtcdemo.R;
  * @create 2020/3/11
  * @Describe
  */
-public class UCloudRtcForeGroundService extends Service {
+public class ForeGroundService extends Service {
 
     private static final String TAG = "UCloudFGService";
     private static final String ID="channel_1";

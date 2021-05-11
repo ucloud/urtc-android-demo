@@ -21,7 +21,7 @@ import com.cmcc.sdkengine.CMCCEnvHelper;
 import com.cmcc.sdkengine.define.CMCCSDKMode;
 import com.cmcc.sdkengine.define.CMCCChannelProfile;
 import com.cmcc.sdkengine.define.CMCCClientRole;
-import com.urtcdemo.Application.UCloudRtcApplication;
+import com.urtcdemo.Application.CMCCRtcApplication;
 import com.urtcdemo.BuildConfig;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
@@ -145,7 +145,7 @@ public class SettingActivity extends AppCompatActivity {
                     if(!userId.startsWith("android_")){
                         userId = "android_" + userId;
                     }
-                    UCloudRtcApplication.setUserId(userId);
+                    CMCCRtcApplication.setUserId(userId);
                 }
                 editor.putInt(CommonUtils.videoprofile, mSelectPos);
                 editor.putInt(CommonUtils.capture_mode, mCaptureMode);
@@ -372,8 +372,8 @@ public class SettingActivity extends AppCompatActivity {
 //                textView.setText(URTCLogReportManager.logPre ? "pre" : "online");
 //            }
 //        });
-        if(!TextUtils.isEmpty(UCloudRtcApplication.getUserId())){
-            mUserIdEditText.setText(UCloudRtcApplication.getUserId());
+        if(!TextUtils.isEmpty(CMCCRtcApplication.getUserId())){
+            mUserIdEditText.setText(CMCCRtcApplication.getUserId());
         }
     }
 

@@ -23,7 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.urtcdemo.Application.UCloudRtcApplication;
+import com.urtcdemo.Application.CMCCRtcApplication;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.PermissionUtils;
@@ -242,7 +242,7 @@ public class ConnectActivity extends AppCompatActivity {
             final Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
-            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
+            mUserId = CMCCRtcApplication.getUserId() != null ? CMCCRtcApplication.getUserId() : autoGenUserId;
             intent.putExtra("user_id", mUserId);
             intent.putExtra("app_id", mAppid);
             intent.putExtra("token", mRoomToken);
@@ -260,7 +260,7 @@ public class ConnectActivity extends AppCompatActivity {
     private void startLivingActivity() {
         if (!mStartSuccess) {
             mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+            final Intent intent = new Intent(ConnectActivity.this, RtcLiveActivity.class);
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
 //            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;

@@ -22,9 +22,7 @@ import com.urtcdemo.BuildConfig;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.UiHelper;
 
-//import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkPushEncode;
-
-public class UCloudRtcApplication extends Application {
+public class CMCCRtcApplication extends Application {
 
     private static final String TAG = "UCloudRtcApplication";
     private static Context sContext;
@@ -97,8 +95,8 @@ public class UCloudRtcApplication extends Application {
         public String provideQualifier() {
             String qualifier = "";
             try {
-                PackageInfo info = UCloudRtcApplication.getAppContext().getPackageManager()
-                        .getPackageInfo(UCloudRtcApplication.getAppContext().getPackageName(), 0);
+                PackageInfo info = CMCCRtcApplication.getAppContext().getPackageManager()
+                        .getPackageInfo(CMCCRtcApplication.getAppContext().getPackageName(), 0);
                 qualifier += info.versionCode + "_" + info.versionName + "_YYB";
             } catch (PackageManager.NameNotFoundException e) {
                 Log.e(TAG, "provideQualifier exception", e);
@@ -126,8 +124,8 @@ public class UCloudRtcApplication extends Application {
         return sContext;
     }
 
-    public static UCloudRtcApplication getInstance() {
-        return (UCloudRtcApplication) sContext;
+    public static CMCCRtcApplication getInstance() {
+        return (CMCCRtcApplication) sContext;
     }
 
     public static String getUserId() {

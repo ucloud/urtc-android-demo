@@ -1848,7 +1848,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         if(mIsPublished){
 //            Intent service = new Intent(this, UCloudRtcForeGroundService.class);
 //            startService(service);
-            sdkEngine.controlAudio(false);
+            sdkEngine.disableAudio();
             sdkEngine.enableLocalVideo(false);
         }
 
@@ -1925,7 +1925,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         super.onResume();
 //        Intent service = new Intent(this, UCloudRtcForeGroundService.class);
 //        stopService(service);
-        sdkEngine.controlAudio(true);
+        sdkEngine.enableAudio();
         sdkEngine.enableLocalVideo(true);
     }
 
