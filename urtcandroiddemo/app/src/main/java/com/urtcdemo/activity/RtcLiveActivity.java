@@ -78,7 +78,7 @@ import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
-import org.webrtc.ucloud.record.URTCRecordManager;
+import org.wrtca.record.RtcRecordManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -1971,8 +1971,8 @@ public class RtcLiveActivity extends AppCompatActivity
 
     //初始化视频录制
     private void initRecordManager() {
-        URTCRecordManager.init("");
-        Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
+        RtcRecordManager.init("");
+        Log.d(TAG, "initRecordManager: cache path:" + RtcRecordManager.getVideoCachePath());
     }
 
     private void toggleLocalRecord() { // 本地录制界面更新（未实现）

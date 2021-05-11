@@ -70,9 +70,9 @@ import com.urtcdemo.view.URTCVideoViewInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.ucloud.record.MediaRecorderBase;
-import org.webrtc.ucloud.record.URTCRecordManager;
-import org.webrtc.ucloud.record.model.MediaObject;
+import org.wrtca.record.MediaRecorderBase;
+import org.wrtca.record.RtcRecordManager;
+import org.wrtca.record.model.MediaObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -1244,11 +1244,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                         if(!mLocalRecordStart){
                             Log.d(TAG, " start local record: ");
 //                        URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,System.currentTimeMillis()+"",mLocalRecordListener,1000);
-                            URTCRecordManager.getInstance().startRecord(CMCCRecordType.RECORD_TYPE_MP4,"mnt/sdcard/urtc/mp4/"+ System.currentTimeMillis()+".mp4",mLocalRecordListener,1000);
+                            RtcRecordManager.getInstance().startRecord(CMCCRecordType.RECORD_TYPE_MP4.ordinal(),"mnt/sdcard/urtc/mp4/"+ System.currentTimeMillis()+".mp4",mLocalRecordListener,1000);
                             mLocalRecordStart = true;
                         }else{
                             Log.d(TAG, " stop local record: ");
-                            URTCRecordManager.getInstance().stopRecord();
+                            RtcRecordManager.getInstance().stopRecord();
                             mLocalRecordStart = false;
                         }
                         break;
@@ -2098,8 +2098,8 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         // 设置拍摄视频缓存路径
 //        File dcim = Environment
 //                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        URTCRecordManager.init("");
-        Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
+        RtcRecordManager.init("");
+        Log.d(TAG, "initRecordManager: cache path:" + RtcRecordManager.getVideoCachePath());
     }
 
 
