@@ -17,6 +17,8 @@ import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkLogLevel;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkPushEncode;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkPushOrentation;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoOutputOrientationMode;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.urtcdemo.BuildConfig;
 import com.urtcdemo.utils.CommonUtils;
@@ -70,9 +72,9 @@ public class UCloudRtcApplication extends Application {
         UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.APP_KEY);
         //UCloudRtcSdkEnv.setDeviceChannelType(UCloudRtcSdkChannelType.UCLOUD_RTC_SDK_CHANNEL_TYPE_VOICE);
         //推流方向
-        //UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_LANDSCAPE_MODE);
+//        UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_PORTRAIT_MODE);
         //视频输出模式
-        //UCloudRtcSdkEnv.setVideoOutputOrientation(UCloudRtcSdkVideoOutputOrientationMode.UCLOUD_RTC_VIDEO_OUTPUT_FIXED_LANDSCAPE_MODE);
+        UCloudRtcSdkEnv.setVideoOutputOrientation(UCloudRtcSdkVideoOutputOrientationMode.UCLOUD_RTC_VIDEO_OUTPUT_FIXED_PORTRAIT_MODE);
         //私有化部署
 //        UCloudRtcSdkEnv.setPrivateDeploy(true);
 //        UCloudRtcSdkEnv.setPrivateDeployRoomURL("wss://xxx:5005/ws");
