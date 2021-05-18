@@ -250,7 +250,6 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mVideoAdapter = new RemoteVideoAdapter(this);
 //        mVideoAdapter.setRemoveRemoteStreamReceiver(mRemoveRemoteStreamReceiver);
         mRemoteGridView.setAdapter(mVideoAdapter);
-
         mLocalVideoView = findViewById(R.id.localvideoview);
         //Surfaceview 打开注释
         mLocalVideoView.init();
