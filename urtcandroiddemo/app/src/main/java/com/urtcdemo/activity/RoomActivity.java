@@ -1,6 +1,7 @@
 package com.urtcdemo.activity;
 
 import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +21,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.Chronometer;
@@ -115,6 +119,10 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
     TextView title = null;
 //    UCloudRtcSdkSurfaceVideoView localrenderview = null;
     UCloudRtcRenderView localrenderview = null;
+    UCloudRtcRenderView localrenderviewtest = null;
+    FrameLayout frameLayoutParent = null;
+    FrameLayout frameLayoutTest = null;
+    FrameLayout frameLayoutGroup = null;
     ProgressBar localprocess = null;
 
     final int COL_SIZE_P = 3;
@@ -621,7 +629,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                                 localrenderview.setBackgroundColor(Color.TRANSPARENT);
 //                                localrenderview.setScalingType(UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT);
                                 sdkEngine.renderLocalView(info,
-                                        localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                                        localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
 
 //                                UCloudRtcRenderView renderView = new UCloudRtcRenderView(RoomActivity.this);
 //                                FrameLayout frameLayout = findViewById(R.id.local_parent);
@@ -641,7 +649,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                             //if (mCaptureMode == CommonUtils.screen_capture_mode) {
                             if (mScreenEnable && !mCameraEnable && !mMicEnable) {
 //                                localrenderview.setVisibility(View.VISIBLE);
-                                sdkEngine.renderLocalView(info, localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                                sdkEngine.renderLocalView(info, localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
                             }
                         }
 
@@ -810,7 +818,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                         }
 
                         if (vinfo != null && videoView != null) {
-                            sdkEngine.startRemoteView(info, videoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                            sdkEngine.startRemoteView(info, localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
 //                            videoView.refreshRemoteOp(View.VISIBLE);
                         }
                         //如果订阅成功就删除待订阅列表中的数据
@@ -1161,6 +1169,8 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         clearGridItem();
 //        UCloudRtcSdkEngine.destory();
     }
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -1562,12 +1572,20 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         title.setText("roomid: " + mRoomid);
         //title.setText("roomid: "+mRoomid+"\nuid: "+ mUserid);
 
-        localrenderview = findViewById(R.id.localview);
+//        localrenderviewtest = findViewById(R.id.localviewtest);
 //        localrenderview.init(true, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
 //        localrenderview.init(true);
+//        localrenderviewtest.init();
+//        localrenderviewtest.setZOrderMediaOverlay(false);
+//        localrenderviewtest.setMirror(true);
+        localrenderview = findViewById(R.id.localview);
         localrenderview.init();
         localrenderview.setZOrderMediaOverlay(false);
         localrenderview.setMirror(true);
+
+        frameLayoutParent = findViewById(R.id.local_parent);
+        frameLayoutTest = findViewById(R.id.local_parent_test);
+        frameLayoutGroup = findViewById(R.id.local_viewgroup);
         localprocess = findViewById(R.id.processlocal);
         isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture();
         mCameraEnable = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
@@ -2094,13 +2112,23 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
     UCloudRtcSdkAudioDevice defaultAudioDevice;
 
     private void onLoudSpeaker(boolean enable) {
-        if (mSpeakerOn) {
-            ToastUtils.shortShow(RoomActivity.this, "关闭喇叭");
+        if (!mSpeakerOn) {
+            frameLayoutTest.removeView(frameLayoutGroup);
+//            frameLayoutGroup.setLayoutParams(new FrameLayout.LayoutParams(-1,-1));
+//            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.MATCH_PARENT);
+//            frameLayoutParent.addView(frameLayoutGroup,0,layoutParams);
+            frameLayoutParent.addView(frameLayoutGroup);
+//            localrenderview.requestLayout();
+//            ToastUtils.shortShow(RoomActivity.this, "关闭喇叭");
         } else {
-            ToastUtils.shortShow(RoomActivity.this, "打开喇叭");
+            frameLayoutParent.removeView(frameLayoutGroup);
+//            frameLayoutGroup.setLayoutParams(new FrameLayout.LayoutParams(-1,-1));
+            frameLayoutTest.addView(frameLayoutGroup);
+//            localrenderview.requestLayout();
+//            ToastUtils.shortShow(RoomActivity.this, "打开喇叭");
         }
         mSpeakerOn = !mSpeakerOn;
-        sdkEngine.setSpeakerOn(enable);
+//        sdkEngine.setSpeakerOn(enable);
         mLoudSpkeader.setImageResource(enable ? R.mipmap.loudspeaker : R.mipmap.loudspeaker_disable);
     }
 
@@ -2126,6 +2154,43 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         URTCRecordManager.init("");
         Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
     }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d(TAG, "onConfigurationChanged");
+        localrenderview.resetSurface();
 
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+//                localrenderview.resetSurface();
+            }
+        }, 50);
+/*        int tempScreen = 0;
+        FrameLayout.LayoutParams params = null;
+        // 呼唤全屏参数
+        tempScreen = screenHeight;
+        screenHeight = screenWidth;
+        screenWidth = tempScreen;
 
+        if (mLocalViewFullScreen) {
+            params = new FrameLayout.LayoutParams(screenWidth, screenHeight + mToolBar.getHeight());
+            params.setMargins(0, 0, 0, 0);
+            mLocalVideoView.setLayoutParams(params);
+        } else {
+            if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                params = new FrameLayout.LayoutParams(localViewWidth_portrait, localViewHeight_portrait);
+                params.setMargins(0, mTitleBar.getHeight(), 0, mToolBar.getHeight());
+                mLocalVideoView.setLayoutParams(params);
+                Log.d(TAG, "PORTRAIT screen. localViewWidth: " + localViewWidth_portrait + " localViewHeight: " + localViewHeight_portrait);
+            }
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                params = new FrameLayout.LayoutParams(localViewWidth_landscape, localViewHeight_landscape);
+                params.setMargins(0, mTitleBar.getHeight(), 0, mToolBar.getHeight());
+                mLocalVideoView.setLayoutParams(params);
+                Log.d(TAG, "LANDSCAPE screen. localViewWidth: " + localViewWidth_landscape + " localViewHeight: " + localViewHeight_landscape);
+            }
+        }*/
+    }
 }
