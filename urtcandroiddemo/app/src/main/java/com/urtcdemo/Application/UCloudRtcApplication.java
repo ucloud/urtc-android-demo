@@ -17,14 +17,11 @@ import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkLogLevel;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkPushEncode;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkPushOrentation;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoOutputOrientationMode;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.urtcdemo.BuildConfig;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.UiHelper;
-
-//import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkPushEncode;
 
 public class UCloudRtcApplication extends Application {
 
@@ -55,7 +52,7 @@ public class UCloudRtcApplication extends Application {
     public void destroyEngine(){
         if(rtcSdkEngine != null){
             Log.d(TAG, "destroyEngine: ");
-            UCloudRtcSdkEngine.destory();
+            UCloudRtcSdkEngine.destroy();
             rtcSdkEngine = null;
         }
     }
@@ -67,9 +64,9 @@ public class UCloudRtcApplication extends Application {
         UCloudRtcSdkEnv.setLogReport(true);
         UCloudRtcSdkEnv.setEncodeMode(UCloudRtcSdkPushEncode.UCLOUD_RTC_PUSH_ENCODE_MODE_H264);
         UCloudRtcSdkEnv.setLogLevel(UCloudRtcSdkLogLevel.UCLOUD_RTC_SDK_LogLevelInfo);
-        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
+        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIAL);
         UCloudRtcSdkEnv.setReConnectTimes(60);
-        UCloudRtcSdkEnv.setTokenSeckey(CommonUtils.APP_KEY);
+        UCloudRtcSdkEnv.setTokenSecKey(CommonUtils.APP_KEY);
         //UCloudRtcSdkEnv.setDeviceChannelType(UCloudRtcSdkChannelType.UCLOUD_RTC_SDK_CHANNEL_TYPE_VOICE);
         //推流方向
 //        UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_PORTRAIT_MODE);

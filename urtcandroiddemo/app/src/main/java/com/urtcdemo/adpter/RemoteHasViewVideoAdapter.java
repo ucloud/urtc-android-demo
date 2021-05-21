@@ -19,8 +19,6 @@ import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
-import org.webrtc.TextureViewRenderer;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

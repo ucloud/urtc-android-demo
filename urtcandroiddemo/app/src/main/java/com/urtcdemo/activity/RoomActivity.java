@@ -75,9 +75,7 @@ import com.urtcdemo.view.URTCVideoViewInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.ucloud.record.MediaRecorderBase;
-import org.webrtc.ucloud.record.URTCRecordManager;
-import org.webrtc.ucloud.record.model.MediaObject;
+import org.wrtca.record.RtcRecordManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -90,6 +88,7 @@ import java.util.Timer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import core.renderer.SurfaceViewGroup;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
@@ -179,14 +178,6 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
     private FrameLayout testT ,testB;
     private AppCompatSeekBar mSeekBar;
 
-    /**
-     * SDK视频录制对象
-     */
-    private MediaRecorderBase mMediaRecorder;
-    /**
-     * 视频信息
-     */
-    private MediaObject mMediaObject;
 
     @Override
     public void onBufferingUpdate(IMediaPlayer iMediaPlayer, int i) {
@@ -473,7 +464,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 
     private UCloudRtcSdkSurfaceVideoView.RemoteOpTrigger mOnRemoteOpTrigger = new UCloudRtcSdkSurfaceVideoView.RemoteOpTrigger() {
         @Override
-        public void onRemoteVideo(View v, UCloudRtcSdkSurfaceVideoView parent) {
+        public void onRemoteVideo(View v, SurfaceViewGroup parent) {
             if (parent.getTag(R.id.swap_info) != null) {
                 UCloudRtcSdkStreamInfo swapStreamInfo = (UCloudRtcSdkStreamInfo) parent.getTag(R.id.swap_info);
                 sdkEngine.muteRemoteVideo(swapStreamInfo.getUId(), !mRemoteVideoMute);
@@ -481,11 +472,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                 UCloudRtcSdkStreamInfo streamInfo = (UCloudRtcSdkStreamInfo) parent.getTag();
                 sdkEngine.muteRemoteVideo(streamInfo.getUId(), !mRemoteVideoMute);
             }
-            mMuteView = parent;
+            mMuteView = (UCloudRtcSdkSurfaceVideoView) parent;
         }
 
         @Override
-        public void onRemoteAudio(View v, UCloudRtcSdkSurfaceVideoView parent) {
+        public void onRemoteAudio(View v, SurfaceViewGroup parent) {
             if (parent.getTag(R.id.swap_info) != null) {
                 UCloudRtcSdkStreamInfo swapStreamInfo = (UCloudRtcSdkStreamInfo) parent.getTag(R.id.swap_info);
                 sdkEngine.muteRemoteAudio(swapStreamInfo.getUId(), !mRemoteAudioMute);
@@ -493,7 +484,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                 UCloudRtcSdkStreamInfo streamInfo = (UCloudRtcSdkStreamInfo) parent.getTag();
                 sdkEngine.muteRemoteAudio(streamInfo.getUId(), !mRemoteAudioMute);
             }
-            mMuteView = parent;
+            mMuteView = (UCloudRtcSdkSurfaceVideoView) parent;
         }
     };
 
@@ -775,7 +766,8 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 
 //                             UCloudRtcSdkSurfaceVideoView 定义的viewgroup,内含UcloudRtcRenderView
                             videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
-                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio});
+                            UCloudRtcRenderView surfaceViewRenderer = new UCloudRtcRenderView(getApplicationContext());
+                            videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio}, surfaceViewRenderer);
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
                             //设置交换
@@ -940,23 +932,13 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onSendRTCStats(UCloudRtcSdkStats rtstats) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    // localprocess.setProgress(volume);
-                }
-            });
+        public void onSendRTCStatus(UCloudRtcSdkStats rtstats) {
+
         }
 
         @Override
-        public void onRemoteRTCStats(UCloudRtcSdkStats rtstats) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    //localprocess.setProgress(volume);
-                }
-            });
+        public void onRemoteRTCStatus(UCloudRtcSdkStats rtstats) {
+
         }
 
         @Override
@@ -1272,12 +1254,12 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                     case OP_LOCAL_RECORD:
                         if(!mLocalRecordStart){
                             Log.d(TAG, " start local record: ");
-//                        URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,System.currentTimeMillis()+"",mLocalRecordListener,1000);
-                            URTCRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,"mnt/sdcard/urtc/mp4/"+ System.currentTimeMillis()+".mp4",mLocalRecordListener,1000);
+//                        RtcRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4,System.currentTimeMillis()+"",mLocalRecordListener,1000);
+                            RtcRecordManager.getInstance().startRecord(UCloudRtcSdkRecordType.U_CLOUD_RTC_SDK_RECORD_TYPE_MP4.ordinal(),"mnt/sdcard/urtc/mp4/"+ System.currentTimeMillis()+".mp4",mLocalRecordListener,1000);
                             mLocalRecordStart = true;
                         }else{
                             Log.d(TAG, " stop local record: ");
-                            URTCRecordManager.getInstance().stopRecord();
+                            RtcRecordManager.getInstance().stopRecord();
                             mLocalRecordStart = false;
                         }
                         break;
@@ -1296,11 +1278,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 //                        .Template(UCloudRtcSdkRecordProfile.RECORD_TEMPLET_9)
 //                        .build();
 //                sdkEngine.startRecord(recordProfile);
-                            UCloudRtcSdkRecordProfile recordAudioProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
-                                    .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_AUDIO)
-                                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-                                    .build();
-                            sdkEngine.startRecord(recordAudioProfile);
+//                            UCloudRtcSdkRecordProfile recordAudioProfile = UCloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
+//                                    .recordType(UCloudRtcSdkRecordProfile.RECORD_TYPE_AUDIO)
+//                                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+//                                    .build();
+//                            sdkEngine.startRecord(recordAudioProfile);
 
                             //如果主窗口不是当前推流用户，而是被订阅的用户
 //                UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo = mVideoAdapter.getStreamInfo(0);
@@ -1331,14 +1313,14 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 //                        pushURL.put("rtmp://push.urtc.com.cn/" + mAppid + "/"+ mUserid);
 //                        pushURL.put("rtmp://push.urtc.com.cn/live/URtc-h4r1txxy123131");
                             pushURL.put("rtmp://rtcpush.ugslb.com/rtclive/"+mRoomid);
-                            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleRelayMixParamsBuilder()
-                                    .pushUrl(pushURL)
-                                    .mainViewUserId(mUserid)
-                                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-                                    .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_AUTO)
-//                                    .mimeType(UCloudRtcSdkMixProfile.MIME_TYPE_AUDIO)
-                                    .build();
-                            sdkEngine.startRelay(mixProfile);
+//                            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleRelayMixParamsBuilder()
+//                                    .pushUrl(pushURL)
+//                                    .mainViewUserId(mUserid)
+//                                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+//                                    .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_AUTO)
+////                                    .mimeType(UCloudRtcSdkMixProfile.MIME_TYPE_AUDIO)
+//                                    .build();
+//                            sdkEngine.startRelay(mixProfile);
                         } else if (!mAtomOpStart) {
                             mAtomOpStart = true;
                             JSONArray jsonArray = new JSONArray();
@@ -1364,14 +1346,14 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                                 e.printStackTrace();
                             }
 
-                            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleRelayMixParamsBuilder()
-                                    .pushUrl(pushURL)
-                                    .streams(streams)
-                                    .mainViewUserId(mUserid)
-                                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-                                    .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
-                                    .build();
-                            sdkEngine.startRelay(mixProfile);
+//                            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleRelayMixParamsBuilder()
+//                                    .pushUrl(pushURL)
+//                                    .streams(streams)
+//                                    .mainViewUserId(mUserid)
+//                                    .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+//                                    .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
+//                                    .build();
+//                            sdkEngine.startRelay(mixProfile);
                         } else if (!mAtomOpStart) {
                             mAtomOpStart = true;
                             JSONArray jsonArray = new JSONArray();
@@ -1587,7 +1569,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         frameLayoutTest = findViewById(R.id.local_parent_test);
         frameLayoutGroup = findViewById(R.id.local_viewgroup);
         localprocess = findViewById(R.id.processlocal);
-        isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture();
+        isScreenCaptureSupport = UCloudRtcSdkEnv.isSupportScreenCapture();
         mCameraEnable = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
         mMicEnable = preferences.getBoolean(CommonUtils.MIC_ENABLE, CommonUtils.MIC_ON);
         mScreenEnable = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
@@ -2151,8 +2133,8 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         // 设置拍摄视频缓存路径
 //        File dcim = Environment
 //                .getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        URTCRecordManager.init("");
-        Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
+        RtcRecordManager.init("");
+        Log.d(TAG, "initRecordManager: cache path:" + RtcRecordManager.getVideoCachePath());
     }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {

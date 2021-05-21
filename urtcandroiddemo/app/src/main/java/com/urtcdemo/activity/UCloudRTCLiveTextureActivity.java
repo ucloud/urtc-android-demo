@@ -71,7 +71,7 @@ import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
-import org.webrtc.ucloud.record.URTCRecordManager;
+import org.wrtca.record.RtcRecordManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -295,7 +295,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
         mAppid = getIntent().getStringExtra("app_id");
-        isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture();
+        isScreenCaptureSupport = UCloudRtcSdkEnv.isSupportScreenCapture();
         mCameraEnable = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
         mMicEnable = preferences.getBoolean(CommonUtils.MIC_ENABLE, CommonUtils.MIC_ON);
         mScreenEnable = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
@@ -1089,23 +1089,13 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onSendRTCStats(UCloudRtcSdkStats rtstats) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    // localprocess.setProgress(volume);
-                }
-            });
+        public void onSendRTCStatus(UCloudRtcSdkStats rtstats) {
+
         }
 
         @Override
-        public void onRemoteRTCStats(UCloudRtcSdkStats rtstats) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    //localprocess.setProgress(volume);
-                }
-            });
+        public void onRemoteRTCStatus(UCloudRtcSdkStats rtstats) {
+
         }
 
         @Override
@@ -1602,7 +1592,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     private void onMediaServerDisconnect() {
         //mLocalVideoView.release();
         clearGridItem();
-        UCloudRtcSdkEngine.destory();
+        UCloudRtcSdkEngine.destroy();
     }
     private void clearGridItem() {
         mVideoAdapter.clearAll();
@@ -1749,8 +1739,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
     //初始化视频录制
     private void initRecordManager() {
-        URTCRecordManager.init("");
-        Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
+        RtcRecordManager.init("");
+        Log.d(TAG, "initRecordManager: cache path:" + RtcRecordManager.getVideoCachePath());
     }
 
     private void toggleLocalRecord(){
@@ -1774,7 +1764,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         if (!mIsRemoteRecording) {
             Log.d(TAG, " start remote record: ");
             mAtomOpStart = true;
-            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+            UCloudRtcSdkMixProfile mixProfile = (UCloudRtcSdkMixProfile) UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
                     .type(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD)
                     //画面模式
                     .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
@@ -1815,7 +1805,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         if (!mIsMixing) {
             Log.d(TAG, " start mix: ");
             mAtomOpStart = true;
-            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+            UCloudRtcSdkMixProfile mixProfile = (UCloudRtcSdkMixProfile) UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
                     .type(UCloudRtcSdkMixProfile.MIX_TYPE_RELAY)
                     //画面模式
                     .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)

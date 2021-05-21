@@ -100,7 +100,7 @@
         </service>
 
         <service
-            android:name="com.ucloudrtclib.monitor.MonitorService"
+            android:name="core.monitor.MonitorService"
             android:enabled="true"
             android:exported="true"
             android:process=":remote">
