@@ -1906,7 +1906,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             Log.d(TAG, " start remote record: ");
             mAtomOpStart = true;
             // 生成录制配置
-            UCloudRtcSdkMixProfile mixProfile = (UCloudRtcSdkMixProfile) UCloudRtcSdkMixProfile.getInstance().assembleRecordMixParamsBuilder()
+            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleRecordMixParamsBuilder()
                     .type(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD)
                     //画面模式
                     .layout(UCloudRtcSdkMixProfile.LAYOUT_AVERAGE_1)
@@ -1946,7 +1946,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             Log.d(TAG, " start mix: ");
             mAtomOpStart = true;
             // 生成转推配置
-            UCloudRtcSdkMixProfile mixProfile = (UCloudRtcSdkMixProfile) UCloudRtcSdkMixProfile.getInstance().assembleUpdateMixParamsBuilder()
+            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleUpdateMixParamsBuilder()
                     .type(UCloudRtcSdkMixProfile.MIX_TYPE_RELAY)
                     //画面模式
                     .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
@@ -1991,7 +1991,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
     private void update(int type) {
         Log.d(TAG, " start update: ");
-        UCloudRtcSdkMixProfile mixProfile = (UCloudRtcSdkMixProfile) UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+        UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
                 .type(type)
                 //画面模式
                 .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)

@@ -1764,7 +1764,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         if (!mIsRemoteRecording) {
             Log.d(TAG, " start remote record: ");
             mAtomOpStart = true;
-            UCloudRtcSdkMixProfile mixProfile = (UCloudRtcSdkMixProfile) UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
                     .type(UCloudRtcSdkMixProfile.MIX_TYPE_RECORD)
                     //画面模式
                     .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
@@ -1805,7 +1805,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         if (!mIsMixing) {
             Log.d(TAG, " start mix: ");
             mAtomOpStart = true;
-            UCloudRtcSdkMixProfile mixProfile = (UCloudRtcSdkMixProfile) UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
+            UCloudRtcSdkMixProfile mixProfile = UCloudRtcSdkMixProfile.getInstance().assembleMixParamsBuilder()
                     .type(UCloudRtcSdkMixProfile.MIX_TYPE_RELAY)
                     //画面模式
                     .layout(UCloudRtcSdkMixProfile.LAYOUT_CLASS_ROOM_2)
