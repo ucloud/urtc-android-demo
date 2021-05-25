@@ -1,4 +1,80 @@
 # Android SDK 版本说明
+## 2.0.0
+发布于2021-5-24
+
+1.sdk结构变动。
+
+2.修正部分类名、方法名、参数名等，具体修改内容如下
+
+UCloudRtcSdkEngine接口：
+
+UCloudRtcSdkEngine.destory->UCloudRtcSdkEngine.destroy
+
+UCloudRtcSdkEnv类：
+
+UCloudRtcSdkEnv.setTokenSeckey->UCloudRtcSdkEnv.setTokenSecKey
+
+UCloudRtcSdkMode枚举：
+
+UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL->UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIAL
+
+UCloudRtcSdkSurfaceVideoView.RemoteOpTrigger接口：
+
+onRemoteAudio(View v, UCloudRtcSdkSurfaceVideoView parent)->onRemoteAudio(View v, SurfaceViewGroup parent)
+
+onRemoteVideo(View v, UCloudRtcSdkSurfaceVideoView parent)->onRemoteVideo(View v, SurfaceViewGroup parent)
+
+UCloudRtcSdkSurfaceVideoView类：
+
+UCloudRtcSdkSurfaceVideoView.init()增加一个参数，类型为UCloudRtcRenderView
+
+UCloudRtcSdkEventListener接口：
+
+onSendRTCStats->onSendRTCStatus
+
+onRemoteRTCStats->onRemoteRTCStatus
+
+## 1.9.8
+发布于2021-5-20
+
+1.解决syncroom消息会取消订阅的问题。
+
+2.解决UCloudRtcRenderView在父控件变化时，尺寸出错的问题。
+
+3.解决在rejoin流程中，syncroom消息内缺少muteaudio和mutevideo的问题
+
+4.增加硬件编解码。
+
+## 1.9.6
+发布于2021-4-15
+
+1.解决子布局切换时没有重新layout的问题。
+
+2.设置pub权限时也能订阅流。
+
+3.本地发布回调参数内加入当前的hasVideo和hasAudio状态。
+
+4.aar包发布到mavenCentral公共仓库中。
+
+## 1.9.3
+发布于2021-3-18
+
+1.实现自定义前台通知接口。
+
+2.修复蓝牙耳机连接时，切换回其他app没有声音的问题。
+
+3.修复本地渲染设置成UCLOUD_RTC_SDK_SCALE_ASPECT_FIT不起作用的问题。
+
+4.支持按输出模式剪裁视频数据
+
+## 1.9.1
+发布于2021-3-4
+
+1.优化混音推流。
+
+2.增加syncroom消息。
+
+
 ## 1.9.0
 发布于2021-1-28
 
