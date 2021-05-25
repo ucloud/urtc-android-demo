@@ -41,7 +41,7 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
 
 ## 2 版本与支持
 
-- sdk 目前最新版本1.9.0
+- sdk 目前更新至版本2.0.0
 
 - 支持Android api 16 ~ 29
 
@@ -68,10 +68,10 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
   其中ucloudrtclib-xxx.aar 是urtc 的sdk，xxx为版本号，支持本地和jcenter引用，common-2.12.4.aar，libyuvcamera-release.aar 为辅助验证自定义外部摄像头（例如usb摄像头）的输入功能的，引用方式参考如下：
 
   ```
-      implementation (name: 'ucloudrtclib-1.9.0', ext: 'aar')
+      implementation (name: 'ucloudrtclib-2.0.0', ext: 'aar')
       implementation(name: 'libuvccamera-release', ext: 'aar')
       implementation(name: 'common-2.12.4', ext: 'aar')
-  //  implementation 'com.ucloud:ucloudrtclib:1.9.0'
+  //  implementation 'com.ucloud:ucloudrtclib:2.0.0'
   ```
 
 - ### APP_ID&APP_KEY
@@ -80,7 +80,7 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
 
 ```
 //测试模式
-UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
+UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIAL);
 //正式模式
 UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_NORMAL);
 ```
