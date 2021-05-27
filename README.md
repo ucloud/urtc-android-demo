@@ -41,7 +41,7 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
 
 ## 2 版本与支持
 
-- sdk 目前最新版本1.9.0
+- sdk 目前最新版本2.0.0
 
 - 支持Android api 16 ~ 29
 
@@ -80,7 +80,7 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
 
 ```
 //测试模式
-UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
+UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIAL);
 //正式模式
 UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_NORMAL);
 ```
