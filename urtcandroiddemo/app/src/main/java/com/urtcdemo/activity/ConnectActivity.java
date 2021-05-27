@@ -113,7 +113,7 @@ public class ConnectActivity extends AppCompatActivity {
                     ToastUtils.shortShow(getApplicationContext(), "房间id 不能为空");
                 } else {
                     //测试环境下SDK自动生成token
-                    if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL) {
+                    if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIAL) {
                         mRoomToken = "testoken";
                         Log.d(TAG, " appid " + mAppid);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -260,7 +260,7 @@ public class ConnectActivity extends AppCompatActivity {
     private void startLivingActivity() {
         if (!mStartSuccess) {
             mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+            final Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
 //            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;

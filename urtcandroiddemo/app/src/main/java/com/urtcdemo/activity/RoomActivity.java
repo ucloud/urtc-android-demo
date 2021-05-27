@@ -96,6 +96,8 @@ import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CO
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
 import static com.urtcdemo.activity.RoomActivity.BtnOp.OP_LOCAL_RECORD;
+import static com.urtcdemo.utils.CommonUtils.BUCKET;
+import static com.urtcdemo.utils.CommonUtils.REGION;
 
 //import com.ucloudrtclib.sdkengine.define.UcloudRtcSdkRecordProfile;
 //import com.ucloudrtclib.sdkengine.openinterface.UcloudRTCSceenShot;
@@ -157,6 +159,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
     boolean mScreenEnable;
     private List<UCloudRtcSdkStreamInfo> mSteamList;
     private UCloudRtcSdkStreamInfo mLocalStreamInfo;
+    private UCloudRtcSdkStreamInfo mLastRemoteStreamInfo;
     private boolean mRemoteVideoMute;
     private boolean mRemoteAudioMute;
     private UCloudRtcSdkSurfaceVideoView mMuteView = null;
@@ -691,6 +694,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
+        public void onLocalUnPublishOnly(int code, String msg, UCloudRtcSdkStreamInfo info) {
+
+        }
+
+        @Override
         public void onRemoteUserJoin(String uid) {
 
             runOnUiThread(new Runnable() {
@@ -818,6 +826,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                         }
 
                         if (vinfo != null && videoView != null) {
+                            mLastRemoteStreamInfo = info;
                             sdkEngine.startRemoteView(info, localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
 //                            videoView.refreshRemoteOp(View.VISIBLE);
                         }
@@ -940,7 +949,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onSendRTCStats(UCloudRtcSdkStats rtstats) {
+        public void onSendRTCStatus(UCloudRtcSdkStats rtstats) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -950,7 +959,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onRemoteRTCStats(UCloudRtcSdkStats rtstats) {
+        public void onRemoteRTCStatus(UCloudRtcSdkStats rtstats) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1167,7 +1176,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
     private void onMediaServerDisconnect() {
         localrenderview.release();
         clearGridItem();
-//        UCloudRtcSdkEngine.destory();
+//        UCloudRtcSdkEngine.destroy();
     }
 
 
@@ -1337,6 +1346,10 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                                     .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                                     .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_AUTO)
 //                                    .mimeType(UCloudRtcSdkMixProfile.MIME_TYPE_AUDIO)
+                                    //录像存储区域
+                                    .region(REGION)
+                                    //录像存储桶
+                                    .Bucket(BUCKET)
                                     .build();
                             sdkEngine.startRelay(mixProfile);
                         } else if (!mAtomOpStart) {
@@ -1370,6 +1383,10 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                                     .mainViewUserId(mUserid)
                                     .mainViewMediaType(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                                     .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
+                                    //录像存储区域
+                                    .region(REGION)
+                                    //录像存储桶
+                                    .Bucket(BUCKET)
                                     .build();
                             sdkEngine.startRelay(mixProfile);
                         } else if (!mAtomOpStart) {
@@ -1587,7 +1604,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         frameLayoutTest = findViewById(R.id.local_parent_test);
         frameLayoutGroup = findViewById(R.id.local_viewgroup);
         localprocess = findViewById(R.id.processlocal);
-        isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture();
+        isScreenCaptureSupport = UCloudRtcSdkEnv.isSupportScreenCapture();
         mCameraEnable = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
         mMicEnable = preferences.getBoolean(CommonUtils.MIC_ENABLE, CommonUtils.MIC_ON);
         mScreenEnable = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
@@ -1979,7 +1996,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "activity destory");
+        Log.d(TAG, "activity destroy");
         super.onDestroy();
         localrenderview.release();
         clearGridItem();
@@ -2003,7 +2020,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 
             }
         }
-//        UCloudRtcSdkEngine.destory();
+//        UCloudRtcSdkEngine.destroy();
 //        if(mVideoPlayer != null ){
 //            mVideoPlayer.stop();
 //        }
@@ -2158,7 +2175,9 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         Log.d(TAG, "onConfigurationChanged");
-        localrenderview.resetSurface();
+//        localrenderview.resetSurface();
+        sdkEngine.stopRemoteView(mLastRemoteStreamInfo);
+        sdkEngine.startRemoteView(mLastRemoteStreamInfo, localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
 
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {

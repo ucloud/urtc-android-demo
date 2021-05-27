@@ -87,6 +87,8 @@ import java.util.concurrent.TimeUnit;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
+import static com.urtcdemo.utils.CommonUtils.BUCKET;
+import static com.urtcdemo.utils.CommonUtils.REGION;
 
 /**
  * @author ciel
@@ -295,7 +297,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
         mAppid = getIntent().getStringExtra("app_id");
-        isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture();
+        isScreenCaptureSupport = UCloudRtcSdkEnv.isSupportScreenCapture();
         mCameraEnable = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
         mMicEnable = preferences.getBoolean(CommonUtils.MIC_ENABLE, CommonUtils.MIC_ON);
         mScreenEnable = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
@@ -693,7 +695,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "activity destory");
+        Log.d(TAG, "activity destroy");
         super.onDestroy();
         System.gc();
     }
@@ -896,6 +898,10 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
             });
         }
 
+        @Override
+        public void onLocalUnPublishOnly(int code, String msg, UCloudRtcSdkStreamInfo info) {
+
+        }
 
         @Override
         public void onRemoteUserJoin(String uid) {
@@ -1089,7 +1095,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onSendRTCStats(UCloudRtcSdkStats rtstats) {
+        public void onSendRTCStatus(UCloudRtcSdkStats rtstats) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1099,7 +1105,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onRemoteRTCStats(UCloudRtcSdkStats rtstats) {
+        public void onRemoteRTCStatus(UCloudRtcSdkStats rtstats) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -1602,7 +1608,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     private void onMediaServerDisconnect() {
         //mLocalVideoView.release();
         clearGridItem();
-        UCloudRtcSdkEngine.destory();
+        UCloudRtcSdkEngine.destroy();
     }
     private void clearGridItem() {
         mVideoAdapter.clearAll();
@@ -1800,6 +1806,10 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                     .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
                     //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
                     .addStream(mUserid,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                    //录像存储区域
+                    .region(REGION)
+                    //录像存储桶
+                    .Bucket(BUCKET)
                     .build();
             sdkEngine.startRelay(mixProfile);
 
@@ -1843,6 +1853,10 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                     .addStream(mUserid,UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
                     //设置转推cdn 的地址
                     .addPushUrl("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid)
+                    //录像存储区域
+                    .region(REGION)
+                    //录像存储桶
+                    .Bucket(BUCKET)
                     .build();
             sdkEngine.startRelay(mixProfile);
         }
