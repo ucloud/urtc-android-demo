@@ -156,6 +156,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
     boolean mScreenEnable;
     private List<UCloudRtcSdkStreamInfo> mSteamList;
     private UCloudRtcSdkStreamInfo mLocalStreamInfo;
+    private UCloudRtcSdkStreamInfo mLastRemoteStreamInfo;
     private boolean mRemoteVideoMute;
     private boolean mRemoteAudioMute;
     private UCloudRtcSdkSurfaceVideoView mMuteView = null;
@@ -682,6 +683,11 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
+        public void onLocalUnPublishOnly(int code, String msg, UCloudRtcSdkStreamInfo info) {
+
+        }
+
+        @Override
         public void onRemoteUserJoin(String uid) {
 
             runOnUiThread(new Runnable() {
@@ -797,10 +803,10 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 //                            mRemoteRenderView.setTag(info);
 //                            mRemoteRenderView.setOnClickListener(mScreenShotOnClickListener);
                         }
-                        vinfo.setmRenderview(videoView);
-                        vinfo.setmUid(info.getUId());
-                        vinfo.setmMediatype(info.getMediaType());
-                        vinfo.setmEanbleVideo(info.isHasVideo());
+                        vinfo.setRenderview(videoView);
+                        vinfo.setUid(info.getUId());
+                        vinfo.setMediaType(info.getMediaType());
+                        vinfo.setEnableVideo(info.isHasVideo());
                         vinfo.setEnableAudio(info.isHasAudio());
                         String mkey = info.getUId() + info.getMediaType().toString();
                         vinfo.setKey(mkey);
@@ -810,7 +816,8 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                         }
 
                         if (vinfo != null && videoView != null) {
-                            sdkEngine.startRemoteView(info, localrenderview,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
+                            mLastRemoteStreamInfo = info;
+                            sdkEngine.startRemoteView(info, localrenderview, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
 //                            videoView.refreshRemoteOp(View.VISIBLE);
                         }
                         //如果订阅成功就删除待订阅列表中的数据
@@ -1842,7 +1849,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 //        for (String key : mVideoAdapter.getStreamViews().keySet()) {
 //        for (String key : mVideoAdapter.getStreamViews().keySet()) {
 //            URTCVideoViewInfo info = mVideoAdapter.getStreamViews().get(key);
-//            View videoView = info.getmRenderview();
+//            View videoView = info.getRenderview();
 //            UCloudRtcSdkStreamInfo videoViewStreamInfo = (UCloudRtcSdkStreamInfo) videoView.getTag();
 //            UCloudRtcSdkStreamInfo videoViewSwapStreamInfo = (UCloudRtcSdkStreamInfo) videoView.getTag(R.id.swap_info);
 //            if (videoView != null && videoViewStreamInfo != null) {
@@ -1879,7 +1886,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 
 //        for (String key : mVideoAdapter.getStreamViews().keySet()) {
 //            URTCVideoViewInfo info = mVideoAdapter.getStreamViews().get(key);
-//            View videoView = info.getmRenderview();
+//            View videoView = info.getRenderview();
 //            UCloudRtcSdkStreamInfo videoViewStreamInfo = (UCloudRtcSdkStreamInfo) videoView.getTag();
 //            if (videoView != null && videoViewStreamInfo != null) {
 //                sdkEngine.stopRemoteView(videoViewStreamInfo);

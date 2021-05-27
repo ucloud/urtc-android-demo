@@ -80,7 +80,7 @@ public class RemoteNoCacheTextureVideoAdapter extends RecyclerView.Adapter<Remot
                         UCloudRtcRenderTextureView render = (UCloudRtcRenderTextureView)view.getTag(R.id.render);
                         if(view.getTag()!= null && view.getTag() instanceof UCloudRtcSdkStreamInfo){
                             URTCVideoViewInfo oldInfo = new URTCVideoViewInfo();
-                            oldInfo.setmRenderview(render);
+                            oldInfo.setRenderview(render);
                             oldInfo.setStreamInfo((UCloudRtcSdkStreamInfo)view.getTag());
                             Log.d(TAG, "onBindViewHolder: clean old cache view ,it's info " + view.getTag() + " render" + render);
                             mSwapInterface.stopRender(oldInfo);
@@ -113,7 +113,7 @@ public class RemoteNoCacheTextureVideoAdapter extends RecyclerView.Adapter<Remot
             boolean isLocal = false;
             if(mSwapInterface != null){
                 videoView.setOnClickListener(mSwapInterface.provideSwapListener());
-                isLocal = mSwapInterface.isLocalStream(viewInfo.getmUid());
+                isLocal = mSwapInterface.isLocalStream(viewInfo.getUid());
             }else{
                 videoView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -148,7 +148,7 @@ public class RemoteNoCacheTextureVideoAdapter extends RecyclerView.Adapter<Remot
                 });
             }
 //
-            viewInfo.setmRenderview(render);
+            viewInfo.setRenderview(render);
             if(isLocal){
                 mSdkEngine.renderLocalView(viewInfo.getStreamInfo(), render, null, new UCloudRTCFirstFrameRendered(){
                     @Override
@@ -191,8 +191,8 @@ public class RemoteNoCacheTextureVideoAdapter extends RecyclerView.Adapter<Remot
         String swapKey = swapInfo.getUId() + swapInfo.getMediaType().toString();
         URTCVideoViewInfo oldBean = mStreamViews.remove(clickKey);
         URTCVideoViewInfo newBean = new URTCVideoViewInfo(swapInfo);
-        Log.d(TAG, "updateSwapInfo: old bean render: "+ oldBean.getmRenderview());
-        newBean.setmRenderview(oldBean.getmRenderview());
+        Log.d(TAG, "updateSwapInfo: old bean render: "+ oldBean.getRenderview());
+        newBean.setRenderview(oldBean.getRenderview());
         mStreamViews.put(swapKey,newBean);
 
         int clickIndex = medialist.indexOf(clickKey);
@@ -204,10 +204,10 @@ public class RemoteNoCacheTextureVideoAdapter extends RecyclerView.Adapter<Remot
 //        UCloudRtcSdkStreamInfo streamInfo = null;
 //        if (medialist.size() > position && mStreamViews.size() > position) {
 //            streamInfo = new UCloudRtcSdkStreamInfo();
-//            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getmMediatype());
+//            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getMediaType());
 //            streamInfo.setHasAudio(mStreamViews.get(medialist.get(position)).isEnableAudio());
-//            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).ismEanbleVideo());
-//            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getmUid());
+//            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).isEnableVideo());
+//            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getUid());
 //        }
 //        return streamInfo;
 //    }

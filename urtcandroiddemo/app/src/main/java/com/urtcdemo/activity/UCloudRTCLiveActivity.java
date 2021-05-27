@@ -93,6 +93,8 @@ import core.renderer.SurfaceViewGroup;
 
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
+import static com.urtcdemo.utils.CommonUtils.BUCKET;
+import static com.urtcdemo.utils.CommonUtils.REGION;
 
 /**
  * @author ciel
@@ -934,6 +936,62 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         }
 
         @Override
+        public void onLocalUnPublishOnly(int code, String msg, UCloudRtcSdkStreamInfo info) {
+            // 取消发布回调结果
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (code == 0) {
+                        if (info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) { // 音视频流
+                            // 界面更新
+                            if (mPublishMode == CommonUtils.AUTO_MODE) {
+                                mImgManualPubVideo.setVisibility(View.GONE);
+                                mTextManualPubVideo.setVisibility(View.GONE);
+                            } else {
+                                mImgManualPubVideo.setImageResource(R.mipmap.publish);
+                                mTextManualPubVideo.setText(R.string.pub_video);
+                            }
+                            if (mLocalVideoView != null) {
+//                                localrenderview.refresh();
+                            }
+                            mVideoIsPublished = false;
+                            if (mIsLocalMixingSound) {
+                                toggleMixingSound(false);
+                            }
+                            if (mIsRemoteMixingSound) {
+                                toggleMixingSound(true);
+                            }
+                        } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) { //屏幕流
+                            mScreenIsPublished = false;
+                            if (mPublishMode == CommonUtils.AUTO_MODE) {
+                                mImgManualPubScreen.setVisibility(View.GONE);
+                                mTextManualPubScreen.setVisibility(View.GONE);
+                            } else {
+                                mImgManualPubScreen.setImageResource(R.mipmap.publish_screen);
+                                mTextManualPubScreen.setText(R.string.pub_screen);
+                            }
+                            if (mScreenEnable && !mCameraEnable && !mMicEnable) {
+//                                if (localrenderview != null) {
+//                                    localrenderview.refresh();
+//                                }
+                            }
+                            if (mIsLocalMixingSound) {
+                                toggleMixingSound(false);
+                            }
+                        }
+                        if (!mScreenIsPublished && !mVideoIsPublished) {
+                            setIconStats(false);
+                        }
+                        ToastUtils.shortShow(UCloudRTCLiveActivity.this, "取消发布成功");
+                    } else {
+                        ToastUtils.shortShow(UCloudRTCLiveActivity.this, "取消发布失败 "
+                                + code + " errmsg " + msg);
+                    }
+                }
+            });
+        }
+
+        @Override
         public void onRemoteUserJoin(String uid) {
             // 远端用户加入房间
             runOnUiThread(new Runnable() {
@@ -1047,10 +1105,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                             //设置交换
                             videoView.setOnClickListener(mSwapRemoteLocalListener);
                         }
-                        vinfo.setmRenderview(videoView);
-                        vinfo.setmUid(info.getUId());
-                        vinfo.setmMediatype(info.getMediaType());
-                        vinfo.setmEanbleVideo(info.isHasVideo());
+                        vinfo.setRenderview(videoView);
+                        vinfo.setUid(info.getUId());
+                        vinfo.setMediaType(info.getMediaType());
+                        vinfo.setEnableVideo(info.isHasVideo());
                         vinfo.setEnableAudio(info.isHasAudio());
                         String mkey = info.getUId() + info.getMediaType().toString();
                         vinfo.setKey(mkey);
@@ -1932,6 +1990,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_AUTO)
                     //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
                     .addStream(mUserid, UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
+                    //录像存储区域
+                    .region(REGION)
+                    //录像存储桶
+                    .Bucket(BUCKET)
                     .build();
             sdkEngine.startRecord(mixProfile); // 开始录制
         } else if (!mAtomOpStart) {

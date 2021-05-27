@@ -896,6 +896,10 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
             });
         }
 
+        @Override
+        public void onLocalUnPublishOnly(int code, String msg, UCloudRtcSdkStreamInfo info) {
+
+        }
 
         @Override
         public void onRemoteUserJoin(String uid) {
@@ -978,9 +982,9 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                     if (code == 0) {
                         Log.d(TAG, " subscribe info: " + info);
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
-                        vinfo.setmUid(info.getUId());
-                        vinfo.setmMediatype(info.getMediaType());
-                        vinfo.setmEanbleVideo(info.isHasVideo());
+                        vinfo.setUid(info.getUId());
+                        vinfo.setMediaType(info.getMediaType());
+                        vinfo.setEnableVideo(info.isHasVideo());
                         vinfo.setEnableAudio(info.isHasAudio());
 
 
@@ -995,7 +999,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
                         //textureview动态生成
 //                        TextureView textureView = new TextureView(getApplicationContext());
-//                        vinfo.setmRenderview(textureView);
+//                        vinfo.setRenderview(textureView);
 //                        textureView.setTag(info);
 //                        textureView.setId(R.id.video_view);
 //                        if (vinfo != null && textureView != null) {
@@ -2288,11 +2292,11 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
     @Override
     public void stopRender(URTCVideoViewInfo info) {
-        Log.d(TAG, "stop render: "+info.getmRenderview());
-        if(info != null && info.getmRenderview()!= null){
+        Log.d(TAG, "stop render: "+info.getRenderview());
+        if(info != null && info.getRenderview()!= null){
             if(info.getStreamInfo().getUId().equals(mUserid)){
-                Log.d(TAG, "stop old list cache local render: "+info.getmRenderview());
-                sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO,info.getmRenderview());
+                Log.d(TAG, "stop old list cache local render: "+info.getRenderview());
+                sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO,info.getRenderview());
             }else{
                 Log.d(TAG, "stop old list cache remote render info: "+info.getStreamInfo());
                 sdkEngine.stopRemoteView(info.getStreamInfo());

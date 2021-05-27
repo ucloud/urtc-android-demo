@@ -8,7 +8,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 public class URTCTextureVideoViewInfo {
     private TextureView mRenderview ;
     private String mUid ;
-    private boolean mEanbleVideo ;
+    private boolean mEnableVideo ;
     private boolean mEnableAudio;
     private UCloudRtcSdkMediaType mMediatype ;
     private String key;
@@ -16,15 +16,15 @@ public class URTCTextureVideoViewInfo {
     public URTCTextureVideoViewInfo(TextureView view) {
         mRenderview = view ;
         mUid = "" ;
-        mEanbleVideo = false ;
+        mEnableVideo = false ;
         mMediatype = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
     }
 
-    public TextureView getmRenderview() {
+    public TextureView getRenderview() {
         return mRenderview;
     }
 
-    public void setmRenderview(TextureView mRenderview) {
+    public void setRenderview(TextureView mRenderview) {
         this.mRenderview = mRenderview;
     }
 
@@ -36,27 +36,27 @@ public class URTCTextureVideoViewInfo {
         mEnableAudio = enableAudio;
     }
 
-    public boolean ismEanbleVideo() {
-        return mEanbleVideo;
+    public boolean isEnableVideo() {
+        return mEnableVideo;
     }
 
-    public void setmEanbleVideo(boolean mEanbleVideo) {
-        this.mEanbleVideo = mEanbleVideo;
+    public void setEnableVideo(boolean mEnableVideo) {
+        this.mEnableVideo = mEnableVideo;
     }
 
-    public String getmUid() {
+    public String getUid() {
         return mUid;
     }
 
-    public void setmUid(String mUid) {
+    public void setUid(String mUid) {
         this.mUid = mUid;
     }
 
-    public UCloudRtcSdkMediaType getmMediatype() {
+    public UCloudRtcSdkMediaType getMediaType() {
         return mMediatype;
     }
 
-    public void setmMediatype(UCloudRtcSdkMediaType mMediatype) {
+    public void setMediaType(UCloudRtcSdkMediaType mMediatype) {
         this.mMediatype = mMediatype;
     }
 

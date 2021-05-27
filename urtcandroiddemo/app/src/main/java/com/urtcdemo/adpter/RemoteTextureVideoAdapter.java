@@ -71,7 +71,7 @@ public class RemoteTextureVideoAdapter extends RecyclerView.Adapter<RemoteTextur
             return;
         }
         if (holderView.getChildCount() == 0) {
-            TextureView videoView = viewInfo.getmRenderview();
+            TextureView videoView = viewInfo.getRenderview();
             if (videoView != null) {
                 ViewParent parent = videoView.getParent();
                 if (parent != null) {
@@ -146,10 +146,10 @@ public class RemoteTextureVideoAdapter extends RecyclerView.Adapter<RemoteTextur
         UCloudRtcSdkStreamInfo streamInfo = null;
         if(medialist.size() > position && mStreamViews.size() > position){
             streamInfo = new UCloudRtcSdkStreamInfo();
-            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getmMediatype());
+            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getMediaType());
             streamInfo.setHasAudio(mStreamViews.get(medialist.get(position)).isEnableAudio());
-            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).ismEanbleVideo());
-            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getmUid());
+            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).isEnableVideo());
+            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getUid());
         }
         return streamInfo;
     }
