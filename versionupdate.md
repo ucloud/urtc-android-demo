@@ -1,4 +1,41 @@
 # Android SDK 版本说明
+## 2.0.0
+发布于2021-5-27
+
+1.sdk结构变动。
+
+2.增加unPublishOnly接口，用于只取消发布不停止预览
+
+3.修正部分类名、方法名、参数名等，具体修改内容如下
+
+UCloudRtcSdkEngine接口：
+
+UCloudRtcSdkEngine.destory->UCloudRtcSdkEngine.destroy
+
+UCloudRtcSdkEnv类：
+
+UCloudRtcSdkEnv.setTokenSeckey->UCloudRtcSdkEnv.setTokenSecKey
+
+UCloudRtcSdkMode枚举：
+
+UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL->UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIAL
+
+UCloudRtcSdkSurfaceVideoView.RemoteOpTrigger接口：
+
+onRemoteAudio(View v, UCloudRtcSdkSurfaceVideoView parent)->onRemoteAudio(View v, SurfaceViewGroup parent)
+
+onRemoteVideo(View v, UCloudRtcSdkSurfaceVideoView parent)->onRemoteVideo(View v, SurfaceViewGroup parent)
+
+UCloudRtcSdkSurfaceVideoView类：
+
+UCloudRtcSdkSurfaceVideoView.init()增加一个参数，类型为UCloudRtcRenderView
+
+UCloudRtcSdkEventListener接口：
+
+onSendRTCStats->onSendRTCStatus
+
+onRemoteRTCStats->onRemoteRTCStatus
+
 ## 1.9.8
 发布于2021-5-20
 
