@@ -150,6 +150,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private int mExtendVideoFormat;
     private int mUVCCameraFormat;
     private int mURTCVideoFormat;
+    private UCloudRtcSdkVideoProfile videoProfile;
 
     UCloudRtcSdkEngine sdkEngine = null;
     private UCloudRtcSdkRoomType mClass;
@@ -244,6 +245,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         // 界面初始化
         setContentView(R.layout.activity_living);
         mVideoProfileSelect = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
+        videoProfile = UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect);
+        videoProfile.updateParams();
         mRemoteGridView = findViewById(R.id.remoteGridView);
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             gridLayoutManager = new GridLayoutManager(this, COL_SIZE_L);
@@ -351,7 +354,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         sdkEngine.configLocalAudioPublish(mMicEnable);
         if (isScreenCaptureSupport) {
             sdkEngine.configLocalScreenPublish(mScreenEnable);
-            if (mScreenEnable && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (mScreenEnable && Build.VERSION.SDK_INT >= 28) {
                 UCloudRtcSdkEngine.regScreenCaptureNotification(mScreenCaptureNotification);
             }
         } else {
@@ -2249,13 +2252,13 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     };
 
     private UVCCamera initUVCCamera(USBMonitor.UsbControlBlock ctrlBlock) { // usb外接摄像头初始化
-        Log.d(TAG, "initUVCCamera-----mVideoProfileSelect:" + mVideoProfileSelect + " width:" + UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth()
-                + " height:" + UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight());
+        Log.d(TAG, "initUVCCamera-----mVideoProfileSelect:" + mVideoProfileSelect + " width:" + videoProfile.getWidth()
+                + " height:" + videoProfile.getHeight());
         final UVCCamera camera = new UVCCamera();
         camera.open(ctrlBlock);
         camera.setPreviewSize(
-                UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth(),
-                UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight(),
+                videoProfile.getWidth(),
+                videoProfile.getHeight(),
                 UVCCamera.FRAME_FORMAT_YUYV
         );
 
@@ -2293,8 +2296,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 /*                Log.d("UCloudRTCLiveActivity", "provideRGBData byteBuffer, videoSourceData.position: " + videoSourceData.position()
                         + " videoSourceData.limit: " + videoSourceData.limit());*/
                 params.add(mURTCVideoFormat);
-                params.add(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth());
-                params.add(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight());
+                params.add(videoProfile.getWidth());
+                params.add(videoProfile.getHeight());
                 if (cacheBuffer == null) {
                     cacheBuffer = sdkEngine.getNativeOpInterface().
                             createNativeByteBuffer(1280 * 720 * 4);

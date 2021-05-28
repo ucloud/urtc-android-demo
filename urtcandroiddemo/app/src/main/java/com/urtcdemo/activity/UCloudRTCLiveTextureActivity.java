@@ -138,6 +138,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     private int mExtendVideoFormat;
     private int mUVCCameraFormat;
     private int mURTCVideoFormat;
+    private UCloudRtcSdkVideoProfile videoProfile;
 
     UCloudRtcSdkEngine sdkEngine = null;
     private UCloudRtcSdkRoomType mClass;
@@ -230,6 +231,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_living_texture);
         mVideoProfileSelect = preferences.getInt(CommonUtils.videoprofile, CommonUtils.videoprofilesel);
+        videoProfile = UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect);
+        videoProfile.updateParams();
         mRemoteGridView = findViewById(R.id.remoteGridView);
         if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             gridLayoutManager = new GridLayoutManager(this, COL_SIZE_L);
@@ -1996,13 +1999,13 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     };
 
     private UVCCamera initUVCCamera(USBMonitor.UsbControlBlock ctrlBlock) {
-        Log.d(TAG, "initUVCCamera-----mVideoProfileSelect:" + mVideoProfileSelect + " width:" + UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth()
-                + " height:" + UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight());
+        Log.d(TAG, "initUVCCamera-----mVideoProfileSelect:" + mVideoProfileSelect + " width:" + videoProfile.getWidth()
+                + " height:" + videoProfile.getHeight());
         final UVCCamera camera = new UVCCamera();
         camera.open(ctrlBlock);
         camera.setPreviewSize(
-                UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth(),
-                UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight(),
+                videoProfile.getWidth(),
+                videoProfile.getHeight(),
                 UVCCamera.FRAME_FORMAT_YUYV
         );
 
@@ -2038,8 +2041,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
             } else {
                 //Log.d("UCloudRTCLiveActivity", "provideRGBData: ! = null");
                 params.add(mURTCVideoFormat);
-                params.add(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getWidth());
-                params.add(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect).getHeight());
+                params.add(videoProfile.getWidth());
+                params.add(videoProfile.getHeight());
                 if (cacheBuffer == null) {
                     cacheBuffer = sdkEngine.getNativeOpInterface().
                             createNativeByteBuffer(1280 * 720 * 4);
