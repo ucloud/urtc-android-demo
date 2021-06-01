@@ -45,6 +45,8 @@ public class CommonUtils {
     public static final String APP_ID = "";
     public static final String APP_KEY = "";
     public static final String PRIVATISATION_ADDRESS = "PRIVATISATION_ADDRESS";
+    public static final String BUCKET = "";
+    public static final String REGION = "";
 
     @IntDef({AUTO_MODE, MANUAL_MODE})
     public @interface  PubScribeMode {}
