@@ -1591,7 +1591,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private final USBMonitor.OnDeviceConnectListener mOnDeviceConnectListener = new USBMonitor.OnDeviceConnectListener() { // 外接usb监听接口
         @Override
         public void onAttach(final UsbDevice device) {
-            Log.v(TAG, "onAttach:");
+            Log.v(TAG, "onAttach current device:" + device);
+            Log.v(TAG, "device class is:" + device.getDeviceClass());
             ToastUtils.shortShow(UCloudRTCLiveActivity.this, "USB摄像头已连接");
             runOnUiThread(new Runnable() {
                 @Override
@@ -1622,8 +1623,14 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     synchronized (mSync) {
                         //final UVCCamera camera = initUVCCamera(ctrlBlock);
                         mUVCCamera = initUVCCamera(ctrlBlock);
-                        isActive = true;
-                        isPreview = true;
+                        if (mUVCCamera != null) {
+                            isActive = true;
+                            isPreview = true;
+                        }
+                        else {
+                            ToastUtils.shortShow(UCloudRTCLiveActivity.this, "USB Camera init failed!");
+                        }
+
                     }
                 }
             });
@@ -2255,7 +2262,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         Log.d(TAG, "initUVCCamera-----mVideoProfileSelect:" + mVideoProfileSelect + " width:" + videoProfile.getWidth()
                 + " height:" + videoProfile.getHeight());
         final UVCCamera camera = new UVCCamera();
-        camera.open(ctrlBlock);
+        int result = camera.open(ctrlBlock);
+        if (result != 0) {
+            return null;
+        }
         camera.setPreviewSize(
                 videoProfile.getWidth(),
                 videoProfile.getHeight(),
@@ -2324,13 +2334,13 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             synchronized (extendByteBufferSync) {
                 if (videoSourceData != null) {
                     videoSourceData.clear();
-                    sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(videoSourceData);
+                    sdkEngine.getNativeOpInterface().releaseNativeByteBuffer(videoSourceData);
                     videoSourceData = null;
                 }
             }
             if (cacheBuffer != null) {
                 cacheBuffer.clear();
-                sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cacheBuffer);
+                sdkEngine.getNativeOpInterface().releaseNativeByteBuffer(cacheBuffer);
                 cacheBuffer = null;
             }
         }
@@ -2384,7 +2394,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         @Override
         public void releaseBuffer() {
             if (cache != null)
-                sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cache);
+                sdkEngine.getNativeOpInterface().releaseNativeByteBuffer(cache);
             cache = null;
         }
     };

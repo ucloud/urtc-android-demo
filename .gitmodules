@@ -1,0 +1,3 @@
+[submodule "urtcandroiddemo/rtc-core"]
+	path = urtcandroiddemo/rtc-core
+	url = git@git.ucloudadmin.com:urtc/sdk/rtc-core.git
