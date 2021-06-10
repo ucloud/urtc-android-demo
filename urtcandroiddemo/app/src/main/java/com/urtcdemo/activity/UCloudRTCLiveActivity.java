@@ -78,9 +78,13 @@ import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
+import org.wrtca.customize.mediaprocess.MediaProcessCallback;
+import org.wrtca.customize.mediaprocess.MediaProcessManager;
+import org.wrtca.customize.mediaprocess.VideoFrameObserver;
 import org.wrtca.record.RtcRecordManager;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -637,6 +641,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         Log.d(TAG, " roomtoken = " + mRoomToken + "appid : "+ mAppid + " userid :"+ mUserid);
         initRecordManager();
         // 加入房间
+        MediaProcessManager.registerVideoFrameObserver(MediaProcessCallback.instance());
+        MediaProcessCallback.instance().addVideoFrameObserver(mVideoFrameObserver);
         if (sdkEngine.joinChannel(info) == UCloudRtcSdkErrorCode.NET_ERR_SECKEY_NULL
                 || mAppid.length() == 0) {
             ToastUtils.shortShow(UCloudRTCLiveActivity.this, "加入房间失败，AppKey或AppId没有设置");
@@ -724,6 +730,53 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         //onMediaServerDisconnect();
         System.gc();
     }
+
+    private File file1 = new File("mnt/sdcard/Android/data/com.urtcdemo/test1.h264");
+    private File file2 = new File("mnt/sdcard/Android/data/com.urtcdemo/test2.h264");
+    private String uid1 ,uid2;
+    private VideoFrameObserver mVideoFrameObserver = new VideoFrameObserver() {
+        @Override
+        public void onCaptureVideoFrame(int mediaType, byte[] data, int frameType, int width, int height, int bufferLength, long renderTimeMs) {
+
+        }
+
+        @Override
+        public void onPreDecodeVideoFrame(String uid, int mediaType, byte[] data, int frameType, int width, int height, int bufferLength, long renderTimeMs) {
+            synchronized (this){
+                Log.d(TAG, "onPreDecodeVideoFrame: "+ uid + " mediaType " + mediaType + "bufferLength " +data.length + "width " + width + "height "+ height + "bufferLength " +bufferLength +  "rendertimems "+ renderTimeMs) ;
+                try {
+                    boolean first = false;
+                    if(!file1.exists()){
+                        uid1 = uid;
+                        first = true;
+                        file1.createNewFile();
+                    }else if(!file2.exists()){
+                        uid2 = uid;
+                        first = true;
+                        file2.createNewFile();
+                    }
+                    if(!first){
+                        if(uid.equals(uid1)){
+                            Log.d(TAG, "onPreDecodeVideoFrame start write : "+ uid1);
+                            FileOutputStream fileOutputStream = new FileOutputStream(file1,true);
+                            fileOutputStream.write(data);
+                            fileOutputStream.flush();
+                            Log.d(TAG, "onPreDecodeVideoFrame: end write" + file1.length());
+                        }else if(uid.equals(uid2)){
+                            Log.d(TAG, "onPreDecodeVideoFrame start write : "+uid2);
+                            FileOutputStream fileOutputStream = new FileOutputStream(file2,true);
+                            fileOutputStream.write(data);
+                            fileOutputStream.flush();
+                            Log.d(TAG, "onPreDecodeVideoFrame: end write" + file2.length());
+                        }
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
 
     private UCloudRtcSdkEventListener eventListener = new UCloudRtcSdkEventListener() {
         @Override
@@ -1084,7 +1137,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     if (code == 0) { // 订阅成功
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
                         UCloudRtcSdkSurfaceVideoView videoView = null;
-                        // UCloudRtcSdkSurfaceVideoView videoViewCallBack = null; // 用于外部扩展输出
+                         UCloudRtcSdkSurfaceVideoView videoViewCallBack = null; // 用于外部扩展输出
 
                         //UCloudRtcRenderView videoView = null;
                         Log.d(TAG, " subscribe info: " + info);
@@ -1100,8 +1153,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
                             //外部扩展输出，和默认输出二选一
-                            //videoViewCallBack = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
-                            //videoViewCallBack.setFrameCallBack(mUCloudRTCDataReceiver);
+                            videoViewCallBack = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
+                            videoViewCallBack.setFrameCallBack(mUCloudRTCDataReceiver);
                             //videoViewCallBack.init(false);
                             //远端截图
                             //videoView.setOnClickListener(mScreenShotOnClickListener);
