@@ -235,7 +235,7 @@
     <string name="room_large">大班课</string>
     <string name="room_small">小班课</string>
     <string name="privatization_deployment">私有化部署</string>
-
+    <string name="video_hardware_acceleration">硬件加速</string>
 
     <string name="screen_capture">屏幕采集</string>
     <string name="camera_capture">视频通话</string>

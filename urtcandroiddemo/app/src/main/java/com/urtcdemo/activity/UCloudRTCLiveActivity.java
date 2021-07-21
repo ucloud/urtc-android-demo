@@ -27,6 +27,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -151,8 +152,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private int mUVCCameraFormat;
     private int mURTCVideoFormat;
     private UCloudRtcSdkVideoProfile videoProfile;
+    private boolean mVideoHwAcc = false;
 
-    UCloudRtcSdkEngine sdkEngine = null;
+    private UCloudRtcSdkEngine sdkEngine = null;
     private UCloudRtcSdkRoomType mClass;
     private UCloudRtcSdkStreamInfo mLocalStreamInfo;
     private UCloudRtcSdkAudioDevice defaultAudioDevice;
@@ -236,6 +238,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
+        mVideoHwAcc = preferences.getBoolean(CommonUtils.VIDEO_HW_ACC, CommonUtils.HARDWARE_ACC);
+        UCloudRtcSdkEnv.setVideoHardWareAcceleration(mVideoHwAcc);
         sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -720,9 +724,18 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         Intent service = new Intent(this, UCloudRtcForeGroundService.class);
         stopService(service);
         endCall();
-        releaseExtendCamera();
-        //onMediaServerDisconnect();
         System.gc();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        Log.d(TAG,"dispatchKeyEvent:keyCode--"+event.getKeyCode());
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+            endCall();
+            return true;
+        } else {
+            return super.dispatchKeyEvent(event);
+        }
     }
 
     private UCloudRtcSdkEventListener eventListener = new UCloudRtcSdkEventListener() {
@@ -769,8 +782,6 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 public void run() {
                     ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 离开房间 " +
                             code + " errmsg " + msg);
-//                    releaseExtendCamera();
-//                    onMediaServerDisconnect();
 //                    System.gc();
                 }
             });
@@ -1798,14 +1809,18 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     }
 
     private void endCall() { // 离开频道
-        sdkEngine.leaveChannel().ordinal();
-        mLeaveRoomFlag = true;
-//        Intent intent = new Intent(UCloudRTCLiveActivity.this, ConnectActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//        releaseExtendCamera();
-        onMediaServerDisconnect();
-//        startActivity(intent);
-        finish();
+        synchronized (mSync) {
+            mLeaveRoomFlag = true;
+            if (sdkEngine != null) {
+                sdkEngine.leaveChannel().ordinal();
+                releaseExtendCamera();
+                UCloudRtcSdkEngine.destroy();
+                sdkEngine = null;
+            }
+            finish();
+        }
+        Log.d(TAG, "endCall: finish called");
+
     }
 
     private void onMediaServerDisconnect() {

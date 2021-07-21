@@ -117,8 +117,9 @@ public class ConnectActivity extends AppCompatActivity {
                         mRoomToken = "testoken";
                         Log.d(TAG, " appid " + mAppid);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            boolean mVideoHwAcc = preferences.getBoolean(CommonUtils.VIDEO_HW_ACC, CommonUtils.HARDWARE_ACC);
+                            UCloudRtcSdkEnv.setVideoHardWareAcceleration(mVideoHwAcc);
                             UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
-
                         } else {
                             startRoomActivity();
 //                        startRoomTextureActivity();
