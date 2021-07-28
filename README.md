@@ -26,3 +26,6 @@ plv-android-livescenes-sdk-demo
     `-- ui
 ```
 
+### api文档
+
+查看目录下《android-plvSDKLiveScenesE-1.5.2.01-api》，查看SDK的api文档。
