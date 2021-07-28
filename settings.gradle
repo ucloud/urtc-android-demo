@@ -1,6 +1,0 @@
-include ':demo',
-        ':polyvLiveCommonModul',
-        ':polyvLiveEcommerceScene',
-        ':polyvLiveCloudClassScene',
-        ':polyvLiveStreamerScene', 
-        ':polyvStreamerAloneScene'
