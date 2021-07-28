@@ -1,0 +1,6 @@
+include ':demo',
+        ':plvLiveCommonModul',
+        ':plvLiveEcommerceScene',
+        ':plvLiveCloudClassScene',
+        ':plvLiveStreamerScene',
+        ':plvStreamerAloneScene'

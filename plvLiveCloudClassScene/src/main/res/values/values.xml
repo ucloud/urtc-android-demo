@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CircleBarView">
+        <attr name="progress_color" format="color" />
+        <attr name="bg_color" format="color" />
+
+        <attr name="bar_width" format="dimension" />
+
+        <attr name="start_angle" format="float" />
+        <attr name="sweep_angle" format="float" />
+    </declare-styleable>
+
+    <!--将连麦id和view做绑定的tag的key-->
+    <item name="tag_link_mic_id" type="id" />
+</resources>
