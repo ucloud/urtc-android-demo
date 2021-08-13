@@ -64,6 +64,7 @@ public class NewSettingActivity extends AppCompatActivity {
     private LSwitch mBroadcastSwitch;
     private LSwitch mPriDeploySwitch;
     private LSwitch mExtendCameraSwitch;
+    private LSwitch mVideoHardWareAccSwitch;
 
     private boolean mEnableCamera;
     private boolean mEnableMic;
@@ -71,6 +72,7 @@ public class NewSettingActivity extends AppCompatActivity {
     private boolean mExtendCamera;
     private boolean mPriDeploy;
     private int mExtendVideoFormat;
+    private boolean mHwAcc;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,6 +82,7 @@ public class NewSettingActivity extends AppCompatActivity {
         mEnableScreen = false;
         mExtendCamera = false;
         mPriDeploy = false;
+        mHwAcc = false;
 
         setContentView(R.layout.activity_setting_new);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -116,6 +119,7 @@ public class NewSettingActivity extends AppCompatActivity {
         mSubScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
         mExtendCamera = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
         mPriDeploy = preferences.getBoolean(CommonUtils.PRIVATISATION_MODE, false);
+        mHwAcc = preferences.getBoolean(CommonUtils.VIDEO_HW_ACC, CommonUtils.HARDWARE_ACC);
         mPriAddr = preferences.getString(CommonUtils.PRIVATISATION_ADDRESS, "");
         int roomInt = preferences.getInt(CommonUtils.SDK_CLASS_TYPE, UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_SMALL.ordinal());
         mRoomType = UCloudRtcSdkRoomType.valueOf(roomInt);
@@ -185,6 +189,14 @@ public class NewSettingActivity extends AppCompatActivity {
                 }
             }
         });
+        mVideoHardWareAccSwitch = findViewById(R.id.video_hw_switch);
+        mVideoHardWareAccSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
+            @Override
+            public void onChecked(boolean isChecked) {
+                mHwAcc = isChecked;
+
+            }
+        });
         mExtendCameraSwitch = findViewById(R.id.extend_camera_switch);
         mExtendCameraSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
             @Override
@@ -244,6 +256,7 @@ public class NewSettingActivity extends AppCompatActivity {
         mBroadcastSwitch.setChecked(mRoomType == UCloudRtcSdkRoomType.UCLOUD_RTC_SDK_ROOM_LARGE);
         mPriDeploySwitch.setChecked(mPriDeploy);
         mExtendCameraSwitch.setChecked(mExtendCamera);
+        mVideoHardWareAccSwitch.setChecked(mHwAcc);
 
         mExtendVideoFormat = preferences.getInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, CommonUtils.i420_format);
         switch (mExtendVideoFormat) {
@@ -320,6 +333,7 @@ public class NewSettingActivity extends AppCompatActivity {
         editor.putString(CommonUtils.PRIVATISATION_ADDRESS, mPriAddr);
         editor.putBoolean(CommonUtils.CAMERA_CAPTURE_MODE, mExtendCamera);
         editor.putInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, mExtendVideoFormat);
+        editor.putBoolean(CommonUtils.VIDEO_HW_ACC, mHwAcc);
 
         editor.apply();
     }

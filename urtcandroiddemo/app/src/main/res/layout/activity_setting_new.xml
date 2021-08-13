@@ -402,9 +402,55 @@
                 android:textCursorDrawable="@null"
                 android:maxLines="1"
                 android:inputType="text"/>
+
+            <RelativeLayout
+                android:id="@+id/video_hw_control"
+                android:layout_below ="@+id/privatisation_edittext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:paddingLeft="15dp"
+                android:paddingTop="8dp"
+                android:paddingRight="15dp"
+                android:paddingBottom="8dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/video_hw_pic"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@mipmap/camera"
+                    android:layout_centerVertical="true"/>
+
+                <TextView
+                    android:id="@+id/video_hw_content"
+                    android:text="@string/video_hardware_acceleration"
+                    android:layout_marginStart="60dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_000_000_000"
+                    android:layout_centerVertical="true"
+                    android:textSize="18sp" />
+
+                <com.urtcdemo.view.LSwitch
+                    android:id="@+id/video_hw_switch"
+                    android:layout_width="50dp"
+                    android:layout_height="36dp"
+                    app:track_radius="10dp"
+                    app:track_height="20dp"
+                    app:thumb_height="24dp"
+                    app:thumb_width="24dp"
+                    app:track_color_off="@color/color_7FBDEF"
+                    app:thumb_color_off="@color/color_FF007AFF"
+                    app:track_color_on="@color/color_CCC5C5C5"
+                    app:thumb_color_on="@color/lsq_color_gray"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"/>
+            </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/extend_camera_control"
-                android:layout_below ="@+id/privatisation_edittext"
+                android:layout_below ="@+id/video_hw_control"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
