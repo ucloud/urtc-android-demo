@@ -102,7 +102,7 @@ public class ConnectActivity extends AppCompatActivity {
         mTextSDKVersion.setText(getString(R.string.app_name) + "\n" + UCloudRtcSdkEngine.getSdkVersion());
         connectButton = findViewById(R.id.connect_button);
         exportButton = findViewById(R.id.log_output_button);
-        exportButton.setVisibility(View.GONE);
+//        exportButton.setVisibility(View.GONE);
         StatusBarUtils.setAndroidNativeLightStatusBar(this,true);
 
         connectButton.setOnClickListener(new View.OnClickListener() {
@@ -182,13 +182,16 @@ public class ConnectActivity extends AppCompatActivity {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        URTCFileUtil.getInstance().copyFolder("/data/user/0/com.urtcdemo/app_bugly", "/sdcard/urtc/app_bugly");
-                        URTCFileUtil.getInstance().copyFolder("/data/tombstones", "/sdcard/urtc/tombstones");
+
+                        String basePath = getApplicationContext().getExternalFilesDir("").getPath();
+                        String newPath = basePath + "/urtc/app_bugly";
+                        Log.d(TAG, "copy new path : " + newPath);
+                        URTCFileUtil.getInstance().copyFolder("/data/user/0/com.urtcdemo/app_bugly", newPath);
                         Handler handler = new Handler(Looper.getMainLooper());
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                ToastUtils.shortShow(ConnectActivity.this, "拷贝完成");
+                                ToastUtils.shortShow(ConnectActivity.this, "拷贝完成,日志路径： " + newPath);
                             }
                         });
 
