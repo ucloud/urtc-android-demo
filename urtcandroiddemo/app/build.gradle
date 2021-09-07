@@ -78,7 +78,7 @@ dependencies {
     implementation (name: 'ucloudrtclib-2.0.5', ext: 'aar')
     implementation(name: 'libuvccamera-release', ext: 'aar')
     implementation(name: 'common-2.12.4', ext: 'aar')
-//    implementation 'cn.ucloud:ucloudrtclib:2.0.4' //mavenCentral
+//    implementation 'cn.ucloud:ucloudrtclib:2.0.5' //mavenCentral
 //    implementation project(':urtc-sdk-android')
 //    implementation project(':libuvccamera')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
