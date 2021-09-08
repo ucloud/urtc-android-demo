@@ -136,6 +136,7 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private boolean mRemoteAudioMute;
     private boolean mIsPreview = false;
     private boolean mIsPriDeploy = false;
+    private boolean mJoinChannelFlag = true;
     @CommonUtils.PubScribeMode
     private int mPublishMode;
     @CommonUtils.PubScribeMode
@@ -204,6 +205,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
     private TextView mTextUserId;
     private ImageView mImgPreview;
     private TextView mTextPreview;
+    private ImageView mImgJoin;
+    private TextView mTextJoin;
+    private ImageView mImgLeave;
+    private TextView mTextLeave;
     private TextView mTextResolution;
     private VideoProfilePopupWindow mResolutionPopupWindow;
     //音量图片
@@ -306,12 +311,17 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
         mTextRemoteMixSound = findViewById(R.id.remote_mix_text);
         mImgControlMixSound = findViewById(R.id.control_mix_pic);
         mTextControlMixSound = findViewById(R.id.control_mix_text);
+        mImgJoin = findViewById(R.id.join_room_pic);
+        mTextJoin = findViewById(R.id.join_room_text);
+        mImgLeave = findViewById(R.id.leave_room_pic);
+        mTextLeave = findViewById(R.id.leave_room_text);
 
         // 用户配置参数获取
         mUserid = getIntent().getStringExtra("user_id");
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
         mAppid = getIntent().getStringExtra("app_id");
+        mJoinChannelFlag = getIntent().getBooleanExtra("join_channel", true);
 
         isScreenCaptureSupport = UCloudRtcSdkEnv.isSupportScreenCapture();
         mCameraEnable = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
@@ -404,17 +414,17 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             UCloudRtcSdkEnv.setCaptureMode(
                     UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
         }
-        if (mPublishMode == CommonUtils.AUTO_MODE) {
-            mImgPreview.setVisibility(View.GONE);
-            mTextPreview.setVisibility(View.GONE);
-            mImgControlMixSound.setVisibility(View.GONE);
-            mTextControlMixSound.setVisibility(View.GONE);
+
+        if (mJoinChannelFlag) {
+            if (mPublishMode == CommonUtils.AUTO_MODE) {
+                setIconStats(userStatus.PUBLISH_VIDEO_AND_PREVIEW);
+            } else {
+                setIconStats(userStatus.JOIN_ROOM_NOT_PREVIEW);
+            }
         } else {
-            //手动发布时，按钮隐藏
-            //mImgManualPub.setVisibility(View.VISIBLE);
-            //mTextManualPub.setVisibility(View.VISIBLE);
-            setIconStats(false);
+            setIconStats(userStatus.PREVIEW_NOT_JOIN_ROOM);
         }
+
         if (!mCameraEnable && !mMicEnable) {
             mImgManualPubVideo.setVisibility(View.GONE);
             mTextManualPubVideo.setVisibility(View.GONE);
@@ -633,18 +643,56 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             }
         });
 
-        UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo();
-        info.setAppId(mAppid);
-        info.setToken(mRoomToken);
-        info.setRoomId(mRoomid);
-        info.setUId(mUserid);
-        Log.d(TAG, " roomtoken = " + mRoomToken + "appid : "+ mAppid + " userid :"+ mUserid);
+        //加入房间
+        mImgJoin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo();
+                info.setAppId(mAppid);
+                info.setToken(mRoomToken);
+                info.setRoomId(mRoomid);
+                info.setUId(mUserid);
+                Log.d(TAG, " roomtoken = " + mRoomToken + "appid : " + mAppid + " userid :" + mUserid);
+                // 加入房间
+                if (sdkEngine.joinChannel(info) == UCloudRtcSdkErrorCode.NET_ERR_SECKEY_NULL
+                        || mAppid.length() == 0) {
+                    ToastUtils.shortShow(UCloudRTCLiveActivity.this, "加入房间失败，AppKey或AppId没有设置");
+                    endCall();
+                }
+            }
+        });
+
+        //离开房间
+        mImgLeave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mLeaveRoomFlag = true;
+                if (sdkEngine != null) {
+                    sdkEngine.leaveChannel().ordinal();
+                }
+            }
+        });
+
         initRecordManager();
-        // 加入房间
-        if (sdkEngine.joinChannel(info) == UCloudRtcSdkErrorCode.NET_ERR_SECKEY_NULL
-                || mAppid.length() == 0) {
-            ToastUtils.shortShow(UCloudRTCLiveActivity.this, "加入房间失败，AppKey或AppId没有设置");
-            endCall();
+
+        if (mJoinChannelFlag) {
+            UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo();
+            info.setAppId(mAppid);
+            info.setToken(mRoomToken);
+            info.setRoomId(mRoomid);
+            info.setUId(mUserid);
+            Log.d(TAG, " roomtoken = " + mRoomToken + "appid : " + mAppid + " userid :" + mUserid);
+            // 加入房间
+            if (sdkEngine.joinChannel(info) == UCloudRtcSdkErrorCode.NET_ERR_SECKEY_NULL
+                    || mAppid.length() == 0) {
+                ToastUtils.shortShow(UCloudRTCLiveActivity.this, "加入房间失败，AppKey或AppId没有设置");
+                endCall();
+            }
+        } else {
+            setPreview(true);
+            mIsPreview = true;
+            mTextPreview.setText(R.string.stop_preview);
+            mLocalVideoView.setVisibility(View.VISIBLE);
         }
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
     }
@@ -761,6 +809,12 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                     if (code == 0) { // 成功
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 加入房间成功");
                         startTimeShow();
+                        if (mIsPreview) {
+                            setIconStats(userStatus.PREVIEW_JOIN_ROOM_NOT_PUBLISH);
+                        }
+                        else {
+                            setIconStats(userStatus.JOIN_ROOM_NOT_PREVIEW);
+                        }
                     } else { // 失败
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 加入房间失败 " +
                                 code + " errmsg " + msg);
@@ -782,6 +836,10 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                 public void run() {
                     ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 离开房间 " +
                             code + " errmsg " + msg);
+                    setIconStats(userStatus.INIT);
+                    mLocalVideoView.setVisibility(View.INVISIBLE);
+                    setPreview(false);
+                    mIsPreview = false;
 //                    System.gc();
                 }
             });
@@ -850,36 +908,29 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                                 }
 
                                 if (!mIsPreview) {
-                                    if (mExtendCameraCapture) { // 扩展摄像头开启渲染
-                                        sdkEngine.renderLocalView(info,
-                                                mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
-                                    } else { // 自带摄像头开启渲染
-                                        sdkEngine.renderLocalView(info,
-                                                mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
-                                    }
-                                    //if (mPublishMode != CommonUtils.AUTO_MODE) {
-                                    // setIconStats(true);
-                                    //}
-                                } else {
-                                    //setIconStats(true);
+                                    sdkEngine.renderLocalView(info,
+                                            mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+                                    mIsPreview = true;
                                 }
                                 // 状态记录
                                 mLocalStreamInfo = info;
                                 mSwapStreamInfo = info;
                                 mLocalVideoView.setTag(mLocalStreamInfo);
                                 mLocalVideoView.setOnClickListener(mToggleScreenOnClickListener);
+                                setIconStats(userStatus.PUBLISH_VIDEO_AND_PREVIEW);
+
                             }
                         } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN.ordinal()) { // 屏幕流
                             // 状态记录及界面更新
                             mScreenIsPublished = true;
                             mImgManualPubScreen.setImageResource(R.mipmap.stop);
                             mTextManualPubScreen.setText(R.string.pub_cancel_screen);
+                            setIconStats(userStatus.PUBLISH_SCREEN_AND_PREVIEW);
                             if (mScreenEnable) { // 屏幕流一般无需渲染
                                 //sdkEngine.startPreview(info.getMediaType(), mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
                             }
                         }
                         // 界面图标状态设置
-                        setIconStats(true);
                     } else {
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this,
                                 "发布视频失败 " + code + " errmsg " + msg);
@@ -916,6 +967,9 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                             if (mIsRemoteMixingSound) {
                                 toggleMixingSound(true);
                             }
+                            setPreview(false);
+                            mIsPreview = false;
+                            mTextPreview.setText(R.string.start_preview);
                         } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) { //屏幕流
                             mScreenIsPublished = false;
                             if (mPublishMode == CommonUtils.AUTO_MODE) {
@@ -935,10 +989,15 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                             }
                         }
                         if (!mScreenIsPublished && !mVideoIsPublished) {
-                            setIconStats(false);
-                            setPreview(false);
-                            mIsPreview = false;
-                            mTextPreview.setText(R.string.start_preview);
+                            if (mIsPreview) {
+                                setIconStats(userStatus.PREVIEW_JOIN_ROOM_NOT_PUBLISH);
+                            }
+                            else {
+                                setIconStats(userStatus.JOIN_ROOM_NOT_PREVIEW);
+                            }
+//                            setPreview(false);
+//                            mIsPreview = false;
+//                            mTextPreview.setText(R.string.start_preview);
                         }
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this, "取消发布成功");
                     } else {
@@ -994,7 +1053,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
                             }
                         }
                         if (!mScreenIsPublished && !mVideoIsPublished) {
-                            setIconStats(false);
+//                            setIconStats(false);
+                            setIconStats(userStatus.PREVIEW_JOIN_ROOM_NOT_PUBLISH);
                         }
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this, "取消发布成功");
                     } else {
@@ -2517,12 +2577,8 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
 
     private void setPreview(boolean onOff) { //预览窗口开关
         if (onOff) {
-            if (mExtendCameraCapture) {
-                sdkEngine.startCameraPreview(
-                        mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
-            } else {
-                sdkEngine.startCameraPreview(mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
-            }
+            sdkEngine.startCameraPreview(
+                    mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
         } else {
             sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
         }
@@ -2566,6 +2622,268 @@ public class UCloudRTCLiveActivity extends AppCompatActivity
             mTextPreview.setVisibility(View.GONE);
             mImgRemoteMixSound.setVisibility(View.VISIBLE);
             mTextRemoteMixSound.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public enum userStatus {
+        INIT,
+        JOIN_ROOM_NOT_PREVIEW,
+        PREVIEW_NOT_JOIN_ROOM,
+        PREVIEW_JOIN_ROOM_NOT_PUBLISH,
+        PUBLISH_NOT_PREVIEW,
+        PUBLISH_VIDEO_AND_PREVIEW,
+        PUBLISH_SCREEN_AND_PREVIEW;
+
+        public  static userStatus matchValue(int value) {
+            for (userStatus en : values()) {
+                if (en.ordinal() == value) {
+                    return en;
+                }
+            }
+            return userStatus.INIT;
+        }
+    }
+
+    private void setIconStats(userStatus status) { // 图标状态切换
+        switch (status) {
+            case JOIN_ROOM_NOT_PREVIEW:
+                mImgJoin.setVisibility(View.GONE);
+                mTextJoin.setVisibility(View.GONE);
+                mImgLeave.setVisibility(View.VISIBLE);
+                mTextLeave.setVisibility(View.VISIBLE);
+                mImgPreview.setVisibility(View.VISIBLE);
+                mTextPreview.setText(R.string.start_preview);
+                mTextPreview.setVisibility(View.VISIBLE);
+                if (mPublishMode == CommonUtils.MANUAL_MODE) {
+                    mImgManualPubVideo.setImageResource(R.mipmap.publish); // 修改界面图标
+                    mTextManualPubVideo.setText(R.string.pub_video); // 修改界面文字
+                    mImgManualPubVideo.setVisibility(View.VISIBLE);
+                    mTextManualPubVideo.setVisibility(View.VISIBLE);
+                    if (mScreenEnable) {
+                        mImgManualPubScreen.setImageResource(R.mipmap.publish_screen); // 修改界面图标
+                        mTextManualPubScreen.setText(R.string.pub_screen); // 修改界面文字
+                        mImgManualPubScreen.setVisibility(View.VISIBLE);
+                        mTextManualPubScreen.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    mImgManualPubVideo.setVisibility(View.GONE);
+                    mTextManualPubVideo.setVisibility(View.GONE);
+                    mImgManualPubScreen.setVisibility(View.GONE);
+                    mTextManualPubScreen.setVisibility(View.GONE);
+                }
+                mImgMix.setVisibility(View.GONE);
+                mTextMix.setVisibility(View.GONE);
+                mImgLocalRecord.setVisibility(View.GONE);
+                mTextLocalRecord.setVisibility(View.GONE);
+                mImgScreenshot.setVisibility(View.GONE);
+                mTextScreenshot.setVisibility(View.GONE);
+                mImgRemoteRecord.setVisibility(View.GONE);
+                mTextRemoteRecord.setVisibility(View.GONE);
+                mImgRemoteMixSound.setVisibility(View.GONE);
+                mTextRemoteMixSound.setVisibility(View.GONE);
+                mImgControlMixSound.setVisibility(View.GONE);
+                mTextControlMixSound.setVisibility(View.GONE);
+                mImgBtnMuteMic.setVisibility(View.INVISIBLE);
+                mImgBtnMuteVideo.setVisibility(View.INVISIBLE);
+                mImgBtnMirror.setVisibility(View.INVISIBLE);
+                mTextResolution.setVisibility(View.INVISIBLE);
+                break;
+            case PREVIEW_NOT_JOIN_ROOM:
+                mImgJoin.setVisibility(View.VISIBLE);
+                mTextJoin.setVisibility(View.VISIBLE);
+                mImgLeave.setVisibility(View.GONE);
+                mTextLeave.setVisibility(View.GONE);
+                mImgPreview.setVisibility(View.VISIBLE);
+                mTextPreview.setText(R.string.stop_preview);
+                mTextPreview.setVisibility(View.VISIBLE);
+                mImgManualPubScreen.setVisibility(View.GONE);
+                mTextManualPubScreen.setVisibility(View.GONE);
+                mImgManualPubVideo.setVisibility(View.GONE);
+                mTextManualPubVideo.setVisibility(View.GONE);
+                mImgManualPubScreen.setVisibility(View.GONE);
+                mTextManualPubScreen.setVisibility(View.GONE);
+                mImgMix.setVisibility(View.GONE);
+                mTextMix.setVisibility(View.GONE);
+                mImgLocalRecord.setVisibility(View.GONE);
+                mTextLocalRecord.setVisibility(View.GONE);
+                mImgScreenshot.setVisibility(View.GONE);
+                mTextScreenshot.setVisibility(View.GONE);
+                mImgRemoteRecord.setVisibility(View.GONE);
+                mTextRemoteRecord.setVisibility(View.GONE);
+                mImgRemoteMixSound.setVisibility(View.GONE);
+                mTextRemoteMixSound.setVisibility(View.GONE);
+                mImgControlMixSound.setVisibility(View.GONE);
+                mTextControlMixSound.setVisibility(View.GONE);
+                mImgBtnMuteMic.setVisibility(View.INVISIBLE);
+                mImgBtnMuteVideo.setVisibility(View.INVISIBLE);
+                mImgBtnMirror.setVisibility(View.INVISIBLE);
+                mTextResolution.setVisibility(View.INVISIBLE);
+                break;
+            case PREVIEW_JOIN_ROOM_NOT_PUBLISH:
+                mImgJoin.setVisibility(View.GONE);
+                mTextJoin.setVisibility(View.GONE);
+                mImgLeave.setVisibility(View.VISIBLE);
+                mTextLeave.setVisibility(View.VISIBLE);
+                mImgPreview.setVisibility(View.VISIBLE);
+                mTextPreview.setText(R.string.stop_preview);
+                mTextPreview.setVisibility(View.VISIBLE);
+                if (mPublishMode == CommonUtils.MANUAL_MODE) {
+                    mImgManualPubVideo.setImageResource(R.mipmap.publish); // 修改界面图标
+                    mTextManualPubVideo.setText(R.string.pub_video); // 修改界面文字
+                    mImgManualPubVideo.setVisibility(View.VISIBLE);
+                    mTextManualPubVideo.setVisibility(View.VISIBLE);
+                    if (mScreenEnable) {
+                        mImgManualPubScreen.setImageResource(R.mipmap.publish_screen); // 修改界面图标
+                        mTextManualPubScreen.setText(R.string.pub_screen); // 修改界面文字
+                        mImgManualPubScreen.setVisibility(View.VISIBLE);
+                        mTextManualPubScreen.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    mImgManualPubVideo.setVisibility(View.GONE);
+                    mTextManualPubVideo.setVisibility(View.GONE);
+                    mImgManualPubScreen.setVisibility(View.GONE);
+                    mTextManualPubScreen.setVisibility(View.GONE);
+                }
+                mImgMix.setVisibility(View.GONE);
+                mTextMix.setVisibility(View.GONE);
+                mImgLocalRecord.setVisibility(View.GONE);
+                mTextLocalRecord.setVisibility(View.GONE);
+                mImgScreenshot.setVisibility(View.GONE);
+                mTextScreenshot.setVisibility(View.GONE);
+                mImgRemoteRecord.setVisibility(View.GONE);
+                mTextRemoteRecord.setVisibility(View.GONE);
+                mImgRemoteMixSound.setVisibility(View.GONE);
+                mTextRemoteMixSound.setVisibility(View.GONE);
+                mImgControlMixSound.setVisibility(View.GONE);
+                mTextControlMixSound.setVisibility(View.GONE);
+                mImgBtnMuteMic.setVisibility(View.INVISIBLE);
+                mImgBtnMuteVideo.setVisibility(View.INVISIBLE);
+                mImgBtnMirror.setVisibility(View.INVISIBLE);
+                mTextResolution.setVisibility(View.INVISIBLE);
+                break;
+            case PUBLISH_NOT_PREVIEW:
+                mImgJoin.setVisibility(View.GONE);
+                mTextJoin.setVisibility(View.GONE);
+                mImgLeave.setVisibility(View.VISIBLE);
+                mTextLeave.setVisibility(View.VISIBLE);
+                mImgPreview.setVisibility(View.VISIBLE);
+                mTextPreview.setText(R.string.start_preview);
+                mTextPreview.setVisibility(View.VISIBLE);
+                mImgManualPubVideo.setImageResource(R.mipmap.stop); // 修改界面图标
+                mTextManualPubVideo.setText(R.string.pub_cancel_video); // 修改界面文字
+                mImgManualPubVideo.setVisibility(View.VISIBLE);
+                mTextManualPubVideo.setVisibility(View.VISIBLE);
+//                if (mScreenEnable) {
+//                    mImgManualPubScreen.setImageResource(R.mipmap.stop); // 修改界面图标
+//                    mTextManualPubScreen.setText(R.string.pub_cancel_screen); // 修改界面文字
+//                    mImgManualPubScreen.setVisibility(View.VISIBLE);
+//                    mTextManualPubScreen.setVisibility(View.VISIBLE);
+//                }
+                mImgMix.setVisibility(View.GONE);
+                mTextMix.setVisibility(View.GONE);
+                mImgLocalRecord.setVisibility(View.GONE);
+                mTextLocalRecord.setVisibility(View.GONE);
+                mImgScreenshot.setVisibility(View.GONE);
+                mTextScreenshot.setVisibility(View.GONE);
+                mImgRemoteRecord.setVisibility(View.GONE);
+                mTextRemoteRecord.setVisibility(View.GONE);
+                mImgRemoteMixSound.setVisibility(View.VISIBLE);
+                mTextRemoteMixSound.setVisibility(View.VISIBLE);
+                mImgControlMixSound.setVisibility(View.GONE);
+                mTextControlMixSound.setVisibility(View.GONE);
+                mImgBtnMuteMic.setVisibility(View.INVISIBLE);
+                mImgBtnMuteVideo.setVisibility(View.INVISIBLE);
+                mImgBtnMirror.setVisibility(View.INVISIBLE);
+                mTextResolution.setVisibility(View.INVISIBLE);
+                break;
+            case PUBLISH_VIDEO_AND_PREVIEW:
+                mImgJoin.setVisibility(View.GONE);
+                mTextJoin.setVisibility(View.GONE);
+                mImgLeave.setVisibility(View.GONE);
+                mTextLeave.setVisibility(View.GONE);
+                mImgPreview.setVisibility(View.VISIBLE);
+                mTextPreview.setText(R.string.stop_preview);
+                mTextPreview.setVisibility(View.VISIBLE);
+                mImgManualPubVideo.setImageResource(R.mipmap.stop); // 修改界面图标
+                mTextManualPubVideo.setText(R.string.pub_cancel_video); // 修改界面文字
+                mImgManualPubVideo.setVisibility(View.VISIBLE);
+                mTextManualPubVideo.setVisibility(View.VISIBLE);
+                mImgMix.setVisibility(View.VISIBLE);
+                mTextMix.setVisibility(View.VISIBLE);
+                mImgLocalRecord.setVisibility(View.VISIBLE);
+                mTextLocalRecord.setVisibility(View.VISIBLE);
+                mImgScreenshot.setVisibility(View.VISIBLE);
+                mTextScreenshot.setVisibility(View.VISIBLE);
+                mImgRemoteRecord.setVisibility(View.VISIBLE);
+                mTextRemoteRecord.setVisibility(View.VISIBLE);
+                mImgRemoteMixSound.setVisibility(View.VISIBLE);
+                mTextRemoteMixSound.setVisibility(View.VISIBLE);
+                mImgControlMixSound.setVisibility(View.GONE);
+                mTextControlMixSound.setVisibility(View.GONE);
+                mImgBtnMuteMic.setVisibility(View.VISIBLE);
+                mImgBtnMuteVideo.setVisibility(View.VISIBLE);
+                mImgBtnMirror.setVisibility(View.VISIBLE);
+                mTextResolution.setVisibility(View.VISIBLE);
+                break;
+            case PUBLISH_SCREEN_AND_PREVIEW:
+                mImgJoin.setVisibility(View.GONE);
+                mTextJoin.setVisibility(View.GONE);
+                mImgLeave.setVisibility(View.GONE);
+                mTextLeave.setVisibility(View.GONE);
+                mImgPreview.setVisibility(View.VISIBLE);
+                mTextPreview.setText(R.string.stop_preview);
+                mTextPreview.setVisibility(View.VISIBLE);
+                mImgManualPubScreen.setImageResource(R.mipmap.stop); // 修改界面图标
+                mTextManualPubScreen.setText(R.string.pub_cancel_screen); // 修改界面文字
+                mImgManualPubScreen.setVisibility(View.VISIBLE);
+                mTextManualPubScreen.setVisibility(View.VISIBLE);
+                mImgMix.setVisibility(View.VISIBLE);
+                mTextMix.setVisibility(View.VISIBLE);
+                mImgLocalRecord.setVisibility(View.VISIBLE);
+                mTextLocalRecord.setVisibility(View.VISIBLE);
+                mImgScreenshot.setVisibility(View.VISIBLE);
+                mTextScreenshot.setVisibility(View.VISIBLE);
+                mImgRemoteRecord.setVisibility(View.VISIBLE);
+                mTextRemoteRecord.setVisibility(View.VISIBLE);
+                mImgRemoteMixSound.setVisibility(View.VISIBLE);
+                mTextRemoteMixSound.setVisibility(View.VISIBLE);
+                mImgControlMixSound.setVisibility(View.GONE);
+                mTextControlMixSound.setVisibility(View.GONE);
+                mImgBtnMuteMic.setVisibility(View.VISIBLE);
+                mImgBtnMuteVideo.setVisibility(View.VISIBLE);
+                mImgBtnMirror.setVisibility(View.VISIBLE);
+                mTextResolution.setVisibility(View.VISIBLE);
+                break;
+            case INIT:
+            default:
+                mImgJoin.setVisibility(View.VISIBLE);
+                mTextJoin.setVisibility(View.VISIBLE);
+                mImgLeave.setVisibility(View.GONE);
+                mTextLeave.setVisibility(View.GONE);
+                mImgPreview.setVisibility(View.VISIBLE);
+                mTextPreview.setText(R.string.start_preview);
+                mTextPreview.setVisibility(View.VISIBLE);
+                mImgManualPubVideo.setVisibility(View.GONE);
+                mTextManualPubVideo.setVisibility(View.GONE);
+                mImgManualPubScreen.setVisibility(View.GONE);
+                mTextManualPubScreen.setVisibility(View.GONE);
+                mImgMix.setVisibility(View.GONE);
+                mTextMix.setVisibility(View.GONE);
+                mImgLocalRecord.setVisibility(View.GONE);
+                mTextLocalRecord.setVisibility(View.GONE);
+                mImgScreenshot.setVisibility(View.GONE);
+                mTextScreenshot.setVisibility(View.GONE);
+                mImgRemoteRecord.setVisibility(View.GONE);
+                mTextRemoteRecord.setVisibility(View.GONE);
+                mImgRemoteMixSound.setVisibility(View.GONE);
+                mTextRemoteMixSound.setVisibility(View.GONE);
+                mImgControlMixSound.setVisibility(View.GONE);
+                mTextControlMixSound.setVisibility(View.GONE);
+                mImgBtnMuteMic.setVisibility(View.INVISIBLE);
+                mImgBtnMuteVideo.setVisibility(View.INVISIBLE);
+                mImgBtnMirror.setVisibility(View.INVISIBLE);
+                mTextResolution.setVisibility(View.INVISIBLE);
+                break;
         }
     }
 
