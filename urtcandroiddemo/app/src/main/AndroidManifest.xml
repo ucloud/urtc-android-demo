@@ -107,7 +107,7 @@
         </service>
 
         <service
-            android:name="com.ucloudrtclib.sdkengine.define.UCloudRtcCaptureScreenService"
+            android:name="core.services.CaptureScreenService"
             android:enabled="true"
             android:foregroundServiceType="mediaProjection">
         </service>
