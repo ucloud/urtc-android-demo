@@ -246,7 +246,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
         mVideoHwAcc = preferences.getBoolean(CommonUtils.VIDEO_HW_ACC, CommonUtils.HARDWARE_ACC);
-        UCloudRtcSdkEnv.setVideoHardWareAcceleration(mVideoHwAcc);
+//        UCloudRtcSdkEnv.setVideoHardWareAcceleration(mVideoHwAcc);
         sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
@@ -684,7 +684,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
             }
         });
 
-        initRecordManager();
+//        initRecordManager();
 
         if (mJoinChannelFlag) {
             UCloudRtcSdkAuthInfo info = new UCloudRtcSdkAuthInfo();
@@ -1863,7 +1863,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
                         releaseExtendCamera();
                     }
                 },0);
-                UCloudRtcSdkEngine.destroy();
+//                UCloudRtcSdkEngine.destroy();
                 sdkEngine = null;
             }
             finish();

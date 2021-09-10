@@ -44,8 +44,8 @@ public class CommonUtils {
     public static final String VIDEO_HW_ACC = "VIDEO_HW_ACC";
 
     public static final String APP_ID_TAG = "APPID";
-    public static final String APP_ID = "";
-    public static final String APP_KEY = "";
+    public static final String APP_ID = "urtc-bjeqcgyt";
+    public static final String APP_KEY = "adcfa9ce62da3883e39a8b8d3cd74553";
     public static final String PRIVATISATION_ADDRESS = "PRIVATISATION_ADDRESS";
     public static final String BUCKET = "";
     public static final String REGION = "";
