@@ -52,11 +52,13 @@ public class ConnectActivity extends AppCompatActivity {
     private String mAppid = "";
     private String mRoomToken = "";
     private View connectButton;
+    private View previewButton;
     private View exportButton;
     private ImageButton setButton;
     private TextView mTextSDKVersion;
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
     private boolean mStartSuccess = false;
+    private boolean mJoinChannel = true;
     private ImageView mAnimal;
 
     @Override
@@ -101,8 +103,9 @@ public class ConnectActivity extends AppCompatActivity {
         mTextSDKVersion = findViewById(R.id.tv_sdk_version);
         mTextSDKVersion.setText(getString(R.string.app_name) + "\n" + UCloudRtcSdkEngine.getSdkVersion());
         connectButton = findViewById(R.id.connect_button);
+        previewButton = findViewById(R.id.preview_button);
         exportButton = findViewById(R.id.log_output_button);
-        exportButton.setVisibility(View.GONE);
+//        exportButton.setVisibility(View.GONE);
         StatusBarUtils.setAndroidNativeLightStatusBar(this,true);
 
         connectButton.setOnClickListener(new View.OnClickListener() {
@@ -115,6 +118,7 @@ public class ConnectActivity extends AppCompatActivity {
                     //测试环境下SDK自动生成token
                     if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIAL) {
                         mRoomToken = "testoken";
+                        mJoinChannel = true;
                         Log.d(TAG, " appid " + mAppid);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             boolean mVideoHwAcc = preferences.getBoolean(CommonUtils.VIDEO_HW_ACC, CommonUtils.HARDWARE_ACC);
@@ -175,6 +179,33 @@ public class ConnectActivity extends AppCompatActivity {
             }
         });
 
+        previewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mRoomid = roomEditText.getText().toString();
+                if (mRoomid.isEmpty()) {
+                    ToastUtils.shortShow(getApplicationContext(), "房间id 不能为空");
+                } else {
+                    //测试环境下SDK自动生成token
+                    if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIAL) {
+                        mRoomToken = "testoken";
+                        mJoinChannel = false;
+                        Log.d(TAG, " appid " + mAppid);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            boolean mVideoHwAcc = preferences.getBoolean(CommonUtils.VIDEO_HW_ACC, CommonUtils.HARDWARE_ACC);
+                            UCloudRtcSdkEnv.setVideoHardWareAcceleration(mVideoHwAcc);
+                            UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
+                        } else {
+                            startLivingActivity();
+                        }
+                    } else {
+                        //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
+                        ToastUtils.shortShow(ConnectActivity.this, "正式环境下请获取自己服务器的token");
+                    }
+                }
+            }
+        });
+
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -182,13 +213,16 @@ public class ConnectActivity extends AppCompatActivity {
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        URTCFileUtil.getInstance().copyFolder("/data/user/0/com.urtcdemo/app_bugly", "/sdcard/urtc/app_bugly");
-                        URTCFileUtil.getInstance().copyFolder("/data/tombstones", "/sdcard/urtc/tombstones");
+
+                        String basePath = getApplicationContext().getExternalFilesDir("").getPath();
+                        String newPath = basePath + "/urtc/app_bugly";
+                        Log.d(TAG, "copy new path : " + newPath);
+                        URTCFileUtil.getInstance().copyFolder("/data/user/0/com.urtcdemo/app_bugly", newPath);
                         Handler handler = new Handler(Looper.getMainLooper());
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                ToastUtils.shortShow(ConnectActivity.this, "拷贝完成");
+                                ToastUtils.shortShow(ConnectActivity.this, "拷贝完成,日志路径： " + newPath);
                             }
                         });
 
@@ -269,6 +303,7 @@ public class ConnectActivity extends AppCompatActivity {
             intent.putExtra("user_id", mUserId);
             intent.putExtra("app_id", mAppid);
             intent.putExtra("token", mRoomToken);
+            intent.putExtra("join_channel", mJoinChannel);
             mMainHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
