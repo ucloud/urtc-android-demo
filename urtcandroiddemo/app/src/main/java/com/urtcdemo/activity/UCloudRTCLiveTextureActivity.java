@@ -618,7 +618,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         info.setRoomId(mRoomid);
         info.setUId(mUserid);
         Log.d(TAG, " roomtoken = " + mRoomToken);
-        initRecordManager();
+//        initRecordManager();
         // 加入房间
         if (sdkEngine.joinChannel(info) == UCloudRtcSdkErrorCode.NET_ERR_SECKEY_NULL
                 || mAppid.length() == 0) {
@@ -780,7 +780,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     if (code == 0) {
-
+                        mLocalVideoView.setVisibility(View.VISIBLE);
                         int mediatype = info.getMediaType().ordinal();
                         mPublishMediaType = UCloudRtcSdkMediaType.matchValue(mediatype);
                         if(mLocalRender != null){
@@ -1589,6 +1589,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
     private void endCall() {
         sdkEngine.leaveChannel().ordinal();
+        UCloudRtcSdkEngine.destroy();
 //        Intent intent = new Intent(UCloudRTCLiveTextureActivity.this, ConnectActivity.class);
 //        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 //        releaseExtendCamera();
@@ -2316,20 +2317,30 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                 final Bitmap bitmap = Bitmap.createBitmap(width * 1, height * 1, Bitmap.Config.ARGB_8888);
 
                 bitmap.copyPixelsFromBuffer(rgbBuffer);
-                String name = "/mnt/sdcard/urtcscreen_" + System.currentTimeMillis() + "_local.jpg";
-                File file = new File(name);
+                String basePath = getApplicationContext().getExternalFilesDir("").getPath();
+                String dirPath = basePath + "/urtc/screenshot";
                 try {
+                    File dir = new File(dirPath);
+                    if(!dir.exists()){
+                        dir.mkdirs();
+                    }
+
+                String filePath = dirPath + System.currentTimeMillis() + "_local.jpg";
+                File file = new File(filePath);
+                file.createNewFile();
+                Log.d(TAG, "screen shoot : " + filePath);
                     FileOutputStream out = new FileOutputStream(file);
                     if (bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)) {
                         out.flush();
                         out.close();
+
                     }
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Log.d(TAG, "screen shoot : " + name);
+
             }
         } );
     }
