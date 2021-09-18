@@ -9,6 +9,30 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <LinearLayout
+        android:layout_gravity="bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp">
+
+        <ImageView
+            android:id="@+id/video_switch"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@mipmap/video_close"/>
+
+        <ImageView
+            android:id="@+id/audio_switch"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@mipmap/loudspeaker_disable"/>
+
+        <ImageView
+            android:id="@+id/stream_switch"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@mipmap/switch_camera"/>
+    </LinearLayout>
+
     <ImageView
         android:id="@+id/cover_view"
         android:visibility="gone"

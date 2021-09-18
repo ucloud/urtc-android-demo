@@ -10,9 +10,11 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderTextureView;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
 import com.urtcdemo.R;
@@ -39,6 +41,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
     private List<ViewHolder> mCacheHolder;
     private SwapInterface mSwapInterface;
     private UCloudRtcSdkEngine mSdkEngine;
+    private String mLocalUser = "";
 
 
     public RemoteHasViewVideoAdapter(Context context, UCloudRtcSdkEngine sdkEngine,SwapInterface provider) {
@@ -64,7 +67,6 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         return holder;
     }
 
-
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 //        holder.setIsRecyclable(false);
@@ -81,6 +83,61 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         if (viewInfo == null) {
             return;
         }
+
+        ImageView videoSwitch = holderView.findViewById(R.id.video_switch);
+        if(viewInfo.isMuteVideo()){
+            videoSwitch.setImageResource(R.mipmap.video_open);
+        }else{
+            videoSwitch.setImageResource(R.mipmap.video_close);
+        }
+        videoSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!viewInfo.isMuteVideo()){
+                    if(viewInfo.getUid().equals(mLocalUser)){
+                        mSdkEngine.muteLocalVideo(true,viewInfo.getMediaType());
+                    }else{
+                        if(viewInfo.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN || viewInfo.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN_SMALL){
+                            mSdkEngine.muteRemoteScreen(viewInfo.getUid(),true);
+                        }else{
+                            mSdkEngine.muteRemoteVideo(viewInfo.getUid(),true);
+                        }
+                    }
+                    videoSwitch.setImageResource(R.mipmap.video_open);
+                }else{
+                    if(viewInfo.getUid().equals(mLocalUser)){
+                        mSdkEngine.muteLocalVideo(false,viewInfo.getMediaType());
+                    }else{
+                        mSdkEngine.muteRemoteVideo(viewInfo.getUid(),false);
+                    }
+                    videoSwitch.setImageResource(R.mipmap.video_close);
+                }
+            }
+        });
+        ImageView audioSwitch = holderView.findViewById(R.id.audio_switch);
+        if(viewInfo.isMuteAudio()){
+            audioSwitch.setImageResource(R.mipmap.loudspeaker);
+        }else{
+            audioSwitch.setImageResource(R.mipmap.loudspeaker_disable);
+        }
+        audioSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!viewInfo.isMuteAudio()){
+                    mSdkEngine.muteRemoteAudio(viewInfo.getUid(),true);
+                }else{
+                    mSdkEngine.muteRemoteAudio(viewInfo.getUid(),false);
+                }
+            }
+        });
+
+        ImageView streamSwitch = holderView.findViewById(R.id.stream_switch);
+        audioSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSdkEngine.switchRemoteStreamType("",viewInfo.getUid(),viewInfo.getMediaType().getType());
+            }
+        });
 
         TextureView videoView = holderView.findViewById(R.id.texture_view);
 
@@ -261,6 +318,11 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         }
     }
 
+//    public void refreshMuteInfo(UCloudRtcSdkTrackType trackType, boolean mute, String uid, UCloudRtcSdkMediaType mediaType){
+//        int index = getPositionByKey(uid+mediaType.toString());
+//        notifyItemChanged(index);
+//    }
+
     @Override
     public int getItemCount() {
         return medialist.size();
@@ -286,5 +348,9 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         boolean isLocalStream(String uid);
 
         void stopRender(URTCVideoViewInfo info);
+    }
+
+    public void setLocalUser(String localUser) {
+        mLocalUser = localUser;
     }
 }

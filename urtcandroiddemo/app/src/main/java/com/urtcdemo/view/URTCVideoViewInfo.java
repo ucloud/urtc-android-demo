@@ -13,6 +13,9 @@ public class URTCVideoViewInfo {
     private String mUid ;
     private boolean mEnableVideo ;
     private boolean mEnableAudio;
+    private boolean mMuteVideo;
+    private boolean mMuteAudio;
+    private boolean mSmall;
     private UCloudRtcSdkMediaType mMediaType ;
     private String key;
     private UCloudRtcSdkStreamInfo mStreamInfo;
@@ -35,6 +38,8 @@ public class URTCVideoViewInfo {
         mEnableAudio = info.isHasAudio();
         mMediaType = info.getMediaType();
         mStreamInfo = info;
+        mMuteAudio = info.isMuteAudio();
+        mMuteVideo = info.isMuteAudio();
     }
 
     public Object getRenderview() {
@@ -91,6 +96,30 @@ public class URTCVideoViewInfo {
 
     public UCloudRtcSdkStreamInfo getStreamInfo() {
         return mStreamInfo;
+    }
+
+    public boolean isMuteVideo() {
+        return mMuteVideo;
+    }
+
+    public void setMuteVideo(boolean muteVideo) {
+        mMuteVideo = muteVideo;
+    }
+
+    public boolean isMuteAudio() {
+        return mMuteAudio;
+    }
+
+    public void setMuteAudio(boolean muteAudio) {
+        mMuteAudio = muteAudio;
+    }
+
+    public boolean isSmall() {
+        return mSmall;
+    }
+
+    public void setSmall(boolean small) {
+        mSmall = small;
     }
 
     public Object release() {

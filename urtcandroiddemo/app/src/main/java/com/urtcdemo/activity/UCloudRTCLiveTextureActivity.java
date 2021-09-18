@@ -84,9 +84,12 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import core.engines.logicengine.unified.data.RTCOutStreamInfo;
+
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
+import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO_SMALL;
 
 /**
  * @author ciel
@@ -295,6 +298,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         mTextControlMixSound = findViewById(R.id.control_mix_text);
 
         mUserid = getIntent().getStringExtra("user_id");
+        mVideoAdapter.setLocalUser(mUserid);
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
         mAppid = getIntent().getStringExtra("app_id");
@@ -355,6 +359,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
+        sdkEngine.enableDualStream(true);
+        sdkEngine.setLowStreamParameter(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO_SMALL.getType(),320,240,25,300);
         sdkEngine.setScreenProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1280_720);
 
         //分辨率菜单显示
@@ -989,9 +995,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                         vinfo.setMediaType(info.getMediaType());
                         vinfo.setEnableVideo(info.isHasVideo());
                         vinfo.setEnableAudio(info.isHasAudio());
-
-
-
+                        vinfo.setMuteAudio(info.isMuteAudio());
+                        vinfo.setMuteVideo(info.isMuteVideo());
                         String mkey = info.getUId() + info.getMediaType().toString();
                         vinfo.setKey(mkey);
                         //默认输出，和外部输出代码二选一
@@ -1065,6 +1070,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                 public void run() {
                     if (code == 0) {
                         Log.d(TAG, " onRemoteStreamMuteRsp " + code + "msg " + msg);
+                        //todo 更新结果
                     }
                 }
             });
