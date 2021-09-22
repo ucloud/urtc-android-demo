@@ -16,6 +16,7 @@ import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderTextureView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
@@ -30,6 +31,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO;
+import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO;
 
 public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasViewVideoAdapter.ViewHolder> {
     public static final String TAG = " RemoteVideoAdapter ";
@@ -103,14 +107,18 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                             mSdkEngine.muteRemoteVideo(viewInfo.getUid(),true);
                         }
                     }
-                    videoSwitch.setImageResource(R.mipmap.video_open);
+//                    videoSwitch.setImageResource(R.mipmap.video_open);
                 }else{
                     if(viewInfo.getUid().equals(mLocalUser)){
                         mSdkEngine.muteLocalVideo(false,viewInfo.getMediaType());
                     }else{
-                        mSdkEngine.muteRemoteVideo(viewInfo.getUid(),false);
+                        if(viewInfo.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN || viewInfo.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN_SMALL){
+                            mSdkEngine.muteRemoteScreen(viewInfo.getUid(),false);
+                        }else{
+                            mSdkEngine.muteRemoteVideo(viewInfo.getUid(),false);
+                        }
                     }
-                    videoSwitch.setImageResource(R.mipmap.video_close);
+//                    videoSwitch.setImageResource(R.mipmap.video_close);
                 }
             }
         });
@@ -124,18 +132,31 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
             @Override
             public void onClick(View v) {
                 if(!viewInfo.isMuteAudio()){
-                    mSdkEngine.muteRemoteAudio(viewInfo.getUid(),true);
+                    mSdkEngine.muteRemoteAudio(viewInfo.getUid(),viewInfo.getMediaType(),true);
                 }else{
-                    mSdkEngine.muteRemoteAudio(viewInfo.getUid(),false);
+                    mSdkEngine.muteRemoteAudio(viewInfo.getUid(),viewInfo.getMediaType(),false);
                 }
             }
         });
 
         ImageView streamSwitch = holderView.findViewById(R.id.stream_switch);
-        audioSwitch.setOnClickListener(new View.OnClickListener() {
+        streamSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mSdkEngine.switchRemoteStreamType("",viewInfo.getUid(),viewInfo.getMediaType().getType());
+                UCloudRtcSdkMediaType mediaType = null;
+                if(!viewInfo.getUid().equals(mLocalUser)){
+                    if(viewInfo.getMediaType().equals(UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) ){
+                        mediaType = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO_SMALL;
+                    }else if(viewInfo.getMediaType().equals(UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO_SMALL)){
+                        mediaType = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO;
+                    }else if(viewInfo.getMediaType().equals(UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN)){
+                        mediaType = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN_SMALL;
+                    }else if(viewInfo.getMediaType().equals(UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN_SMALL)){
+                        mediaType = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN;
+                    }
+                    if(mediaType != null)
+                    mSdkEngine.switchRemoteStreamType("",viewInfo.getUid(),mediaType.getType());
+                }
             }
         });
 
@@ -318,10 +339,20 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         }
     }
 
-//    public void refreshMuteInfo(UCloudRtcSdkTrackType trackType, boolean mute, String uid, UCloudRtcSdkMediaType mediaType){
-//        int index = getPositionByKey(uid+mediaType.toString());
-//        notifyItemChanged(index);
-//    }
+    public void refreshMuteInfo(UCloudRtcSdkTrackType trackType, boolean mute, String uid, UCloudRtcSdkMediaType mediaType){
+        int index = getPositionByKey(uid+mediaType.toString());
+        Log.d(TAG, "refreshMuteInfo: key  " + uid+mediaType.toString() + " index " + index);
+        URTCVideoViewInfo videoViewInfo = mStreamViews.get(uid+mediaType.toString());
+        Log.d(TAG, "refreshMuteInfo: videoViewInfo  " + videoViewInfo);
+        if(videoViewInfo != null && index >= 0){
+            if(trackType == UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO){
+                videoViewInfo.setMuteAudio(mute);
+            }else if(trackType == UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO){
+                videoViewInfo.setMuteVideo(mute);
+            }
+            notifyItemChanged(index);
+        }
+    }
 
     @Override
     public int getItemCount() {

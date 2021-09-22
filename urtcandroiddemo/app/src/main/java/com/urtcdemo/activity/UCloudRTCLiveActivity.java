@@ -1602,10 +1602,10 @@ public class UCloudRTCLiveActivity extends BaseActivity
         public void onRemoteAudio(View v, SurfaceViewGroup parent) {
             if (parent.getTag(R.id.swap_info) != null) {
                 UCloudRtcSdkStreamInfo swapStreamInfo = (UCloudRtcSdkStreamInfo) parent.getTag(R.id.swap_info);
-                sdkEngine.muteRemoteAudio(swapStreamInfo.getUId(), !mRemoteAudioMute);
+                sdkEngine.muteRemoteAudio(swapStreamInfo.getUId(),swapStreamInfo.getMediaType(), !mRemoteAudioMute);
             } else if (parent.getTag() != null) {
                 UCloudRtcSdkStreamInfo streamInfo = (UCloudRtcSdkStreamInfo) parent.getTag();
-                sdkEngine.muteRemoteAudio(streamInfo.getUId(), !mRemoteAudioMute);
+                sdkEngine.muteRemoteAudio(streamInfo.getUId(), streamInfo.getMediaType(),!mRemoteAudioMute);
             }
             mMuteView = (UCloudRtcSdkSurfaceVideoView) parent;
         }

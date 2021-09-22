@@ -139,4 +139,19 @@ public class URTCVideoViewInfo {
         return mRenderview;
     }
 
+    @Override
+    public String toString() {
+        return "URTCVideoViewInfo{" +
+                "mRenderview=" + mRenderview +
+                ", mUid='" + mUid + '\'' +
+                ", mEnableVideo=" + mEnableVideo +
+                ", mEnableAudio=" + mEnableAudio +
+                ", mMuteVideo=" + mMuteVideo +
+                ", mMuteAudio=" + mMuteAudio +
+                ", mSmall=" + mSmall +
+                ", mMediaType=" + mMediaType +
+                ", key='" + key + '\'' +
+                ", mStreamInfo=" + mStreamInfo +
+                '}';
+    }
 }

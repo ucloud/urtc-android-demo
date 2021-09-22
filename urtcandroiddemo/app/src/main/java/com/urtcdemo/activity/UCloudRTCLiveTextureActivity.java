@@ -989,7 +989,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                 @Override
                 public void run() {
                     if (code == 0) {
-                        Log.d(TAG, " subscribe info: " + info);
+                        Log.d(TAG, " onSubscribeResult info: " + info);
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
                         vinfo.setUid(info.getUId());
                         vinfo.setMediaType(info.getMediaType());
@@ -1030,6 +1030,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.d(TAG, "onUnSubscribeResult: " + info);
                     ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, " 取消订阅用户 " +
                             info.getUId() + " 类型 " + info.getMediaType());
                     if (mVideoAdapter != null) {
@@ -1071,6 +1072,9 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                     if (code == 0) {
                         Log.d(TAG, " onRemoteStreamMuteRsp " + code + "msg " + msg);
                         //todo 更新结果
+                        if(mVideoAdapter!= null){
+                            mVideoAdapter.refreshMuteInfo(tracktype,mute,uid,mediatype);
+                        }
                     }
                 }
             });
