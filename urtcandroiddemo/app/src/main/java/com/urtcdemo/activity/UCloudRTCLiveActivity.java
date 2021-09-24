@@ -1299,6 +1299,11 @@ public class UCloudRTCLiveActivity extends BaseActivity
         }
 
         @Override
+        public void onSwitchRemoteStream(int code, String msg, String roomId, String uid, UCloudRtcSdkMediaType mediaType) {
+
+        }
+
+        @Override
         public void onSendRTCStatus(UCloudRtcSdkStats rtstats) {
 
         }

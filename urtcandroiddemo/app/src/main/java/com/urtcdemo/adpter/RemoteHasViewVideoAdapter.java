@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderTextureView;
@@ -88,6 +89,14 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
             return;
         }
 
+        TextView textViewDesc = holderView.findViewById(R.id.text_desc);
+        if(viewInfo.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN_SMALL
+        ||viewInfo.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO_SMALL){
+            textViewDesc.setText("low");
+        }else if(viewInfo.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN
+                ||viewInfo.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO){
+            textViewDesc.setText("high");
+        }
         ImageView videoSwitch = holderView.findViewById(R.id.video_switch);
         if(viewInfo.isMuteVideo()){
             videoSwitch.setImageResource(R.mipmap.video_open);
@@ -254,6 +263,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         } else {
             holderView.setBackground(mContext.getResources().getDrawable(R.drawable.border));
         }
+        viewInfo.setView(holderView);
     }
 
     public int getPositionByKey(String key) {
@@ -353,6 +363,34 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
             notifyItemChanged(index);
         }
     }
+
+    public void refreshRemoteStreamInfo(String uid, UCloudRtcSdkMediaType mediaType){
+        UCloudRtcSdkMediaType oldType = UCloudRtcSdkMediaType.getSwitchType(mediaType);
+        int index = getPositionByKey(uid+oldType.toString());
+        Log.d(TAG, "refreshRemoteStreamInfo old key  " + uid+oldType.toString() + " index " + index);
+        URTCVideoViewInfo videoViewInfo = mStreamViews.remove(uid+oldType.toString());
+        mStreamViews.put(uid+mediaType,videoViewInfo);
+        medialist.remove(index);
+        medialist.add(index,uid+mediaType);
+        Log.d(TAG, "refreshRemoteStreamInfo: videoViewInfo  " + videoViewInfo);
+        if(videoViewInfo != null && index >= 0){
+            videoViewInfo.setKey(uid+mediaType);
+            videoViewInfo.setMediaType(mediaType);
+            videoViewInfo.getStreamInfo().setMediaType(mediaType);
+        }
+
+        if(videoViewInfo.getView()!= null){
+          TextView textViewDesc =   videoViewInfo.getView().findViewById(R.id.text_desc);
+            if(videoViewInfo.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN_SMALL
+                    ||videoViewInfo.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO_SMALL){
+                textViewDesc.setText("low");
+            }else if(videoViewInfo.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN
+                    ||videoViewInfo.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO){
+                textViewDesc.setText("high");
+            }
+        }
+    }
+
 
     @Override
     public int getItemCount() {

@@ -19,6 +19,7 @@ public class URTCVideoViewInfo {
     private UCloudRtcSdkMediaType mMediaType ;
     private String key;
     private UCloudRtcSdkStreamInfo mStreamInfo;
+    private View mView;
     public URTCVideoViewInfo(){
         mUid = "" ;
         mEnableVideo = false ;
@@ -122,6 +123,14 @@ public class URTCVideoViewInfo {
         mSmall = small;
     }
 
+    public View getView() {
+        return mView;
+    }
+
+    public void setView(View view) {
+        mView = view;
+    }
+
     public Object release() {
         if (mRenderview != null) {
             if(mRenderview instanceof UCloudRtcSdkSurfaceVideoView){
@@ -152,6 +161,7 @@ public class URTCVideoViewInfo {
                 ", mMediaType=" + mMediaType +
                 ", key='" + key + '\'' +
                 ", mStreamInfo=" + mStreamInfo +
+                ", mView=" + mView +
                 '}';
     }
 }
