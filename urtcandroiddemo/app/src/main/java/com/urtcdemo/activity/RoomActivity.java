@@ -544,7 +544,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onJoinRoomResult(int code, String msg, String roomid) {
+        public void onJoinRoom(int code, String msg, String uId,String roomid) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -566,7 +566,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onLeaveRoomResult(int code, String msg, String roomid) {
+        public void onLeaveRoom(int code, String msg,String roomId) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -582,7 +582,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onRejoiningRoom(String roomid) {
+        public void onRejoining(String uId,String roomId) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -594,7 +594,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onRejoinRoomResult(String roomid) {
+        public void onRejoinRoom(String uid, String roomId) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -849,19 +849,19 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onLocalStreamMuteRsp(int code, String msg, UCloudRtcSdkMediaType mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
-            Log.d(TAG, " code " + code + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
+        public void onLocalStreamMuteRsp(int code, String msg, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkTrackType trackType, boolean mute) {
+            Log.d(TAG, " code " + code + " mediatype " + mediaType + " ttype " + trackType + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (code == 0) {
-                        if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
-                            if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
+                        if (mediaType == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
+                            if (trackType == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
                                 onMuteMicResult(mute);
-                            } else if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
+                            } else if (trackType == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
                                 onMuteCamResult(mute);
                             }
-                        } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
+                        } else if (mediaType == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
                             onMuteCamResult(mute);
                         }
                     }
@@ -870,15 +870,15 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
         }
 
         @Override
-        public void onRemoteStreamMuteRsp(int code, String msg, String uid, UCloudRtcSdkMediaType mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
-            Log.d(TAG, " code " + code + " uid " + uid + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
+        public void onRemoteStreamMuteRsp(int code, String msg, String uid, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkTrackType trackType, boolean mute) {
+            Log.d(TAG, " code " + code + " uid " + uid + " mediatype " + mediaType + " ttype " + trackType + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (code == 0) {
-                        String mkey = uid + mediatype.toString();
+                        String mkey = uid + mediaType.toString();
                         Log.d(TAG, " onRemoteStreamMuteRsp " + mkey + " " + mVideoAdapter);
-                        if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
+                        if (trackType == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
                             mRemoteAudioMute = mute;
                             if (mMuteView != null) {
                                 mMuteView.refreshRemoteAudio(mute);
@@ -891,7 +891,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 //                            } else {
 //                                localrenderview.refreshRemoteAudio(mute);
 //                            }
-                        } else if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
+                        } else if (trackType == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
                             mRemoteVideoMute = mute;
                             if (mMuteView != null) {
                                 mMuteView.refreshRemoteVideo(mute);
@@ -907,29 +907,29 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                         }
 
                     } else {
-                        ToastUtils.shortShow(RoomActivity.this, "mute " + mediatype + "failed with code: " + code);
+                        ToastUtils.shortShow(RoomActivity.this, "mute " + mediaType + "failed with code: " + code);
                     }
                 }
             });
         }
 
         @Override
-        public void onRemoteTrackNotify(String uid, UCloudRtcSdkMediaType mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
-            Log.d(TAG, " uid " + uid + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
+        public void onRemoteTrackNotify(String uid, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkTrackType trackType, boolean mute) {
+            Log.d(TAG, " uid " + uid + " mediatype " + mediaType + " ttype " + trackType + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
+                    if (mediaType == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
                         String cmd = mute ? "关闭" : "打开";
-                        if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
+                        if (trackType == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
                             ToastUtils.shortShow(RoomActivity.this, " 用户 " +
                                     uid + cmd + " 麦克风");
-                        } else if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
+                        } else if (trackType == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
                             ToastUtils.shortShow(RoomActivity.this, " 用户 " +
                                     uid + cmd + " 摄像头");
                         }
 
-                    } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
+                    } else if (mediaType == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
                         String cmd = mute ? "关闭" : "打开";
                         ToastUtils.shortShow(RoomActivity.this, " 用户 " +
                                 uid + cmd + " 桌面流");

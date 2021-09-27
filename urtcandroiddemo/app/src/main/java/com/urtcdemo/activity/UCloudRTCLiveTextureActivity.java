@@ -481,8 +481,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
             });
         }
 
-        @Override
-        public void onJoinRoomResult(int code, String msg, String roomid) {
+        public void onJoinRoom(int code, String msg, String uId,String roomId) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -503,13 +502,14 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onLeaveRoomResult(int code, String msg, String roomid) {
+        public void onLeaveRoom(int code, String msg,String roomId) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mLeaveRoomFlag = true;
                     ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, " 离开房间 " +
                             code + " errmsg " + msg);
+                    Log.d(TAG, "onLeaveRoom code: " + code + " msg " + msg  + " roomId " + roomId);
                     onMediaServerDisconnect();
                     releaseExtendCamera();
                     finish();
@@ -518,7 +518,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onRejoiningRoom(String roomid) {
+        public void onRejoining(String uId,String roomId) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -530,7 +530,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onRejoinRoomResult(String roomid) {
+        public void onRejoinRoom(String uId,String roomId) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -603,10 +603,12 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
         @Override
         public void onLocalUnPublish(int code, String msg, UCloudRtcSdkStreamInfo info) {
+            Log.d(TAG, "onLocalUnPublish: code " + info);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (code == 0) {
+
                         if (info.getMediaType() == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
                             if (mPublishMode == CommonUtils.AUTO_MODE) {
                                 mImgManualPubVideo.setVisibility(View.GONE);
@@ -797,19 +799,19 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onLocalStreamMuteRsp(int code, String msg, UCloudRtcSdkMediaType mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
-            Log.d(TAG, " code " + code + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
+        public void onLocalStreamMuteRsp(int code, String msg, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkTrackType trackType, boolean mute) {
+            Log.d(TAG, " code " + code + " mediatype " + mediaType + " ttype " + trackType + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (code == 0) {
-                        if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
-                            if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
+                        if (mediaType == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
+                            if (trackType == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
                                 onMuteMicResult(mute);
-                            } else if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
+                            } else if (trackType == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
                                 onMuteVideoResult(mute);
                             }
-                        } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
+                        } else if (mediaType == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
                             onMuteVideoResult(mute);
                         }
                     }
@@ -818,8 +820,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onRemoteStreamMuteRsp(int code, String msg, String uid, UCloudRtcSdkMediaType mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
-            Log.d(TAG, " code " + code + " uid " + uid + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
+        public void onRemoteStreamMuteRsp(int code, String msg, String uid, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkTrackType trackType, boolean mute) {
+            Log.d(TAG, " code " + code + " uid " + uid + " mediatype " + mediaType + " ttype " + trackType + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -827,7 +829,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                         Log.d(TAG, " onRemoteStreamMuteRsp " + code + "msg " + msg);
                         //todo 更新结果
                         if (mVideoAdapter != null) {
-                            mVideoAdapter.refreshMuteInfo(tracktype, mute, uid, mediatype);
+                            mVideoAdapter.refreshMuteInfo(trackType, mute, uid, mediaType);
                         }
                     }
                 }
@@ -835,22 +837,22 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
-        public void onRemoteTrackNotify(String uid, UCloudRtcSdkMediaType mediatype, UCloudRtcSdkTrackType tracktype, boolean mute) {
-            Log.d(TAG, " uid " + uid + " mediatype " + mediatype + " ttype " + tracktype + " mute " + mute);
+        public void onRemoteTrackNotify(String uid, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkTrackType trackType, boolean mute) {
+            Log.d(TAG, " uid " + uid + " mediatype " + mediaType + " ttype " + trackType + " mute " + mute);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
+                    if (mediaType == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) {
                         String cmd = mute ? "关闭" : "打开";
-                        if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
+                        if (trackType == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_AUDIO) {
                             ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, " 用户 " +
                                     uid + cmd + " 麦克风");
-                        } else if (tracktype == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
+                        } else if (trackType == UCloudRtcSdkTrackType.UCLOUD_RTC_SDK_TRACK_TYPE_VIDEO) {
                             ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, " 用户 " +
                                     uid + cmd + " 摄像头");
                         }
 
-                    } else if (mediatype == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
+                    } else if (mediaType == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) {
                         String cmd = mute ? "关闭" : "打开";
                         ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, " 用户 " +
                                 uid + cmd + " 桌面流");
@@ -1706,7 +1708,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
     private void endCall() {
         sdkEngine.leaveChannel().ordinal();
-        UCloudRtcSdkEngine.destroy();
+//        UCloudRtcSdkEngine.destroy();
 //        Intent intent = new Intent(UCloudRTCLiveTextureActivity.this, ConnectActivity.class);
 //        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 //        releaseExtendCamera();
