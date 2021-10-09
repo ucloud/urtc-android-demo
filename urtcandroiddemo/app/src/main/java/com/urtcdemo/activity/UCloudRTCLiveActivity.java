@@ -2365,8 +2365,8 @@ public class UCloudRTCLiveActivity extends BaseActivity
         camera.setFrameCallback(new IFrameCallback() {
             @Override
             public void onFrame(ByteBuffer frame) {
-/*                Log.d("UCloudRTCLiveActivity", "onFrame byteBuffer, frame.position: " + frame.position()
-                                + " frame.limit: " + frame.limit());*/
+//                Log.d("UCloudRTCLiveActivity", "onFrame byteBuffer, frame.position: " + frame.position()
+//                                + " frame.limit: " + frame.limit());
                 createFrameByteBuffer(frame);
             }
         }, mUVCCameraFormat);
@@ -2379,10 +2379,11 @@ public class UCloudRTCLiveActivity extends BaseActivity
 
         @Override
         public ByteBuffer provideRGBData(List<Integer> params) {
-            if (videoSourceData == null ) {
-                Log.d("UCloudRTCLiveActivity", "provideRGBData byteBuffer data is null");
+            if (videoSourceData == null || videoSourceData.limit() == videoSourceData.capacity()) {
+//                Log.d("UCloudRTCLiveActivity", "provideRGBData byteBuffer data is null");
                 return null;
             } else {
+
                 params.add(mURTCVideoFormat);
                 params.add(videoProfile.getWidth());
                 params.add(videoProfile.getHeight());
@@ -2390,13 +2391,10 @@ public class UCloudRTCLiveActivity extends BaseActivity
                     cacheBuffer = sdkEngine.getNativeOpInterface().createNativeByteBuffer(videoProfile.getWidth() * videoProfile.getHeight() * 4);
                     Log.d("UCloudRTCLiveActivity", "byteBuffer allocate call ");
                 }
-                cacheBuffer.clear();
                 synchronized (extendByteBufferSync) {
                     cacheBuffer.put(videoSourceData);
+                    videoSourceData.clear();
                 }
-
-//                cacheBuffer.flip();
-//                Log.d(TAG, "provideRGBData: cacheBuffer.limit: " + cacheBuffer.limit());
 
                 return cacheBuffer;
             }
@@ -2509,7 +2507,6 @@ public class UCloudRTCLiveActivity extends BaseActivity
             if (frame != null) {
                 synchronized (extendByteBufferSync) {
                     if (videoSourceData != null) {
-                        videoSourceData.clear();
                         videoSourceData.put(frame);
                         videoSourceData.flip();
                     }
