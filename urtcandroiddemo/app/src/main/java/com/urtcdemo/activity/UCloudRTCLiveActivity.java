@@ -393,16 +393,15 @@ public class UCloudRTCLiveActivity extends BaseActivity
         sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
         sdkEngine.setScreenProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1920_1080);
 
-        synchronized (extendByteBufferSync) {
-            videoSourceData = ByteBuffer.allocate(1920 * 1080 * 4);
-            videoSourceData.clear();
-        }
+
         //分辨率菜单显示
         mTextResolution.setText(mResolutionOption.get(mVideoProfileSelect));
         mAdapter = new ArrayAdapter<String>(this, R.layout.videoprofile_item, mResolutionOption);
 
         mResolutionPopupWindow = new VideoProfilePopupWindow(this);
         mResolutionPopupWindow.setOnSpinnerItemClickListener(mOnResulutionOptionClickListener);
+        sdkEngine.enableExtendVideoCapture(mExtendCameraCapture);
+
         if (mExtendCameraCapture) {
             //扩展摄像头方式
             UCloudRtcSdkEnv.setCaptureMode(
@@ -2344,7 +2343,10 @@ public class UCloudRTCLiveActivity extends BaseActivity
             camera.destroy();
             return null;
         }
-
+        synchronized (extendByteBufferSync) {
+            videoSourceData = ByteBuffer.allocate(videoProfile.getWidth() * videoProfile.getHeight() * 4);
+            videoSourceData.clear();
+        }
 
         //SurfaceTexture surface= mLocalVideoView.getSurfaceTexture();
         //UCloudRtcRenderView surface = mLocalVideoView.getSurfaceView();
@@ -2385,7 +2387,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
                 params.add(videoProfile.getWidth());
                 params.add(videoProfile.getHeight());
                 if (cacheBuffer == null) {
-                    cacheBuffer = sdkEngine.getNativeOpInterface().createNativeByteBuffer(1920 * 1080 * 4);
+                    cacheBuffer = sdkEngine.getNativeOpInterface().createNativeByteBuffer(videoProfile.getWidth() * videoProfile.getHeight() * 4);
                     Log.d("UCloudRTCLiveActivity", "byteBuffer allocate call ");
                 }
                 cacheBuffer.clear();
@@ -2393,7 +2395,8 @@ public class UCloudRTCLiveActivity extends BaseActivity
                     cacheBuffer.put(videoSourceData);
                 }
 
-                cacheBuffer.flip();
+//                cacheBuffer.flip();
+//                Log.d(TAG, "provideRGBData: cacheBuffer.limit: " + cacheBuffer.limit());
 
                 return cacheBuffer;
             }
