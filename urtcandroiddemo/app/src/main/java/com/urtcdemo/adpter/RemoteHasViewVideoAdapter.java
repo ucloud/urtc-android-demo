@@ -106,6 +106,8 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         videoSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String mkey = medialist.get(position);
+                URTCVideoViewInfo viewInfo = mStreamViews.get(mkey);
                 if(!viewInfo.isMuteVideo()){
                     if(viewInfo.getUid().equals(mLocalUser)){
                         mSdkEngine.muteLocalVideo(true,viewInfo.getMediaType());
@@ -140,6 +142,8 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         audioSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String mkey = medialist.get(position);
+                URTCVideoViewInfo viewInfo = mStreamViews.get(mkey);
                 if(!viewInfo.isMuteAudio()){
                     mSdkEngine.muteRemoteAudio(viewInfo.getUid(),viewInfo.getMediaType(),true);
                 }else{
@@ -152,6 +156,8 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         streamSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String mkey = medialist.get(position);
+                URTCVideoViewInfo viewInfo = mStreamViews.get(mkey);
                 UCloudRtcSdkMediaType mediaType = null;
                 if(!viewInfo.getUid().equals(mLocalUser)){
                     if(viewInfo.getMediaType().equals(UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO) ){
@@ -188,6 +194,8 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                     @Override
                     public void onClick(View v) {
                         //screen shot
+                        String mkey = medialist.get(position);
+                        URTCVideoViewInfo viewInfo = mStreamViews.get(mkey);
                         Log.d(TAG, "onClick: take snapShop: " + viewInfo.getStreamInfo());
                         mSdkEngine.takeSnapShot(false,viewInfo.getStreamInfo(), (rgbBuffer, width, height) -> {
                             Log.d(TAG, "onReceiveRGBAData: rgbBuffer: " + rgbBuffer + " width: " + width + " height: " + height);
@@ -288,6 +296,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         URTCVideoViewInfo newBean = new URTCVideoViewInfo(swapInfo);
         Log.d(TAG, "updateSwapInfo: old bean render: "+ oldBean.getRenderview());
         newBean.setRenderview(oldBean.getRenderview());
+        newBean.setView(oldBean.getView());
         mStreamViews.put(swapKey,newBean);
 
         int clickIndex = medialist.indexOf(clickKey);

@@ -2,10 +2,13 @@
 
 buildscript {
     repositories {
+
         google()
         jcenter()
         //maven中央仓库
+
         mavenCentral()
+        maven { url 'https://maven.aliyun.com/repository/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.2'
@@ -22,12 +25,14 @@ buildscript {
 
 allprojects {
     repositories {
+
         google()
         jcenter()
         mavenCentral()
 
         //uvccamera common lib
-        maven { url 'https://raw.githubusercontent.com/saki4510t/libcommon/master/repository/' }
+//        maven { url 'https://raw.githubusercontent.com/saki4510t/libcommon/master/repository/' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
     }
 }
 
