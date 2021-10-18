@@ -75,10 +75,10 @@ dependencies {
     implementation 'com.github.markzhai:blockcanary-android:1.5.0'
     testImplementation 'junit:junit:4.12'
 
-    implementation (name: 'ucloudrtclib-2.0.6', ext: 'aar')
+    implementation (name: 'ucloudrtclib-2.0.7', ext: 'aar')
     implementation(name: 'libuvccamera-release', ext: 'aar')
     implementation(name: 'common-2.12.4', ext: 'aar')
-//    implementation 'cn.ucloud:ucloudrtclib:2.0.5' //mavenCentral
+//    implementation 'cn.ucloud:ucloudrtclib:2.0.7' //mavenCentral
 //    implementation project(':urtc-sdk-android')
 //    implementation project(':libuvccamera')
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
