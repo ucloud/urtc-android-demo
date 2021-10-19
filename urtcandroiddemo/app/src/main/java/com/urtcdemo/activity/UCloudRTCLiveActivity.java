@@ -1122,7 +1122,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
                             Log.d(TAG," onRemoteUnPublish localIndex "+ localIndex);
                             mkey = mUserid + mPublishMediaType.toString();
                             sdkEngine.stopPreview(mPublishMediaType);
-                            sdkEngine.renderLocalView(mLocalStreamInfo,mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                            sdkEngine.renderLocalView(mLocalStreamInfo,mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
                             mSwapStreamInfo = mLocalStreamInfo;
                         }
                     }else{
@@ -1186,14 +1186,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
 
                         if (videoView != null) {
                             sdkEngine.startRemoteView(info, videoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null); // 渲染订阅流
-                            //videoView.refreshRemoteOp(View.VISIBLE);
                         }
-                        //if (videoViewCallBack != null) {
-                            // sdkEngine.startRemoteView(info, videoViewCallBack, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null); // 渲染订阅流，同时从回调输出
-                        //}
-                        //如果订阅成功就删除待订阅列表中的数据
-                        //mSpinnerPopupWindowScribe.removeStreamInfoByUid(info.getUId());
-                        //refreshStreamInfoText();
                     } else {
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 订阅用户  " +
                                 info.getUId() + " 流 " + info.getMediaType() + " 失败 " +
@@ -1739,23 +1732,23 @@ public class UCloudRTCLiveActivity extends BaseActivity
                     sdkEngine.stopPreview(mSwapStreamInfo.getMediaType());
 //                        sdkEngine.renderLocalView(mSwapStreamInfo, v,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                     UCloudRtcRenderView remoteRender = (UCloudRtcRenderView)v.getTag(R.id.render);
-                    sdkEngine.renderLocalView(mSwapStreamInfo, remoteRender,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                    sdkEngine.renderLocalView(mSwapStreamInfo, remoteRender,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
 //                        sdkEngine.startRemoteView(clickStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
-                    sdkEngine.startRemoteView(clickStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                    sdkEngine.startRemoteView(clickStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
                         ((UCloudRtcSdkSurfaceVideoView) v).refreshRemoteOp(View.INVISIBLE);
                 }else if(!swapLocal && clickLocal){
                     sdkEngine.stopRemoteView(mSwapStreamInfo);
                     sdkEngine.stopPreview(clickStreamInfo.getMediaType());
                     UCloudRtcRenderView remoteRender = (UCloudRtcRenderView)v.getTag(R.id.render);
-                    sdkEngine.renderLocalView(clickStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
-                    sdkEngine.startRemoteView(mSwapStreamInfo, remoteRender,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                    sdkEngine.renderLocalView(clickStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
+                    sdkEngine.startRemoteView(mSwapStreamInfo, remoteRender,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
                         ((UCloudRtcSdkSurfaceVideoView) v).refreshRemoteOp(View.VISIBLE);
                 }else if(!swapLocal && !clickLocal){
                     sdkEngine.stopRemoteView(mSwapStreamInfo);
                     sdkEngine.stopRemoteView(clickStreamInfo);
-                    sdkEngine.startRemoteView(clickStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                    sdkEngine.startRemoteView(clickStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
                     UCloudRtcRenderView remoteRender = (UCloudRtcRenderView)v.getTag(R.id.render);
-                    sdkEngine.startRemoteView(mSwapStreamInfo, remoteRender,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
+                    sdkEngine.startRemoteView(mSwapStreamInfo, remoteRender,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT,null);
                     }
                 v.setTag(mSwapStreamInfo);
                 mVideoAdapter.updateSwapInfo(clickStreamInfo,mSwapStreamInfo);
@@ -2404,7 +2397,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
 
             if (cacheBuffer != null) {
                 cacheBuffer.clear();
-                sdkEngine.getNativeOpInterface().releaseNativeByteBuffer(videoSourceData);
+                sdkEngine.getNativeOpInterface().releaseNativeByteBuffer(cacheBuffer);
                 cacheBuffer = null;
             }
         }
