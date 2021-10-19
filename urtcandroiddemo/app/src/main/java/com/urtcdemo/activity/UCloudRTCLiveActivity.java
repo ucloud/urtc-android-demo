@@ -829,7 +829,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
                             code + " errmsg " + msg);
                     setIconStats(userStatus.INIT);
                     mLocalVideoView.setVisibility(View.INVISIBLE);
-                    setPreview(false);
+//                    setPreview(false);
                     mIsPreview = false;
 //                    System.gc();
                 }
@@ -1867,7 +1867,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
                         releaseExtendCamera();
                     }
                 },0);
-//                UCloudRtcSdkEngine.destroy();
+                UCloudRtcSdkEngine.destroy();
                 sdkEngine = null;
             }
             finish();
@@ -2410,7 +2410,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
 
             if (cacheBuffer != null) {
                 cacheBuffer.clear();
-                sdkEngine.getNativeOpInterface().releaseNativeByteBuffer(videoSourceData);
+                sdkEngine.getNativeOpInterface().releaseNativeByteBuffer(cacheBuffer);
                 cacheBuffer = null;
             }
         }
@@ -2569,12 +2569,14 @@ public class UCloudRTCLiveActivity extends BaseActivity
         }
     }
 
-    private void setPreview(boolean onOff) { //预览窗口开关
-        if (onOff) {
-            sdkEngine.startCameraPreview(
-                    mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
-        } else {
-            sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+    private void setPreview(boolean onOff) {
+        if(sdkEngine != null){
+            if (onOff) {
+                sdkEngine.startCameraPreview(
+                        mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+            } else {
+                sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+            }
         }
     }
 

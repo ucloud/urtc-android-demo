@@ -295,8 +295,8 @@ public class ConnectActivity extends AppCompatActivity {
     private void startLivingActivity() {
         if (!mStartSuccess) {
             mStartSuccess = true;
-//            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
-            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveTextureActivity.class);
+            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+//            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveTextureActivity.class);
             intent.putExtra("room_id", mRoomid);
             if(TextUtils.isEmpty(UCloudRtcApplication.getUserId())){
                 String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");

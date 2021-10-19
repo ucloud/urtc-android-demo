@@ -218,6 +218,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     private boolean mIsLocalMixingSound = false;
     private boolean mIsRemoteMixingSound = false;
     private boolean mIsPauseMixingSound = false;
+    private boolean mControlAudio = true;
     //外部摄像数据读取
     private ArrayBlockingQueue<ByteBuffer> mQueueByteBuffer = new ArrayBlockingQueue(8);
     private final USBMonitor.OnDeviceConnectListener mOnDeviceConnectListener = new USBMonitor.OnDeviceConnectListener() {
@@ -1625,13 +1626,14 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     }
 
     private boolean muteMic() {
-        sdkEngine.muteLocalMic(!mMuteMic);
-        if (!mMuteMic) {
-            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "关闭麦克风");
-        } else {
-            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "打开麦克风");
-        }
-        return false;
+//        sdkEngine.muteLocalMic(!mMuteMic);
+//        if (!mMuteMic) {
+//            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "关闭麦克风");
+//        } else {
+//            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "打开麦克风");
+//        }
+        throw new NullPointerException();
+//        return false;
     }
 
     private boolean muteVideo() {
