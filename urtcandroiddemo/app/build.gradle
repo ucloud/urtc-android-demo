@@ -84,7 +84,7 @@ dependencies {
     implementation(name: 'common-2.12.4', ext: 'aar')
 //    implementation 'cn.ucloud:ucloudrtclib:2.0.5' //mavenCentral
     implementation project(':urtc-sdk-android')
-//    implementation project(':libuvccamera')
+
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     //bugly

@@ -152,6 +152,7 @@ public class NewSettingActivity extends AppCompatActivity {
                 mEnableScreen = isChecked;
             }
         });
+        mScreenShareSwitch.setVisibility(View.GONE);
         mAutoPubSwitch = findViewById(R.id.pub_switch);
         mAutoPubSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
             @Override
@@ -189,6 +190,8 @@ public class NewSettingActivity extends AppCompatActivity {
                 }
             }
         });
+        mPriDeploySwitch.setVisibility(View.GONE);
+
         mVideoHardWareAccSwitch = findViewById(R.id.video_hw_switch);
         mVideoHardWareAccSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
             @Override
@@ -197,6 +200,8 @@ public class NewSettingActivity extends AppCompatActivity {
 
             }
         });
+        mVideoHardWareAccSwitch.setVisibility(View.GONE);
+
         mExtendCameraSwitch = findViewById(R.id.extend_camera_switch);
         mExtendCameraSwitch.setOnCheckedListener(new BaseSwitch.OnCheckedListener() {
             @Override

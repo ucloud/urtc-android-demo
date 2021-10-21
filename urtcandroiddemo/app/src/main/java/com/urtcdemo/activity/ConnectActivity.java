@@ -77,7 +77,6 @@ public class ConnectActivity extends AppCompatActivity {
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
 //        startRoomActivity();
         startLivingActivity();
-//        startRoomTextureActivity();
 //        startWebViewActivity();
     }
 
@@ -126,7 +125,6 @@ public class ConnectActivity extends AppCompatActivity {
                             UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
                         } else {
                             startRoomActivity();
-//                        startRoomTextureActivity();
 //                            startWebViewActivity();
                         }
                     } else {
@@ -295,8 +293,15 @@ public class ConnectActivity extends AppCompatActivity {
     private void startLivingActivity() {
         if (!mStartSuccess) {
             mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
-//            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveTextureActivity.class);
+            final Intent intent;
+            SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
+                    Context.MODE_PRIVATE);
+            if (preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false)) {
+                intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+            }
+            else {
+                intent = new Intent(ConnectActivity.this, UCloudRTCLiveTextureActivity.class);
+            }
             intent.putExtra("room_id", mRoomid);
             if(TextUtils.isEmpty(UCloudRtcApplication.getUserId())){
                 String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
