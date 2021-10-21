@@ -117,7 +117,7 @@ public class NewSettingActivity extends AppCompatActivity {
         mEnableScreen = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
         mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
         mSubScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
-        mExtendCamera = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
+        mExtendCamera = preferences.getBoolean(CommonUtils.EXTEND_CAMERA_CAPTURE_MODE, false);
         mPriDeploy = preferences.getBoolean(CommonUtils.PRIVATISATION_MODE, false);
         mHwAcc = preferences.getBoolean(CommonUtils.VIDEO_HW_ACC, CommonUtils.HARDWARE_ACC);
         mPriAddr = preferences.getString(CommonUtils.PRIVATISATION_ADDRESS, "");
@@ -336,7 +336,7 @@ public class NewSettingActivity extends AppCompatActivity {
         editor.putBoolean(CommonUtils.PRIVATISATION_MODE, mPriDeploy);
         mPriAddr = mPriDeployEditText.getText().toString();
         editor.putString(CommonUtils.PRIVATISATION_ADDRESS, mPriAddr);
-        editor.putBoolean(CommonUtils.CAMERA_CAPTURE_MODE, mExtendCamera);
+        editor.putBoolean(CommonUtils.EXTEND_CAMERA_CAPTURE_MODE, mExtendCamera);
         editor.putInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, mExtendVideoFormat);
         editor.putBoolean(CommonUtils.VIDEO_HW_ACC, mHwAcc);
 

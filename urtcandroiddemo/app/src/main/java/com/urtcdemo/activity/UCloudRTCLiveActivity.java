@@ -371,7 +371,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
             UCloudRtcSdkEnv.setPrivateDeployRoomURL(mPriAddr);
         }
 
-        mExtendCameraCapture = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
+        mExtendCameraCapture = preferences.getBoolean(CommonUtils.EXTEND_CAMERA_CAPTURE_MODE, false);
         mExtendVideoFormat = preferences.getInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, CommonUtils.i420_format);
         updateVideoFormat(mExtendVideoFormat);
         // mSteamList = new ArrayList<>();
@@ -2887,7 +2887,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
         mClass = UCloudRtcSdkRoomType.valueOf(classType);
         mPublishMode = preferences.getInt(CommonUtils.PUBLISH_MODE, CommonUtils.AUTO_MODE);
         mScribeMode = preferences.getInt(CommonUtils.SUBSCRIBE_MODE, CommonUtils.AUTO_MODE);
-        mExtendCameraCapture = preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false);
+        mExtendCameraCapture = preferences.getBoolean(CommonUtils.EXTEND_CAMERA_CAPTURE_MODE, false);
         mExtendVideoFormat = preferences.getInt(CommonUtils.EXTEND_CAMERA_VIDEO_FORMAT, CommonUtils.i420_format);
         updateVideoFormat(mExtendVideoFormat);
 

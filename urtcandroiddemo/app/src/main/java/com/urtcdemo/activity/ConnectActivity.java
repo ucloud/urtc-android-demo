@@ -296,7 +296,7 @@ public class ConnectActivity extends AppCompatActivity {
             final Intent intent;
             SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                     Context.MODE_PRIVATE);
-            if (preferences.getBoolean(CommonUtils.CAMERA_CAPTURE_MODE, false)) {
+            if (preferences.getBoolean(CommonUtils.EXTEND_CAMERA_CAPTURE_MODE, false)) {
                 intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
             }
             else {
