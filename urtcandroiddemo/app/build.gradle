@@ -9,7 +9,7 @@ android {
         buildToolsVersion rootProject.buildToolsVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionName rootProject.versionName
-        versionCode 42
+        versionCode 43
         ndk {
             abiFilters  "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
