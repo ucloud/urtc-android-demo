@@ -9,7 +9,7 @@ android {
         buildToolsVersion rootProject.buildToolsVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionName rootProject.versionName
-        versionCode 43
+        versionCode 44
         ndk {
             abiFilters  "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
@@ -75,11 +75,11 @@ dependencies {
     implementation 'com.github.markzhai:blockcanary-android:1.5.0'
     testImplementation 'junit:junit:4.12'
 
-    implementation (name: 'ucloudrtclib-2.0.8', ext: 'aar')
+    implementation (name: 'ucloudrtclib-2.0.9', ext: 'aar')
 //    implementation project(':urtc-sdk-android')
     implementation(name: 'libuvccamera-release', ext: 'aar')
     implementation(name: 'common-2.12.4', ext: 'aar')
-//    implementation 'cn.ucloud:ucloudrtclib:2.0.7' //mavenCentral
+//    implementation 'cn.ucloud:ucloudrtclib:2.0.8' //mavenCentral
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     //bugly
