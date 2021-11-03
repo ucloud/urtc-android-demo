@@ -39,6 +39,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkClientRole;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaServiceStatus;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
@@ -1217,6 +1218,9 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
         sdkEngine.setStreamRole(UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH);
         sdkEngine.setClassType(mClass);
+        //2.0
+        UCloudRtcSdkEnv.setRoleType(UCloudRtcSdkClientRole.UCLOUD_RTC_SDK_STREAM_ROLE_SPEAKER);
+        UCloudRtcSdkEnv.setRoomType(mClass);
         sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
@@ -1509,7 +1513,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         Log.d(TAG, "onResume");
         Intent service = new Intent(this, UCloudRtcForeGroundService.class);
         stopService(service);
-//        sdkEngine.controlAudio(true);
+        sdkEngine.controlLocalVideo(true);
 //        if (!mExtendCameraCapture) {
 //            sdkEngine.controlLocalVideo(true);
 //        }
@@ -1534,14 +1538,14 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     }
 
     private boolean muteMic() {
-//        sdkEngine.muteLocalMic(!mMuteMic);
-//        if (!mMuteMic) {
-//            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "关闭麦克风");
-//        } else {
-//            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "打开麦克风");
-//        }
-        throw new NullPointerException();
-//        return false;
+        sdkEngine.muteLocalMic(!mMuteMic);
+        if (!mMuteMic) {
+            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "关闭麦克风");
+        } else {
+            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "打开麦克风");
+        }
+//        throw new NullPointerException();
+        return false;
     }
 
     private boolean muteVideo() {
