@@ -136,7 +136,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
     private boolean mLocalViewFullScreen = false;
     private boolean mRemoteVideoMute;
     private boolean mRemoteAudioMute;
-//    private boolean mIsPreview = false;
+    private boolean mIsPreview = false;
     private boolean mIsPriDeploy = false;
     private boolean mJoinChannelFlag = true;
     @CommonUtils.PubScribeMode
@@ -931,11 +931,11 @@ public class UCloudRTCLiveActivity extends BaseActivity
                                     localViewHeight_landscape = screenWidth - mTitleBar.getHeight() - mToolBar.getHeight();
                                 }
 
-//                                if (!mIsPreview) {
-//                                    sdkEngine.renderLocalView(info,
-//                                            mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
-//                                    mIsPreview = true;
-//                                }
+                                if (!mIsPreview) {
+                                    sdkEngine.renderLocalView(info,
+                                            mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+                                    mIsPreview = true;
+                                }
                                 // 状态记录
                                 mLocalStreamInfo = info;
                                 mSwapStreamInfo = info;
@@ -992,7 +992,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
 //                                toggleMixingSound(true);
 //                            }
 //                            setPreview(false);
-//                            mIsPreview = false;
+                            mIsPreview = false;
 //                            mTextPreview.setText(R.string.start_preview);
                         } else if (info.getMediaType() == UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN) { //屏幕流
                             mScreenIsPublished = false;
