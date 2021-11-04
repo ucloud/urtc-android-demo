@@ -236,7 +236,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     private View.OnClickListener mSwapRemoteLocalListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (v instanceof TextureView) {
+            if (v instanceof TextureView && mSwapStreamInfo != null) {
                 UCloudRtcSdkStreamInfo clickStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
                 boolean swapLocal = mSwapStreamInfo.getUId().equals(mUserid);
                 boolean clickLocal = clickStreamInfo.getUId().equals(mUserid);
@@ -245,10 +245,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                 if (swapLocal && !clickLocal) {
                     sdkEngine.stopRemoteView(clickStreamInfo);
                     sdkEngine.stopPreview(mSwapStreamInfo.getMediaType());
-//                        sdkEngine.renderLocalView(mSwapStreamInfo, v,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                     UCloudRtcRenderTextureView remoteRender = (UCloudRtcRenderTextureView) v.getTag(R.id.render);
                     sdkEngine.renderLocalView(mSwapStreamInfo, remoteRender, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
-//                        sdkEngine.startRemoteView(clickStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
                     sdkEngine.startRemoteView(clickStreamInfo, mLocalRender, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                 } else if (!swapLocal && clickLocal) {
                     sdkEngine.stopRemoteView(mSwapStreamInfo);
@@ -473,10 +471,10 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                 public void run() {
                     if (code == 0) {
                         mLocalVideoView.setVisibility(View.VISIBLE);
-                        int mediatype = info.getMediaType().ordinal();
-                        mPublishMediaType = UCloudRtcSdkMediaType.matchValue(mediatype);
+                        int mediatype = info.getMediaType().getType();
                         if (mLocalRender != null) {
                             if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
+                                mPublishMediaType = UCloudRtcSdkMediaType.matchValue(mediatype);
                                 mLocalRender.init();
                                 mImgManualPubVideo.setImageResource(R.mipmap.stop);
                                 mTextManualPubVideo.setText(R.string.pub_cancel_video);
