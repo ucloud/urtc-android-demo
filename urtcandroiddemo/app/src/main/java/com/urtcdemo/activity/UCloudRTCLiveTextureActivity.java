@@ -1620,12 +1620,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
     private void endCall() {
         sdkEngine.leaveChannel().ordinal();
-        UCloudRtcSdkEngine.destroy();
-//        Intent intent = new Intent(UCloudRTCLiveTextureActivity.this, ConnectActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//        releaseExtendCamera();
-//        onMediaServerDisconnect();
-//        startActivity(intent);
         finish();
     }
 
