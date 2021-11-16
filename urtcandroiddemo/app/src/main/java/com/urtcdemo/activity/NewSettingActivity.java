@@ -222,9 +222,6 @@ public class NewSettingActivity extends AppCompatActivity {
         mI420Format = findViewById(R.id.i420_format);
         mRGBAFormat = findViewById(R.id.rgba_format);
         mARGBFormat = findViewById(R.id.argb_format);
-        // 2.0不支持，暂时隐藏，原因未知
-        mRGBAFormat.setVisibility(View.GONE);
-        mARGBFormat.setVisibility(View.GONE);
         mRGB24Format = findViewById(R.id.rgb24_format);
         mRGB565Format = findViewById(R.id.rgb565_format);
         mExtendVideoFormatRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {

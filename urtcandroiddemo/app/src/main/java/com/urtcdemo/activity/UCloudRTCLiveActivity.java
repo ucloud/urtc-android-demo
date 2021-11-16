@@ -2416,7 +2416,8 @@ public class UCloudRTCLiveActivity extends BaseActivity
 
         @Override
         public ByteBuffer provideRGBData(List<Integer> params) {
-            if (videoSourceData == null || videoSourceData.limit() == videoSourceData.capacity()) {
+            boolean externalCheck = mUVCCameraFormat != UVCCamera.PIXEL_FORMAT_RGBX && mUVCCameraFormat != UVCCamera.PIXEL_FORMAT_ARGB;
+            if (videoSourceData == null || ( externalCheck && videoSourceData.limit() == videoSourceData.capacity())) {
 //                Log.d("UCloudRTCLiveActivity", "provideRGBData byteBuffer data is null");
                 return null;
             } else {
