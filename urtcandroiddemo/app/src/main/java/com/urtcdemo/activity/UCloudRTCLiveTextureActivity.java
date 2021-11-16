@@ -39,6 +39,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkClientRole;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaServiceStatus;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
@@ -235,7 +236,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     private View.OnClickListener mSwapRemoteLocalListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (v instanceof TextureView) {
+            if (v instanceof TextureView && mSwapStreamInfo != null) {
                 UCloudRtcSdkStreamInfo clickStreamInfo = (UCloudRtcSdkStreamInfo) v.getTag();
                 boolean swapLocal = mSwapStreamInfo.getUId().equals(mUserid);
                 boolean clickLocal = clickStreamInfo.getUId().equals(mUserid);
@@ -244,10 +245,8 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                 if (swapLocal && !clickLocal) {
                     sdkEngine.stopRemoteView(clickStreamInfo);
                     sdkEngine.stopPreview(mSwapStreamInfo.getMediaType());
-//                        sdkEngine.renderLocalView(mSwapStreamInfo, v,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                     UCloudRtcRenderTextureView remoteRender = (UCloudRtcRenderTextureView) v.getTag(R.id.render);
                     sdkEngine.renderLocalView(mSwapStreamInfo, remoteRender, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
-//                        sdkEngine.startRemoteView(clickStreamInfo, mLocalVideoView,UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL,null);
                     sdkEngine.startRemoteView(clickStreamInfo, mLocalRender, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
                 } else if (!swapLocal && clickLocal) {
                     sdkEngine.stopRemoteView(mSwapStreamInfo);
@@ -472,10 +471,10 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                 public void run() {
                     if (code == 0) {
                         mLocalVideoView.setVisibility(View.VISIBLE);
-                        int mediatype = info.getMediaType().ordinal();
-                        mPublishMediaType = UCloudRtcSdkMediaType.matchValue(mediatype);
+                        int mediatype = info.getMediaType().getType();
                         if (mLocalRender != null) {
                             if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
+                                mPublishMediaType = UCloudRtcSdkMediaType.matchValue(mediatype);
                                 mLocalRender.init();
                                 mImgManualPubVideo.setImageResource(R.mipmap.stop);
                                 mTextManualPubVideo.setText(R.string.pub_cancel_video);
@@ -1217,6 +1216,9 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
         sdkEngine.setStreamRole(UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH);
         sdkEngine.setClassType(mClass);
+        //2.0
+        UCloudRtcSdkEnv.setRoleType(UCloudRtcSdkClientRole.UCLOUD_RTC_SDK_STREAM_ROLE_SPEAKER);
+        UCloudRtcSdkEnv.setRoomType(mClass);
         sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
@@ -1509,7 +1511,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         Log.d(TAG, "onResume");
         Intent service = new Intent(this, UCloudRtcForeGroundService.class);
         stopService(service);
-//        sdkEngine.controlAudio(true);
+        sdkEngine.controlLocalVideo(true);
 //        if (!mExtendCameraCapture) {
 //            sdkEngine.controlLocalVideo(true);
 //        }
@@ -1534,14 +1536,14 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
     }
 
     private boolean muteMic() {
-//        sdkEngine.muteLocalMic(!mMuteMic);
-//        if (!mMuteMic) {
-//            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "关闭麦克风");
-//        } else {
-//            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "打开麦克风");
-//        }
-        throw new NullPointerException();
-//        return false;
+        sdkEngine.muteLocalMic(!mMuteMic);
+        if (!mMuteMic) {
+            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "关闭麦克风");
+        } else {
+            ToastUtils.shortShow(UCloudRTCLiveTextureActivity.this, "打开麦克风");
+        }
+//        throw new NullPointerException();
+        return false;
     }
 
     private boolean muteVideo() {
@@ -1618,12 +1620,6 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
 
     private void endCall() {
         sdkEngine.leaveChannel().ordinal();
-//        UCloudRtcSdkEngine.destroy();
-//        Intent intent = new Intent(UCloudRTCLiveTextureActivity.this, ConnectActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//        releaseExtendCamera();
-//        onMediaServerDisconnect();
-//        startActivity(intent);
         finish();
     }
 

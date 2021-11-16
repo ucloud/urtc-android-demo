@@ -52,6 +52,7 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkClientRole;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaServiceStatus;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMediaType;
@@ -418,6 +419,9 @@ public class UCloudRTCLiveActivity extends BaseActivity
         }
         sdkEngine.setStreamRole(UCloudRtcSdkStreamRole.UCLOUD_RTC_SDK_STREAM_ROLE_BOTH);
         sdkEngine.setClassType(mClass);
+        //2.0
+        UCloudRtcSdkEnv.setRoleType(UCloudRtcSdkClientRole.UCLOUD_RTC_SDK_STREAM_ROLE_SPEAKER);
+        UCloudRtcSdkEnv.setRoomType(mClass);
         sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
@@ -899,7 +903,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
                 @Override
                 public void run() {
                     if (code == 0) {
-                        int mediatype = info.getMediaType().ordinal(); // 获取媒体类型（音视频流或桌面流）
+                        int mediatype = info.getMediaType().getType(); // 获取媒体类型（音视频流或桌面流）
                         mPublishMediaType = UCloudRtcSdkMediaType.matchValue(mediatype);
                         if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) { // 音视频流
                             mImgManualPubVideo.setImageResource(R.mipmap.stop); // 修改界面图标
@@ -2185,7 +2189,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
                 .addStreamMode(UCloudRtcSdkMixProfile.ADD_STREAM_MODE_MANUAL)
                 //添加流列表，也可以后续调用MIX_TYPE_UPDATE 动态添加
                 .addStream(mUserid, UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal())
-                .addStream(latestRemoteInfo.getUId(), latestRemoteInfo.getMediaType().ordinal())
+                .addStream(latestRemoteInfo.getUId(), latestRemoteInfo.getMediaType().getResult())
                 //设置转推cdn 的地址
                 .addPushUrl("rtmp://rtcpush.ugslb.com/rtclive/" + mRoomid)
                 //关键用户

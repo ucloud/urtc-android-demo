@@ -613,7 +613,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 //                        ToastUtils.shortShow(RoomActivity.this, "发布视频成功");
                         mPublish.setImageResource(R.drawable.unpublish);
                         mIsPublished = true;
-                        int mediatype = info.getMediaType().ordinal();
+                        int mediatype = info.getMediaType().getType();
                         mPublishMediaType = UCloudRtcSdkMediaType.matchValue(mediatype);
                         if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
                             if (!sdkEngine.isAudioOnlyMode()) {
@@ -1302,7 +1302,7 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
 //                    UcloudRtcSdkRecordProfile recordProfile = UcloudRtcSdkRecordProfile.getInstance().assembleRecordBuilder()
 //                            .recordType(UcloudRtcSdkRecordProfile.RECORD_TYPE_VIDEO)
 //                            .mainViewUserId(uCloudRtcSdkStreamInfo.getUId())
-//                            .mainViewMediaType(uCloudRtcSdkStreamInfo.getMediaType().ordinal())
+//                            .mainViewMediaType(uCloudRtcSdkStreamInfo.getMediaType().getResult())
 //                            .VideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_640_480.ordinal())
 //                            .Average(UcloudRtcSdkRecordProfile.RECORD_UNEVEN)
 //                            .WaterType(UcloudRtcSdkRecordProfile.RECORD_WATER_TYPE_IMG)
@@ -1390,12 +1390,12 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                    JSONObject remote = new JSONObject();
                    try {
                        remote.put("user_id",info.getUId());
-                       remote.put("media_type",info.getMediaType().ordinal());
+                       remote.put("media_type",info.getMediaType().getType());
                        streams.put(remote);
                    } catch (JSONException e) {
                        e.printStackTrace();
                    }
-                   //sdkEngine.addMixStream(info.getUId(), info.getMediaType().ordinal());
+                   //sdkEngine.addMixStream(info.getUId(), info.getMediaType().getResult());
                }else{
                    mMixAddOrDel = true;
                    mAddDelBtn.setText("add_st");
@@ -1405,12 +1405,12 @@ public class RoomActivity extends AppCompatActivity implements VideoListener {
                    JSONObject remote = new JSONObject();
                    try {
                        remote.put("user_id",info.getUId());
-                       remote.put("media_type",info.getMediaType().ordinal());
+                       remote.put("media_type",info.getMediaType().getType());
                        streams.put(remote);
                    } catch (JSONException e) {
                        e.printStackTrace();
                    }
-                   //sdkEngine.delMixStream(info.getUId(), info.getMediaType().ordinal());
+                   //sdkEngine.delMixStream(info.getUId(), info.getMediaType().getResult());
                }
             }
         });
