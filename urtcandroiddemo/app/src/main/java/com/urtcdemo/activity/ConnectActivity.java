@@ -77,8 +77,6 @@ public class ConnectActivity extends AppCompatActivity {
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
 //        startRoomActivity();
         startLivingActivity();
-//        startRoomTextureActivity();
-//        startWebViewActivity();
     }
 
     @Override
@@ -124,11 +122,9 @@ public class ConnectActivity extends AppCompatActivity {
                             boolean mVideoHwAcc = preferences.getBoolean(CommonUtils.VIDEO_HW_ACC, CommonUtils.HARDWARE_ACC);
                             UCloudRtcSdkEnv.setVideoHardWareAcceleration(mVideoHwAcc);
                             UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
+//                            startLivingActivity();
                         } else {
-//                            startRoomActivity();
                             startLivingActivity();
-//                        startRoomTextureActivity();
-//                            startWebViewActivity();
                         }
                     } else {
                         //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
@@ -196,6 +192,7 @@ public class ConnectActivity extends AppCompatActivity {
                             boolean mVideoHwAcc = preferences.getBoolean(CommonUtils.VIDEO_HW_ACC, CommonUtils.HARDWARE_ACC);
                             UCloudRtcSdkEnv.setVideoHardWareAcceleration(mVideoHwAcc);
                             UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
+//                            startLivingActivity();
                         } else {
                             startLivingActivity();
                         }
@@ -261,7 +258,7 @@ public class ConnectActivity extends AppCompatActivity {
             }
         });
 
-        String[] permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        String[] permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE};
         PermissionUtils.needsPermissions(this, permissions);
         Thread thread = new Thread(new CopyMixFileTask(this));
         thread.start();
@@ -297,7 +294,6 @@ public class ConnectActivity extends AppCompatActivity {
         if (!mStartSuccess) {
             mStartSuccess = true;
             final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
-//            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveTextureActivity.class);
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
 //            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;

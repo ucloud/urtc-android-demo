@@ -72,7 +72,7 @@ public class UCloudRtcApplication extends Application {
         //推流方向
 //        UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_PORTRAIT_MODE);
         //视频输出模式
-        UCloudRtcSdkEnv.setVideoOutputOrientation(UCloudRtcSdkVideoOutputOrientationMode.UCLOUD_RTC_VIDEO_OUTPUT_FIXED_PORTRAIT_MODE);
+//        UCloudRtcSdkEnv.setVideoOutputOrientation(UCloudRtcSdkVideoOutputOrientationMode.UCLOUD_RTC_VIDEO_OUTPUT_FIXED_PORTRAIT_MODE);
         //私有化部署
 //        UCloudRtcSdkEnv.setPrivateDeploy(true);
 //        UCloudRtcSdkEnv.setPrivateDeployRoomURL("wss://xxx:5005/ws");
