@@ -67,6 +67,7 @@ public class UCloudRtcApplication extends Application {
         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIAL);
         UCloudRtcSdkEnv.setReConnectTimes(60);
         UCloudRtcSdkEnv.setTokenSecKey(CommonUtils.APP_KEY);
+        UCloudRtcSdkEnv.setVideoTrackOpenCamera(true);
         //UCloudRtcSdkEnv.setDeviceChannelType(UCloudRtcSdkChannelType.UCLOUD_RTC_SDK_CHANNEL_TYPE_VOICE);
         //推流方向
 //        UCloudRtcSdkEnv.setPushOrientation(UCloudRtcSdkPushOrentation.UCLOUD_RTC_PUSH_PORTRAIT_MODE);
