@@ -249,7 +249,9 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         mRemoteGridView.setAdapter(mVideoAdapter);
 
         mLocalVideoView = findViewById(R.id.localvideoview);
+        //mLocalVideoView.setOpaque(true);
         mLocalRender = new UCloudRtcRenderTextureView(mLocalVideoView);
+        mLocalRender.init();
         //Surfaceview 打开注释
         //mLocalVideoView.init(true);
         //mLocalVideoView.setZOrderMediaOverlay(false);
@@ -785,7 +787,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                         mPublishMediaType = UCloudRtcSdkMediaType.matchValue(mediatype);
                         if(mLocalRender != null){
                         if (mediatype == UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO.ordinal()) {
-                                mLocalRender.init();
+
                             mImgManualPubVideo.setImageResource(R.mipmap.stop);
                             mTextManualPubVideo.setText(R.string.pub_cancel_video);
                             if (!sdkEngine.isAudioOnlyMode()) {
@@ -801,7 +803,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                                     if (mExtendCameraCapture) {
                                             sdkEngine.renderLocalView(info,mLocalRender, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
                                     } else {
-                                            sdkEngine.renderLocalView(info,mLocalRender, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null);
+                                            sdkEngine.renderLocalView(info,mLocalRender, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
                                     }
                                     //if (mPublishMode != CommonUtils.AUTO_MODE) {
 //                                        setIconStats(true);

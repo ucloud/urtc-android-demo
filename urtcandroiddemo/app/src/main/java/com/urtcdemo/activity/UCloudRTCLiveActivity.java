@@ -70,12 +70,14 @@ import com.ucloudrtclib.sdkengine.listener.UCloudRtcRecordListener;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataProvider;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCDataReceiver;
+import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCFirstFrameRendered;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCNotification;
 import com.ucloudrtclib.sdkengine.openinterface.UCloudRTCScreenShot;
 import com.urtcdemo.R;
 import com.urtcdemo.adpter.RemoteVideoAdapter;
 import com.urtcdemo.service.UCloudRtcForeGroundService;
 import com.urtcdemo.utils.CommonUtils;
+import com.urtcdemo.utils.EDensityUtils;
 import com.urtcdemo.utils.StatusBarUtils;
 import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
@@ -242,6 +244,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
             decorView.setSystemUiVisibility(uiOptions);
         }
+//        EDensityUtils.setDensity(getApplication(),this);
 
         SharedPreferences preferences = getSharedPreferences(getString(R.string.app_name),
                 Context.MODE_PRIVATE);
@@ -271,9 +274,11 @@ public class UCloudRTCLiveActivity extends BaseActivity
         mLocalVideoView = findViewById(R.id.localvideoview);
         //Surfaceview 打开注释
         mLocalVideoView.init();
-        mLocalVideoView.setVisibility(View.INVISIBLE);
+//        mLocalVideoView.setVisibility(View.INVISIBLE);
 //        mLocalVideoView.setZOrderMediaOverlay(false);
 //        mLocalVideoView.setMirror(true);
+//        mLocalVideoView.setZOrderOnTop(true);
+//        mLocalVideoView.setBackgroundColor(Color.TRANSPARENT);
         mDrawer = findViewById(R.id.drawer_layout);
         mDrawer.setScrimColor(0x00ffffff);
         mDrawerContent = findViewById(R.id.drawer_content);
@@ -391,7 +396,8 @@ public class UCloudRTCLiveActivity extends BaseActivity
         sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
-        sdkEngine.setScreenProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1920_1080);
+//        sdkEngine.setScreenProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1920_1080);
+        sdkEngine.setScreenProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1280_720);
 
         synchronized (extendByteBufferSync) {
             videoSourceData = ByteBuffer.allocate(1920 * 1080 * 4);
@@ -703,7 +709,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
             setPreview(true);
             mIsPreview = true;
             mTextPreview.setText(R.string.stop_preview);
-            mLocalVideoView.setVisibility(View.VISIBLE);
+//            mLocalVideoView.setVisibility(View.VISIBLE);
         }
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
     }
@@ -728,15 +734,17 @@ public class UCloudRTCLiveActivity extends BaseActivity
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "on Stop");
+        if(sdkEngine != null){
+//            sdkEngine.controlAudio(false);
+            if (!mExtendCameraCapture) {
+                sdkEngine.controlLocalVideo(false);
+            }
+        }
         if (mVideoIsPublished || mScreenIsPublished) {
             if (!mLeaveRoomFlag) {
                 Intent service = new Intent(this, UCloudRtcForeGroundService.class);
                 startService(service);
             }
-//            sdkEngine.controlAudio(false);
-//            if (!mExtendCameraCapture) {
-//                sdkEngine.controlLocalVideo(false);
-//            }
         }
     }
 
@@ -746,10 +754,12 @@ public class UCloudRTCLiveActivity extends BaseActivity
         Log.d(TAG, "onResume");
         Intent service = new Intent(this, UCloudRtcForeGroundService.class);
         stopService(service);
-//        sdkEngine.controlAudio(true);
-//        if (!mExtendCameraCapture) {
-//            sdkEngine.controlLocalVideo(true);
-//        }
+        if(sdkEngine!= null){
+            if (!mExtendCameraCapture) {
+            sdkEngine.controlLocalVideo(true);
+//          sdkEngine.controlAudio(true);
+        }
+        }
     }
 
     @Override
@@ -801,6 +811,14 @@ public class UCloudRTCLiveActivity extends BaseActivity
                     if (code == 0) { // 成功
                         ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 加入房间成功");
                         startTimeShow();
+                        DisplayMetrics metric = new DisplayMetrics();
+                        getWindowManager().getDefaultDisplay().getMetrics(metric);
+                        int width = metric.widthPixels;  // 屏幕宽度（像素）
+                        int height = metric.heightPixels;  // 屏幕高度（像素）
+                        float density = metric.density;  // 屏幕密度（0.75 / 1.0 / 1.5，小米4的是3.0）
+                        int densityDpi = metric.densityDpi;  // 屏幕密度DPI（120 / 160 / 240,小米4的是480）
+                        Log.d(TAG, "metric.widthPixels: " + metric.widthPixels + "metric.heightPixels: "+ metric.heightPixels +
+                                "metric.density: " + metric.density + " metric.densityDpi: " + metric.densityDpi);
                         if (mIsPreview) {
                             setIconStats(userStatus.PREVIEW_JOIN_ROOM_NOT_PUBLISH);
                         }
@@ -879,8 +897,8 @@ public class UCloudRTCLiveActivity extends BaseActivity
                                 // Surfaceview打开
 
                                 // 回显view布局设置
-                                mLocalVideoView.setBackgroundColor(Color.TRANSPARENT);
-                                mLocalVideoView.setVisibility(View.VISIBLE);
+
+//                                mLocalVideoView.setVisibility(View.VISIBLE);
                                 // 获取当前横竖屏模式
                                 if (UCloudRTCLiveActivity.this.getResources().getConfiguration().orientation
                                         == Configuration.ORIENTATION_LANDSCAPE) {
@@ -1149,7 +1167,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
                         UCloudRtcSdkSurfaceVideoView videoView = null;
                         // UCloudRtcSdkSurfaceVideoView videoViewCallBack = null; // 用于外部扩展输出
 
-                        //UCloudRtcRenderView videoView = null;
+//                        UCloudRtcRenderView videoView = null;
                         Log.d(TAG, " subscribe info: " + info);
                         latestRemoteInfo = info;
                         if (info.isHasVideo()) { // 订阅流是否包含视频
@@ -1157,19 +1175,23 @@ public class UCloudRTCLiveActivity extends BaseActivity
                             videoView = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
                             UCloudRtcRenderView surfaceViewRenderer = new UCloudRtcRenderView(getApplicationContext());
                             videoView.init(false, new int[]{R.mipmap.video_open, R.mipmap.loudspeaker, R.mipmap.video_close, R.mipmap.loudspeaker_disable, R.drawable.publish_layer}, mOnRemoteOpTrigger, new int[]{R.id.remote_video, R.id.remote_audio},surfaceViewRenderer);
-                            // UCloudRtcRenderView
-                            //videoView = new UCloudRtcRenderView(getApplicationContext());// 初始化渲染界面
-                            //videoView.init();
+//                            // UCloudRtcRenderView
+//                            videoView = new UCloudRtcRenderView(getApplicationContext());// 初始化渲染界面
+//                            videoView.init();
                             videoView.setTag(info);
                             videoView.setId(R.id.video_view);
-                            //外部扩展输出，和默认输出二选一
-                            //videoViewCallBack = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
-                            //videoViewCallBack.setFrameCallBack(mUCloudRTCDataReceiver);
-                            //videoViewCallBack.init(false);
-                            //远端截图
-                            //videoView.setOnClickListener(mScreenShotOnClickListener);
-                            //设置交换
+//                            //外部扩展输出，和默认输出二选一
+//                            //videoViewCallBack = new UCloudRtcSdkSurfaceVideoView(getApplicationContext());
+//                            //videoViewCallBack.setFrameCallBack(mUCloudRTCDataReceiver);
+//                            //videoViewCallBack.init(false);
+//                            //远端截图
+//                            //videoView.setOnClickListener(mScreenShotOnClickListener);
+//                            //设置交换
                             videoView.setOnClickListener(mSwapRemoteLocalListener);
+                              //测试远端大屏
+//                            mLocalVideoView.setBackgroundColor(Color.TRANSPARENT);
+//                            mLocalVideoView.setVisibility(View.VISIBLE);
+//                            sdkEngine.startRemoteView(info, mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null); // 渲染订阅流
                         }
                         vinfo.setRenderview(videoView);
                         vinfo.setUid(info.getUId());
@@ -1178,14 +1200,14 @@ public class UCloudRTCLiveActivity extends BaseActivity
                         vinfo.setEnableAudio(info.isHasAudio());
                         String mkey = info.getUId() + info.getMediaType().toString();
                         vinfo.setKey(mkey);
-                        //默认输出，和外部输出代码二选一
+//                        //默认输出，和外部输出代码二选一
                         if (mVideoAdapter != null) {
                             vinfo.setStreamInfo(info);
                             mVideoAdapter.addStreamView(mkey, vinfo, info);
                         }
 
                         if (videoView != null) {
-                            sdkEngine.startRemoteView(info, videoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null); // 渲染订阅流
+                            sdkEngine.startRemoteView(info, videoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FILL, null); // 渲染订阅流
                             //videoView.refreshRemoteOp(View.VISIBLE);
                         }
                         //if (videoViewCallBack != null) {
@@ -1798,8 +1820,12 @@ public class UCloudRTCLiveActivity extends BaseActivity
 
     private void muteSpeaker(boolean enable) { //喇叭听筒切换
         if (mSpeakerOn) {
+//            mLocalVideoView.setVisibility(View.VISIBLE);
+            Log.d(TAG, "muteSpeaker: ............");
             ToastUtils.shortShow(UCloudRTCLiveActivity.this, "关闭喇叭");
         } else {
+//            mLocalVideoView.setVisibility(View.GONE);
+            Log.d(TAG, "muteSpeaker: ............");
             ToastUtils.shortShow(UCloudRTCLiveActivity.this, "打开喇叭");
         }
         mSpeakerOn = !mSpeakerOn;
@@ -2567,7 +2593,22 @@ public class UCloudRTCLiveActivity extends BaseActivity
     private void setPreview(boolean onOff) { //预览窗口开关
         if (onOff) {
             sdkEngine.startCameraPreview(
-                    mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, null);
+                    mLocalVideoView, UCloudRtcSdkScaleType.UCLOUD_RTC_SDK_SCALE_ASPECT_FIT, new UCloudRTCFirstFrameRendered() {
+                        @Override
+                        public void onFirstFrameRender(UCloudRtcSdkStreamInfo info, View view) {
+                            Log.d(TAG, "onFirstFrameRender: local");
+                            View mask = findViewById(R.id.mask);
+                            runOnUiThread(new Runnable() {
+                                              @Override
+                                              public void run() {
+                                                  Log.d(TAG, "onFirstFrameRender: remove mask");
+                                                  mask.setVisibility(View.GONE);
+                                              }
+                                          }
+                            );
+
+                        }
+                    });
         } else {
             sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
         }

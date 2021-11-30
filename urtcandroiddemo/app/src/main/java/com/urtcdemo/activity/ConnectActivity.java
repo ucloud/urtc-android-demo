@@ -125,7 +125,8 @@ public class ConnectActivity extends AppCompatActivity {
                             UCloudRtcSdkEnv.setVideoHardWareAcceleration(mVideoHwAcc);
                             UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
                         } else {
-                            startRoomActivity();
+//                            startRoomActivity();
+                            startLivingActivity();
 //                        startRoomTextureActivity();
 //                            startWebViewActivity();
                         }
@@ -296,6 +297,7 @@ public class ConnectActivity extends AppCompatActivity {
         if (!mStartSuccess) {
             mStartSuccess = true;
             final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+//            final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveTextureActivity.class);
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
 //            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
