@@ -6,6 +6,7 @@ buildscript {
         jcenter()
         //maven中央仓库
         mavenCentral()
+        maven { url'http://maven.aliyun.com/nexus/content/groups/public/' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.2'
@@ -27,7 +28,8 @@ allprojects {
         mavenCentral()
 
         //uvccamera common lib
-        maven { url 'https://raw.githubusercontent.com/saki4510t/libcommon/master/repository/' }
+//        maven { url 'https://raw.githubusercontent.com/saki4510t/libcommon/master/repository/' }
+        maven { url'http://maven.aliyun.com/nexus/content/groups/public/' }
     }
 }
 
@@ -40,7 +42,7 @@ ext {
     targetSdkVersion = 27
     compileSdkVersion = 29
     buildToolsVersion ="27.0.3"
-    versionName = "2.0.6"
+    versionName = "2.0.9"
     //Dependencies
     supportLibraryVersion = "27.0.0"
 
