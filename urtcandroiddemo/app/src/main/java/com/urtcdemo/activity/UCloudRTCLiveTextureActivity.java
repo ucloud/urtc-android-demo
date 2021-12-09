@@ -1500,6 +1500,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         if ((mVideoIsPublished || mScreenIsPublished) && !mLeaveRoomFlag) {
             Intent service = new Intent(this, UCloudRtcForeGroundService.class);
             startService(service);
+            sdkEngine.controlAudioPlayOut(false);
 //            sdkEngine.controlAudio(false);
 //            if (!mExtendCameraCapture) {
 //                sdkEngine.controlLocalVideo(false);
@@ -1514,6 +1515,7 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         Intent service = new Intent(this, UCloudRtcForeGroundService.class);
         stopService(service);
         sdkEngine.controlLocalVideo(true);
+        sdkEngine.controlAudioPlayOut(true);
 //        if (!mExtendCameraCapture) {
 //            sdkEngine.controlLocalVideo(true);
 //        }

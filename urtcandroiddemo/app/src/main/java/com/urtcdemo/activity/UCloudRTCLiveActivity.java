@@ -2421,7 +2421,6 @@ public class UCloudRTCLiveActivity extends BaseActivity
 //                Log.d("UCloudRTCLiveActivity", "provideRGBData byteBuffer data is null");
                 return null;
             } else {
-
                 params.add(mURTCVideoFormat);
                 params.add(videoProfile.getWidth());
                 params.add(videoProfile.getHeight());
