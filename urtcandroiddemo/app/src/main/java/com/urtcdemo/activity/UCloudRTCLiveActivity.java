@@ -737,7 +737,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
         if(sdkEngine != null){
 //            sdkEngine.controlAudio(false);
             if (!mExtendCameraCapture) {
-                sdkEngine.controlLocalVideo(false);
+//                sdkEngine.controlLocalVideo(false);
             }
         }
         if (mVideoIsPublished || mScreenIsPublished) {
@@ -756,7 +756,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
         stopService(service);
         if(sdkEngine!= null){
             if (!mExtendCameraCapture) {
-            sdkEngine.controlLocalVideo(true);
+//            sdkEngine.controlLocalVideo(true);
 //          sdkEngine.controlAudio(true);
         }
         }
