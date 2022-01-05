@@ -73,19 +73,42 @@ public class CameraRenderer implements Camera.PreviewCallback, UCloudRTCDataProv
     }
 
     public void onResume() {
-        startBackgroundThread();
+        if(mBackgroundHandler == null){
+            startBackgroundThread();
+        }
         mBackgroundHandler.post(new Runnable() {
             @Override
             public void run() {
-                mFURenderer.onSurfaceCreated();
-                mCameraTextureId = GlUtil.createTextureObject(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
-                openCamera(mCameraFacing);
-                startPreview();
+                Log.d(TAG, "onResume background thread run camera "+ mCamera);
+                if(mCamera == null){
+                    mFURenderer.onSurfaceCreated();
+                    mCameraTextureId = GlUtil.createTextureObject(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
+                    openCamera(mCameraFacing);
+                    startPreview();
+                }
             }
         });
     }
 
     public void onPause() {
+        if (mBackgroundHandler == null) {
+            return;
+        }
+        mBackgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+//                releaseCamera();
+//                if (mCameraTextureId > 0) {
+//                    GLES20.glDeleteTextures(1, new int[]{mCameraTextureId}, 0);
+//                    mCameraTextureId = 0;
+//                }
+//                mFURenderer.onSurfaceDestroyed();
+            }
+        });
+//        stopBackgroundThread();
+    }
+
+    public void onDestroy() {
         if (mBackgroundHandler == null) {
             return;
         }

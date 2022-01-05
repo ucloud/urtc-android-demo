@@ -658,6 +658,11 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
     protected void onDestroy() {
         Log.d(TAG, "activity destory");
         super.onDestroy();
+        synchronized (mSync) {
+            if(mCameraRenderer != null){
+                mCameraRenderer.onDestroy();
+            }
+        }
         releaseExtendCamera();
         System.gc();
     }
