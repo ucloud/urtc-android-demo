@@ -14,10 +14,24 @@
         android:layout_height="match_parent"
         android:background="@drawable/video_close_bg">
 
-        <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
-            android:id="@+id/localvideoview"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_marginBottom="50dp">
+
+            <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
+                android:id="@+id/localvideoview"
+                android:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <FrameLayout
+                android:id="@+id/mask"
+                android:background="@color/BEIGE"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
 
         <LinearLayout
             android:id="@+id/title_bar"

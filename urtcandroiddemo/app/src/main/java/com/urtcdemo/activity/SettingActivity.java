@@ -244,7 +244,7 @@ public class SettingActivity extends AppCompatActivity {
                 break;
         }
 
-        if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL) {
+        if (UCloudRtcSdkEnv.getSdkMode() == UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIAL) {
             mDevenv.setChecked(false);
             mTestenv.setChecked(true);
         } else {
@@ -260,7 +260,7 @@ public class SettingActivity extends AppCompatActivity {
                         UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_NORMAL);
                         break;
                     case R.id.test_env:
-                        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIVAL);
+                        UCloudRtcSdkEnv.setSdkMode(UCloudRtcSdkMode.UCLOUD_RTC_SDK_MODE_TRIAL);
                         break;
                 }
             }

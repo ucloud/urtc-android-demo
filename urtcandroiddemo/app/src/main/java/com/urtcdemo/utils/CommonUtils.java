@@ -19,6 +19,7 @@ public class CommonUtils {
     public static final boolean CAMERA_ON = true;
     public static final boolean SCREEN_OFF = false;
     public static final boolean MIC_ON = true;
+    public static final boolean HARDWARE_ACC = false;
 
     public static final int nv21_format = 1;
     public static final int nv12_format = 2;
@@ -38,11 +39,18 @@ public class CommonUtils {
     public static final String SDK_STREAM_ROLE = "SDK_STREAM_ROLE";
     public static final String SDK_CLASS_TYPE = "SDK_CLASS_TYPE";
     public static final String CAMERA_CAPTURE_MODE = "CAMERA_CAPTURE_MODE";
+    public static final String PRIVATISATION_MODE = "PRIVATISATION_MODE";
     public static final String EXTEND_CAMERA_VIDEO_FORMAT = "EXTEND_CAMERA_VIDEO_FORMAT";
+    public static final String VIDEO_HW_ACC = "VIDEO_HW_ACC";
 
     public static final String APP_ID_TAG = "APPID";
-    public static final String APP_ID = "";
-    public static final String APP_KEY = "";
+    //    public static final String APP_ID = "";
+//    public static final String APP_KEY = "";
+    public static final String APP_ID = "URtc-h4r1txxy";
+    public static final String APP_KEY = "9129304dbf8c5c4bf68d70824462409f";
+    public static final String PRIVATISATION_ADDRESS = "PRIVATISATION_ADDRESS";
+    public static final String BUCKET = "";
+    public static final String REGION = "";
 
     @IntDef({AUTO_MODE, MANUAL_MODE})
     public @interface  PubScribeMode {}

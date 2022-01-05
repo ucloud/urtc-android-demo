@@ -234,7 +234,8 @@
 
     <string name="room_large">大班课</string>
     <string name="room_small">小班课</string>
-
+    <string name="privatization_deployment">私有化部署</string>
+    <string name="video_hardware_acceleration">硬件加速</string>
 
     <string name="screen_capture">屏幕采集</string>
     <string name="camera_capture">视频通话</string>
@@ -244,6 +245,8 @@
 
     <string name="server_address">服务器地址:</string>
     <string name="start_meeting">加入房间</string>
+    <string name="leave_meeting">离开房间</string>
+    <string name="preview_before_join">预览</string>
     <string name="export_log">导出日志</string>
     <string name="connect">连接会议</string>
     <string name="disconnect">断开会议</string>

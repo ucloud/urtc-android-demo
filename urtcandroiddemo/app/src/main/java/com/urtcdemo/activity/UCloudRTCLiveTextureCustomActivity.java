@@ -76,7 +76,7 @@ import com.urtcdemo.utils.ToastUtils;
 import com.urtcdemo.utils.VideoProfilePopupWindow;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
-import org.webrtc.ucloud.record.URTCRecordManager;
+import org.wrtca.record.RtcRecordManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -278,7 +278,7 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
         mRoomid = getIntent().getStringExtra("room_id");
         mRoomToken = getIntent().getStringExtra("token");
         mAppid = getIntent().getStringExtra("app_id");
-        isScreenCaptureSupport = UCloudRtcSdkEnv.isSuportScreenCapture();
+        isScreenCaptureSupport = UCloudRtcSdkEnv.isSupportScreenCapture();
         mCameraEnable = preferences.getBoolean(CommonUtils.CAMERA_ENABLE, CommonUtils.CAMERA_ON);
         mMicEnable = preferences.getBoolean(CommonUtils.MIC_ENABLE, CommonUtils.MIC_ON);
         mScreenEnable = preferences.getBoolean(CommonUtils.SCREEN_ENABLE, CommonUtils.SCREEN_OFF);
@@ -353,7 +353,7 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
             FaceUnityView faceUnityView = findViewById(R.id.fu_view);
             faceUnityView.setVisibility(View.VISIBLE);
             faceUnityView.setModuleManager(mCameraRenderer.getFURenderer());
-            sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_EXTEND.extendParams(30,mCameraRenderer.mCameraHeight,mCameraRenderer.mCameraWidth));
+            sdkEngine.setCustomizedVideoParam(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_EXTEND.extendParams(30,mCameraRenderer.mCameraHeight,mCameraRenderer.mCameraWidth,1500,2000,2000));
             UCloudRtcSdkEngine.onRGBCaptureResult(mCameraRenderer);
             mTextResolution.setVisibility(View.GONE);
             synchronized (extendByteBufferSync) {
@@ -851,6 +851,11 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
             });
         }
 
+        @Override
+        public void onLocalUnPublishOnly(int i, String s, UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo) {
+
+        }
+
 
         @Override
         public void onRemoteUserJoin(String uid) {
@@ -933,9 +938,9 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
                     if (code == 0) {
                         Log.d(TAG, " subscribe info: " + info);
                         URTCVideoViewInfo vinfo = new URTCVideoViewInfo();
-                        vinfo.setmUid(info.getUId());
-                        vinfo.setmMediatype(info.getMediaType());
-                        vinfo.setmEanbleVideo(info.isHasVideo());
+                        vinfo.setUid(info.getUId());
+                        vinfo.setMediaType(info.getMediaType());
+                        vinfo.setEnableVideo(info.isHasVideo());
                         vinfo.setEnableAudio(info.isHasAudio());
 
 
@@ -1044,23 +1049,13 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
         }
 
         @Override
-        public void onSendRTCStats(UCloudRtcSdkStats rtstats) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    // localprocess.setProgress(volume);
-                }
-            });
+        public void onSendRTCStatus(UCloudRtcSdkStats uCloudRtcSdkStats) {
+
         }
 
         @Override
-        public void onRemoteRTCStats(UCloudRtcSdkStats rtstats) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    //localprocess.setProgress(volume);
-                }
-            });
+        public void onRemoteRTCStatus(UCloudRtcSdkStats uCloudRtcSdkStats) {
+
         }
 
         @Override
@@ -1272,12 +1267,27 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
         }
 
         @Override
+        public void onPeerReconnected(int i, UCloudRtcSdkStreamInfo uCloudRtcSdkStreamInfo) {
+
+        }
+
+        @Override
         public void onNetWorkQuality(String userId, UCloudRtcSdkStreamType streamType, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkNetWorkQuality quality) {
             Log.d(TAG, "onNetWorkQuality: userid: " + userId + "streamType: " + streamType + "mediatype : "+ mediaType + " quality: " + quality);
         }
 
         @Override
         public void onAudioFileFinish() {
+
+        }
+
+        @Override
+        public void onFirstLocalVideoFrame() {
+
+        }
+
+        @Override
+        public void onStartLocalRenderFailed(String s) {
 
         }
     };
@@ -1491,7 +1501,7 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
     private void onMediaServerDisconnect() {
         //mLocalVideoView.release();
         clearGridItem();
-        UCloudRtcSdkEngine.destory();
+        UCloudRtcSdkEngine.destroy();
     }
     private void clearGridItem() {
         mVideoAdapter.clearAll();
@@ -1592,8 +1602,8 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
 
     //初始化视频录制
     private void initRecordManager() {
-        URTCRecordManager.init("");
-        Log.d(TAG, "initRecordManager: cache path:" + URTCRecordManager.getVideoCachePath());
+        RtcRecordManager.init("");
+        Log.d(TAG, "initRecordManager: cache path:" + RtcRecordManager.getVideoCachePath());
     }
 
     private void toggleLocalRecord(){
@@ -1833,13 +1843,13 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
             synchronized (extendByteBufferSync) {
                 if (videoSourceData != null) {
                     videoSourceData.clear();
-                    sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(videoSourceData);
+                    sdkEngine.getNativeOpInterface().releaseNativeByteBuffer(videoSourceData);
                     videoSourceData = null;
                 }
             }
             if (cacheBuffer != null) {
                 cacheBuffer.clear();
-                sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cacheBuffer);
+                sdkEngine.getNativeOpInterface().releaseNativeByteBuffer(cacheBuffer);
                 cacheBuffer = null;
             }
         }
@@ -1893,7 +1903,7 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
         @Override
         public void releaseBuffer() {
             if(cache != null)
-                sdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(cache);
+                sdkEngine.getNativeOpInterface().releaseNativeByteBuffer(cache);
             cache = null;
         }
     };
@@ -2050,11 +2060,11 @@ public class UCloudRTCLiveTextureCustomActivity extends AppCompatActivity
 
     @Override
     public void stopRender(URTCVideoViewInfo info) {
-        Log.d(TAG, "stop render: " + info.getmRenderview());
-        if (info != null && info.getmRenderview() != null) {
+        Log.d(TAG, "stop render: " + info.getRenderview());
+        if (info != null && info.getRenderview() != null) {
             if (info.getStreamInfo().getUId().equals(mUserid)) {
-                Log.d(TAG, "stop old list cache local render: " + info.getmRenderview());
-                sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, info.getmRenderview());
+                Log.d(TAG, "stop old list cache local render: " + info.getRenderview());
+                sdkEngine.stopPreview(UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO, info.getRenderview());
             } else {
                 Log.d(TAG, "stop old list cache remote render info: " + info.getStreamInfo());
                 sdkEngine.stopRemoteView(info.getStreamInfo());

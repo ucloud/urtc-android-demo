@@ -19,8 +19,6 @@ import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
 
-import org.webrtc.TextureViewRenderer;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -97,7 +95,7 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
             boolean isLocal = false;
             if(mSwapInterface != null){
                 videoView.setOnClickListener(mSwapInterface.provideSwapListener());
-                isLocal = mSwapInterface.isLocalStream(viewInfo.getmUid());
+                isLocal = mSwapInterface.isLocalStream(viewInfo.getUid());
             }else{
                 videoView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -132,8 +130,8 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
                 });
             }
             UCloudRtcRenderTextureView render = null;
-            Object viewInfoRender = viewInfo.getmRenderview();
-            Log.d(TAG, "onBindViewHolder: video info render "+ viewInfo.getmRenderview());
+            Object viewInfoRender = viewInfo.getRenderview();
+            Log.d(TAG, "onBindViewHolder: video info render "+ viewInfo.getRenderview());
             if(videoView.getTag(R.id.render)!= null){
                 render = (UCloudRtcRenderTextureView)videoView.getTag(R.id.render);
                 Log.d(TAG, "onBindViewHolder: view "+ videoView +" has render "+ render);
@@ -146,11 +144,11 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 
             if(!render.equals(viewInfoRender)){
                 Log.d(TAG, "onBindViewHolder: new render old info "+ videoView.getTag());
-                Log.d(TAG, "onBindViewHolder: new info " + viewInfo.getStreamInfo() + " old render : "+ viewInfo.getmRenderview());
+                Log.d(TAG, "onBindViewHolder: new info " + viewInfo.getStreamInfo() + " old render : "+ viewInfo.getRenderview());
                 mSwapInterface.stopRender(viewInfo);
             }
             videoView.setTag(viewInfo.getStreamInfo());
-            viewInfo.setmRenderview(render);
+            viewInfo.setRenderview(render);
             for (Object releaseCacheRender : cacheRender) {
                 if(releaseCacheRender.equals(render)){
                     Log.d(TAG, "onBindViewHolder: reinit render "+ releaseCacheRender);
@@ -200,8 +198,8 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
         String swapKey = swapInfo.getUId() + swapInfo.getMediaType().toString();
         URTCVideoViewInfo oldBean = mStreamViews.remove(clickKey);
         URTCVideoViewInfo newBean = new URTCVideoViewInfo(swapInfo);
-        Log.d(TAG, "updateSwapInfo: old bean render: "+ oldBean.getmRenderview());
-        newBean.setmRenderview(oldBean.getmRenderview());
+        Log.d(TAG, "updateSwapInfo: old bean render: "+ oldBean.getRenderview());
+        newBean.setRenderview(oldBean.getRenderview());
         mStreamViews.put(swapKey,newBean);
 
         int clickIndex = medialist.indexOf(clickKey);
@@ -213,10 +211,10 @@ public class RemoteHasViewVideoAdapter extends RecyclerView.Adapter<RemoteHasVie
 //        UCloudRtcSdkStreamInfo streamInfo = null;
 //        if (medialist.size() > position && mStreamViews.size() > position) {
 //            streamInfo = new UCloudRtcSdkStreamInfo();
-//            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getmMediatype());
+//            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getMediaType());
 //            streamInfo.setHasAudio(mStreamViews.get(medialist.get(position)).isEnableAudio());
-//            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).ismEanbleVideo());
-//            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getmUid());
+//            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).isEnableVideo());
+//            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getUid());
 //        }
 //        return streamInfo;
 //    }

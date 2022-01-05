@@ -338,7 +338,7 @@ public class CameraRenderer implements Camera.PreviewCallback, UCloudRTCDataProv
     @Override
     public void releaseBuffer() {
         if (mCacheBuffer != null) {
-            mRtcSdkEngine.getNativeOpInterface().realeaseNativeByteBuffer(mCacheBuffer);
+            mRtcSdkEngine.getNativeOpInterface().releaseNativeByteBuffer(mCacheBuffer);
             mCacheBuffer = null;
         }
     }

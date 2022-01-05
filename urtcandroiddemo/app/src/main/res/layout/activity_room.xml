@@ -13,18 +13,27 @@
         <FrameLayout
             android:layout_gravity="center_horizontal"
             android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="500dp"
+            android:layout_height="400dp"
+            android:background="@color/BLACK"
             android:id="@+id/local_parent">
 <!--            <com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView-->
 <!--                android:id="@+id/localview"-->
 <!--                android:layout_width="match_parent"-->
 <!--                android:layout_height="match_parent" />-->
-
-            <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
-                android:id="@+id/localview"
+            <FrameLayout
+                android:id="@+id/local_viewgroup"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:background="@color/BLACK">
+                <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
+                    android:id="@+id/localview"
+                    android:layout_gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -73,7 +82,24 @@
                 android:progress="0"
                 android:progressDrawable="@drawable/processbar_style_v" />
         </FrameLayout>
+        <FrameLayout
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="400dp"
+            android:background="@color/BLACK"
+            android:id="@+id/local_parent_test">
+<!--            <com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView-->
+<!--                android:id="@+id/localview"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent" />-->
 
+<!--            <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView-->
+<!--                android:id="@+id/localviewtest"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent" />-->
+        </FrameLayout>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/remoteGridView"
             android:layout_width="match_parent"

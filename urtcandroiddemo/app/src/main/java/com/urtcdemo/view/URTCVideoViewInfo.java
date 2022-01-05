@@ -11,37 +11,37 @@ import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 public class URTCVideoViewInfo {
     private Object mRenderview ;
     private String mUid ;
-    private boolean mEanbleVideo ;
+    private boolean mEnableVideo ;
     private boolean mEnableAudio;
-    private UCloudRtcSdkMediaType mMediatype ;
+    private UCloudRtcSdkMediaType mMediaType ;
     private String key;
     private UCloudRtcSdkStreamInfo mStreamInfo;
     public URTCVideoViewInfo(){
         mUid = "" ;
-        mEanbleVideo = false ;
-        mMediatype = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
+        mEnableVideo = false ;
+        mMediaType = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
     }
     public URTCVideoViewInfo(UCloudRtcSdkSurfaceVideoView view) {
         mRenderview = view ;
         mUid = "" ;
-        mEanbleVideo = false ;
-        mMediatype = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
+        mEnableVideo = false ;
+        mMediaType = UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_NULL;
     }
 
     public URTCVideoViewInfo(UCloudRtcSdkStreamInfo info) {
         mRenderview = null ;
         mUid = info.getUId() ;
-        mEanbleVideo = info.isHasVideo() ;
+        mEnableVideo = info.isHasVideo() ;
         mEnableAudio = info.isHasAudio();
-        mMediatype = info.getMediaType();
+        mMediaType = info.getMediaType();
         mStreamInfo = info;
     }
 
-    public Object getmRenderview() {
+    public Object getRenderview() {
         return mRenderview;
     }
 
-    public void setmRenderview(Object mRenderview) {
+    public void setRenderview(Object mRenderview) {
         this.mRenderview = mRenderview;
     }
 
@@ -53,28 +53,28 @@ public class URTCVideoViewInfo {
         mEnableAudio = enableAudio;
     }
 
-    public boolean ismEanbleVideo() {
-        return mEanbleVideo;
+    public boolean isEnableVideo() {
+        return mEnableVideo;
     }
 
-    public void setmEanbleVideo(boolean mEanbleVideo) {
-        this.mEanbleVideo = mEanbleVideo;
+    public void setEnableVideo(boolean mEnableVideo) {
+        this.mEnableVideo = mEnableVideo;
     }
 
-    public String getmUid() {
+    public String getUid() {
         return mUid;
     }
 
-    public void setmUid(String mUid) {
+    public void setUid(String mUid) {
         this.mUid = mUid;
     }
 
-    public UCloudRtcSdkMediaType getmMediatype() {
-        return mMediatype;
+    public UCloudRtcSdkMediaType getMediaType() {
+        return mMediaType;
     }
 
-    public void setmMediatype(UCloudRtcSdkMediaType mMediatype) {
-        this.mMediatype = mMediatype;
+    public void setMediaType(UCloudRtcSdkMediaType mMediaType) {
+        this.mMediaType = mMediaType;
     }
 
     public String getKey() {

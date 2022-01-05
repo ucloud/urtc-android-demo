@@ -12,13 +12,12 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkScaleType;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkStreamInfo;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.view.URTCVideoViewInfo;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkSurfaceVideoView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,7 +71,7 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
             return;
         }
         if (holderView.getChildCount() == 0) {
-            Object render = viewInfo.getmRenderview();
+            Object render = viewInfo.getRenderview();
             Log.d(TAG, "onBindViewHolder: render" + render + "info "+ viewInfo.getStreamInfo());
             if (render != null && render instanceof View) {
                 View videoView = (View)render;
@@ -80,7 +79,7 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
                 if (parent != null) {
                     ((FrameLayout) parent).removeView(videoView);
                 }
-                if(videoView instanceof UCloudRtcSdkSurfaceVideoView ){
+                if(videoView instanceof UCloudRtcSdkSurfaceVideoView){
                     ((UCloudRtcSdkSurfaceVideoView)videoView).setZOrderMediaOverlay(true);
                     videoView.setTag(R.id.render,((UCloudRtcSdkSurfaceVideoView)videoView).getSurfaceView());
                 }
@@ -107,12 +106,12 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
         }
     }
 
-    public void updateSwapInfo(UCloudRtcSdkStreamInfo clickInfo,UCloudRtcSdkStreamInfo swapInfo){
+    public void updateSwapInfo(UCloudRtcSdkStreamInfo clickInfo, UCloudRtcSdkStreamInfo swapInfo){
         String clickKey = clickInfo.getUId() + clickInfo.getMediaType().toString();
         String swapKey = swapInfo.getUId() + swapInfo.getMediaType().toString();
         URTCVideoViewInfo click = mStreamViews.remove(clickKey);
         URTCVideoViewInfo newBean = new URTCVideoViewInfo(swapInfo);
-        newBean.setmRenderview(click.getmRenderview());
+        newBean.setRenderview(click.getRenderview());
         mStreamViews.put(swapKey,newBean);
         int clickIndex = medialist.indexOf(clickKey);
         Log.d(TAG, "updateSwapInfo: old medialist index: "+ medialist.indexOf(clickKey));
@@ -173,10 +172,10 @@ public class RemoteVideoAdapter extends RecyclerView.Adapter<RemoteVideoAdapter.
         UCloudRtcSdkStreamInfo streamInfo = null;
         if(medialist.size() > position && mStreamViews.size() > position){
             streamInfo = new UCloudRtcSdkStreamInfo();
-            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getmMediatype());
+            streamInfo.setMediaType(mStreamViews.get(medialist.get(position)).getMediaType());
             streamInfo.setHasAudio(mStreamViews.get(medialist.get(position)).isEnableAudio());
-            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).ismEanbleVideo());
-            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getmUid());
+            streamInfo.setHasVideo(mStreamViews.get(medialist.get(position)).isEnableVideo());
+            streamInfo.setUid(mStreamViews.get(medialist.get(position)).getUid());
         }
         return streamInfo;
     }
