@@ -267,7 +267,8 @@ public class ConnectActivity extends AppCompatActivity {
             if (extendCameraCapture) {
                 intent = new Intent(ConnectActivity.this, UCloudRTCLiveTextureCustomActivity.class);
             }else {
-                intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+//                intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
+                intent = new Intent(ConnectActivity.this, UCloudRTCLiveTextureCustom2Activity.class);
             }
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");

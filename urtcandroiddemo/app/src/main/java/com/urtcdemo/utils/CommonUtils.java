@@ -48,6 +48,8 @@ public class CommonUtils {
 //    public static final String APP_KEY = "";
     public static final String APP_ID = "URtc-h4r1txxy";
     public static final String APP_KEY = "9129304dbf8c5c4bf68d70824462409f";
+//    public static final String APP_ID = "urtc-b52rd1v1";
+//    public static final String APP_KEY = "7bd281bee6edb5d0eb2a5766c95269ef";
     public static final String PRIVATISATION_ADDRESS = "PRIVATISATION_ADDRESS";
     public static final String BUCKET = "";
     public static final String REGION = "";

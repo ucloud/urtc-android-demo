@@ -26,7 +26,7 @@ allprojects {
         //jcenter无法下载时，添加以下地址
         //maven { url 'https://dl.bintray.com/lukesong07/maven' }
         //uvccamera common lib
-        maven { url 'https://raw.githubusercontent.com/saki4510t/libcommon/master/repository/' }
+//        maven { url 'https://raw.githubusercontent.com/saki4510t/libcommon/master/repository/' }
     }
 }
 
