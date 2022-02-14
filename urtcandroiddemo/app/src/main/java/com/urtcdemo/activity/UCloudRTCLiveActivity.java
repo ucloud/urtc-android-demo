@@ -50,6 +50,7 @@ import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioDevice;
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAudioVideoMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkAuthInfo;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkCaptureMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode;
@@ -232,6 +233,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
     private boolean mIsLocalMixingSound = false;
     private boolean mIsRemoteMixingSound = false;
     private boolean mIsPauseMixingSound = false;
+    private boolean mTestRestartCamera = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -373,6 +375,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
         }
         sdkEngine.configLocalCameraPublish(mCameraEnable);
         sdkEngine.configLocalAudioPublish(mMicEnable);
+//        UCloudRtcSdkEnv.setAudioVideoMode(UCloudRtcSdkAudioVideoMode.UCLOUD_RTC_SDK_ONLY_VIDEO_MODULE);
         if (isScreenCaptureSupport) {
             sdkEngine.configLocalScreenPublish(mScreenEnable);
             if (mScreenEnable && Build.VERSION.SDK_INT >= 28) {
@@ -706,6 +709,9 @@ public class UCloudRTCLiveActivity extends BaseActivity
                 endCall();
             }
         } else {
+            //only for test camera failed
+//            UCloudRtcSdkEnv.setCaptureMode(
+//                    UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_RTSP);
             setPreview(true);
             mIsPreview = true;
             mTextPreview.setText(R.string.stop_preview);
@@ -756,7 +762,12 @@ public class UCloudRTCLiveActivity extends BaseActivity
         stopService(service);
         if(sdkEngine!= null){
             if (!mExtendCameraCapture) {
-//            sdkEngine.controlLocalVideo(true);
+               if(mTestRestartCamera){
+                   setPreview(true);
+                   mTestRestartCamera = false;
+               }else{
+                   sdkEngine.controlLocalVideo(true);
+               }
 //          sdkEngine.controlAudio(true);
         }
         }
@@ -1636,6 +1647,11 @@ public class UCloudRTCLiveActivity extends BaseActivity
         }
 
         @Override
+        public void onPeerReconnected(int type, UCloudRtcSdkStreamInfo info) {
+
+        }
+
+        @Override
         public void onNetWorkQuality(String userId, UCloudRtcSdkStreamType streamType, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkNetWorkQuality quality) {
             // 网络质量通知
             Log.d(TAG, "onNetWorkQuality: userid: " + userId + "streamType: " + streamType + "mediatype : " + mediaType + " quality: " + quality);
@@ -1673,6 +1689,19 @@ public class UCloudRTCLiveActivity extends BaseActivity
                     mTextControlMixSound.setVisibility(View.GONE);
                 }
             });
+        }
+
+        @Override
+        public void onFirstLocalVideoFrame() {
+
+        }
+
+        @Override
+        public void onStartLocalRenderFailed(String reason) {
+            Log.d(TAG, "onStartLocalRenderFailed: " + reason);
+            UCloudRtcSdkEnv.setCaptureMode(
+                    UCloudRtcSdkCaptureMode.UCLOUD_RTC_CAPTURE_MODE_LOCAL);
+            mTestRestartCamera = true;
         }
     };
 

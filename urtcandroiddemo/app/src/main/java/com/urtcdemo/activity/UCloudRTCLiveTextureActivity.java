@@ -1317,6 +1317,11 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
         }
 
         @Override
+        public void onPeerReconnected(int type, UCloudRtcSdkStreamInfo info) {
+
+        }
+
+        @Override
         public void onNetWorkQuality(String userId, UCloudRtcSdkStreamType streamType, UCloudRtcSdkMediaType mediaType, UCloudRtcSdkNetWorkQuality quality) {
 //            Log.d(TAG, "onNetWorkQuality: userid: " + userId + "streamType: " + streamType + "mediatype : "+ mediaType + " quality: " + quality);
         }
@@ -1352,6 +1357,18 @@ public class UCloudRTCLiveTextureActivity extends AppCompatActivity
                 }
             });
         }
+
+        @Override
+        public void onFirstLocalVideoFrame() {
+
+        }
+
+        @Override
+        public void onStartLocalRenderFailed(String reason) {
+            Log.d(TAG, "onStartLocalRenderFailed: " + reason);
+        }
+
+
     };
 
     UCloudRtcRecordListener mLocalRecordListener = new UCloudRtcRecordListener() {
