@@ -41,6 +41,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class ConnectActivity extends AppCompatActivity {
@@ -258,8 +261,18 @@ public class ConnectActivity extends AppCompatActivity {
             }
         });
 
-        String[] permissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE};
-        PermissionUtils.needsPermissions(this, permissions);
+        List<String> needPermissions = new ArrayList<>();
+        needPermissions.add(Manifest.permission.CAMERA);
+        needPermissions.add(Manifest.permission.RECORD_AUDIO);
+        needPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        needPermissions.add(Manifest.permission.READ_PHONE_STATE);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+            needPermissions.add(Manifest.permission.BLUETOOTH_SCAN);
+            needPermissions.add(Manifest.permission.BLUETOOTH_CONNECT);
+        }
+        String[] requestPermissions = new String[needPermissions.size()];
+        needPermissions.toArray(requestPermissions);
+        PermissionUtils.needsPermissions(this, requestPermissions);
         Thread thread = new Thread(new CopyMixFileTask(this));
         thread.start();
     }

@@ -3,23 +3,18 @@ package com.urtcdemo.Application;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 
-import com.github.moduth.blockcanary.BlockCanaryContext;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkLogLevel;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkPushEncode;
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoOutputOrientationMode;
 import com.ucloudrtclib.sdkengine.listener.UCloudRtcSdkEventListener;
-import com.urtcdemo.BuildConfig;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.UiHelper;
 
@@ -40,24 +35,24 @@ public class UCloudRtcApplication extends Application {
         }
     }
 
-    public UCloudRtcSdkEngine createRtcEngine(UCloudRtcSdkEventListener eventListener){
-        if(rtcSdkEngine == null){
+    public UCloudRtcSdkEngine createRtcEngine(UCloudRtcSdkEventListener eventListener) {
+        if (rtcSdkEngine == null) {
             rtcSdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
-        }else{
+        } else {
             rtcSdkEngine.setEventListener(eventListener);
         }
-        return  rtcSdkEngine;
+        return rtcSdkEngine;
     }
 
-    public void destroyEngine(){
-        if(rtcSdkEngine != null){
+    public void destroyEngine() {
+        if (rtcSdkEngine != null) {
             Log.d(TAG, "destroyEngine: ");
             UCloudRtcSdkEngine.destroy();
             rtcSdkEngine = null;
         }
     }
 
-    private void init(){
+    private void init() {
         sContext = this;
         UCloudRtcSdkEnv.initEnv(getApplicationContext());
         UCloudRtcSdkEnv.setWriteToLogCat(true);
@@ -90,37 +85,37 @@ public class UCloudRtcApplication extends Application {
     }
 
     //参数设置
-    public class AppContext extends BlockCanaryContext {
-        private static final String TAG = "AppContext";
-
-        @Override
-        public String provideQualifier() {
-            String qualifier = "";
-            try {
-                PackageInfo info = UCloudRtcApplication.getAppContext().getPackageManager()
-                        .getPackageInfo(UCloudRtcApplication.getAppContext().getPackageName(), 0);
-                qualifier += info.versionCode + "_" + info.versionName + "_YYB";
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.e(TAG, "provideQualifier exception", e);
-            }
-            return qualifier;
-        }
-
-        @Override
-        public int provideBlockThreshold() {
-            return 500;
-        }
-
-        @Override
-        public boolean displayNotification() {
-            return BuildConfig.DEBUG;
-        }
-
-        @Override
-        public boolean stopWhenDebugging() {
-            return false;
-        }
-    }
+//    public class AppContext extends BlockCanaryContext {
+//        private static final String TAG = "AppContext";
+//
+//        @Override
+//        public String provideQualifier() {
+//            String qualifier = "";
+//            try {
+//                PackageInfo info = UCloudRtcApplication.getAppContext().getPackageManager()
+//                        .getPackageInfo(UCloudRtcApplication.getAppContext().getPackageName(), 0);
+//                qualifier += info.versionCode + "_" + info.versionName + "_YYB";
+//            } catch (PackageManager.NameNotFoundException e) {
+//                Log.e(TAG, "provideQualifier exception", e);
+//            }
+//            return qualifier;
+//        }
+//
+//        @Override
+//        public int provideBlockThreshold() {
+//            return 500;
+//        }
+//
+//        @Override
+//        public boolean displayNotification() {
+//            return BuildConfig.DEBUG;
+//        }
+//
+//        @Override
+//        public boolean stopWhenDebugging() {
+//            return false;
+//        }
+//    }
 
     public static Context getAppContext() {
         return sContext;

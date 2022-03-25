@@ -72,11 +72,11 @@ dependencies {
     implementation var.SupportV4
     implementation var.SupportRecyclerviewV7
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
-    implementation 'com.github.markzhai:blockcanary-android:1.5.0'
+//    implementation 'com.github.markzhai:blockcanary-android:1.5.0'
     testImplementation 'junit:junit:4.12'
 
-//    implementation 'cn.ucloud:ucloudrtclib:2.1.3' //mavenCentral
-    implementation (name: 'ucloudrtclib-2.1.3', ext: 'aar')
+//    implementation 'cn.ucloud:ucloudrtclib:2.1.4' //mavenCentral
+    implementation (name: 'ucloudrtclib-2.1.4', ext: 'aar')
 //    implementation project(':urtc-sdk-android')
     implementation(name: 'libuvccamera-release', ext: 'aar')
     implementation(name: 'common-2.12.4', ext: 'aar')
