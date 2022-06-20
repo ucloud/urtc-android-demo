@@ -862,12 +862,12 @@ public class UCloudRTCLiveActivity extends BaseActivity
                     ToastUtils.shortShow(UCloudRTCLiveActivity.this, " 离开房间 " +
                             code + " errmsg " + msg);
                     setIconStats(userStatus.INIT);
-                    mRemoteGridView.setVisibility(View.INVISIBLE);
-                    mLocalVideoView.setVisibility(View.INVISIBLE);
+//                    mRemoteGridView.setVisibility(View.INVISIBLE);
+//                    mLocalVideoView.setVisibility(View.INVISIBLE);
                     mSwapStreamInfo = null;
-                    clearGridItem();
-                    setPreview(false);
-                    mIsPreview = false;
+//                    clearGridItem();
+//                    setPreview(false);
+//                    mIsPreview = false;
 //                    System.gc();
                 }
             });
@@ -1871,7 +1871,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
     };
 
     private void switchCamera() { // 前后置摄像头切换
-        sdkEngine.switchCamera();
+        sdkEngine.switchCameraSkipSameSide();
         ToastUtils.shortShow(this, "切换摄像头");
         mSwitchCamera = !mSwitchCamera;
     }
@@ -1891,7 +1891,9 @@ public class UCloudRTCLiveActivity extends BaseActivity
             if (isScreenCaptureSupport && !mCameraEnable) {
                 sdkEngine.muteLocalVideo(!mMuteVideo, UCloudRtcSdkMediaType.UCLOUD_RTC_SDK_MEDIA_TYPE_SCREEN);
             } else {
-                sdkEngine.muteLocalVideo(!mMuteVideo, UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO);
+//                sdkEngine.muteLocalVideo(!mMuteVideo, UCLOUD_RTC_SDK_MEDIA_TYPE_VIDEO)
+                sdkEngine.controlLocalVideo(mMuteVideo);
+                mMuteVideo = !mMuteVideo;
             }
         }
         if (!mMuteVideo) {
@@ -1914,7 +1916,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
     }
 
     private void onMuteVideoResult(boolean mute) {
-        mMuteVideo = mute;
+//        mMuteVideo = mute;
         mImgBtnMuteVideo.setImageResource(mMuteVideo ? R.mipmap.camera_off :
                 R.mipmap.camera);
         if (mLocalVideoView.getTag(R.id.swap_info) != null) {
@@ -1961,18 +1963,21 @@ public class UCloudRTCLiveActivity extends BaseActivity
     private void endCall() { // 离开频道
         synchronized (mSync) {
             mLeaveRoomFlag = true;
-            if (sdkEngine != null) {
-                sdkEngine.leaveChannel().ordinal();
-                queueEvent(new Runnable() {
-                    @Override
-                    public void run() {
-                        releaseExtendCamera();
-                    }
-                },0);
-                UCloudRtcSdkEngine.destroy();
-                sdkEngine = null;
-            }
-            finish();
+//            if (sdkEngine != null) {
+//                sdkEngine.leaveChannel().ordinal();
+//                queueEvent(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        releaseExtendCamera();
+//                    }
+//                },0);
+//                UCloudRtcSdkEngine.destroy();
+//                sdkEngine = null;
+//            }
+//            finish();
+            sdkEngine.leaveChannelNonStopLocalPreview();
+            sdkEngine.controlLocalVideo(false);
+            mMuteVideo = true;
         }
         Log.d(TAG, "endCall: finish called");
 

@@ -68,8 +68,7 @@
 
         <activity
             android:name=".activity.UCloudRTCLiveActivity"
-            android:screenOrientation="sensor"
-            android:configChanges="orientation|screenSize"
+            android:screenOrientation="portrait"
             android:launchMode="singleTop">
         </activity>
 
