@@ -251,6 +251,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
         mVideoHwAcc = preferences.getBoolean(CommonUtils.VIDEO_HW_ACC, CommonUtils.HARDWARE_ACC);
         UCloudRtcSdkEnv.setVideoHardWareAcceleration(mVideoHwAcc);
         sdkEngine = UCloudRtcSdkEngine.createEngine(eventListener);
+        sdkEngine.controlDetect(true);
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         screenWidth = displaymetrics.widthPixels;
@@ -699,6 +700,9 @@ public class UCloudRTCLiveActivity extends BaseActivity
             info.setRoomId(mRoomid);
             info.setUId(mUserid);
             Log.d(TAG, " roomtoken = " + mRoomToken + "appid : " + mAppid + " userid :" + mUserid);
+//            sdkEngine.setCustomizedVideoParam(UCloudRtcSdkVideoProfile.matchValue(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_480_360.ordinal())
+//                    .extendParams(15,1280,720));
+//            sdkEngine.cropPushResolution(640,280);
             // 加入房间
             if (sdkEngine.joinChannel(info) == UCloudRtcSdkErrorCode.NET_ERR_SECKEY_NULL
                     || mAppid.length() == 0) {
@@ -1955,7 +1959,12 @@ public class UCloudRTCLiveActivity extends BaseActivity
 
     private void mirrorSwitch() { // 前置摄像头镜像切换
         mMirror = !mMirror;
-        UCloudRtcSdkEnv.setFrontCameraMirror(mMirror);
+//        UCloudRtcSdkEnv.setFrontCameraMirror(mMirror);
+//        if(mMirror) {
+//            sdkEngine.updateDesensitizationState(UCloudRtcDesensitizationState.ALL_DESENSITIZATION);
+//        }else{
+//            sdkEngine.updateDesensitizationState(UCloudRtcDesensitizationState.NONE);
+//        }
         mImgBtnMirror.setImageResource(mMirror ? R.mipmap.mirror_on :
                 R.mipmap.mirror);
     }
@@ -1963,21 +1972,21 @@ public class UCloudRTCLiveActivity extends BaseActivity
     private void endCall() { // 离开频道
         synchronized (mSync) {
             mLeaveRoomFlag = true;
-//            if (sdkEngine != null) {
-//                sdkEngine.leaveChannel().ordinal();
-//                queueEvent(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        releaseExtendCamera();
-//                    }
-//                },0);
-//                UCloudRtcSdkEngine.destroy();
-//                sdkEngine = null;
-//            }
-//            finish();
-            sdkEngine.leaveChannelNonStopLocalPreview();
-            sdkEngine.controlLocalVideo(false);
-            mMuteVideo = true;
+            if (sdkEngine != null) {
+                sdkEngine.leaveChannel().ordinal();
+                queueEvent(new Runnable() {
+                    @Override
+                    public void run() {
+                        releaseExtendCamera();
+                    }
+                },0);
+                UCloudRtcSdkEngine.destroy();
+                sdkEngine = null;
+            }
+            finish();
+//            sdkEngine.leaveChannelNonStopLocalPreview();
+//            sdkEngine.controlLocalVideo(false);
+//            mMuteVideo = true;
         }
         Log.d(TAG, "endCall: finish called");
 

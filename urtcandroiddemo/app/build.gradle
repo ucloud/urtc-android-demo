@@ -76,7 +76,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
 //    implementation 'cn.ucloud:ucloudrtclib:2.1.4' //mavenCentral
-    implementation (name: 'ucloudrtclib-2.1.5.5', ext: 'aar')
+    implementation (name: 'ucloudrtclib-2.1.5.7', ext: 'aar')
 //    implementation project(':urtc-sdk-android')
     implementation(name: 'libuvccamera-release', ext: 'aar')
     implementation(name: 'common-2.12.4', ext: 'aar')

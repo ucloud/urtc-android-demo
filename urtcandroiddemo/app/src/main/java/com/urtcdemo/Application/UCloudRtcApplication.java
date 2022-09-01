@@ -80,7 +80,7 @@ public class UCloudRtcApplication extends Application {
         windowManager.getDefaultDisplay().getMetrics(outMetrics);
         CommonUtils.mItemWidth = (outMetrics.widthPixels - UiHelper.dipToPx(this, 15)) / 3;
         CommonUtils.mItemHeight = CommonUtils.mItemWidth;
-        CrashReport.initCrashReport(getApplicationContext(), "9a51ae062a", true);
+        CrashReport.initCrashReport(getApplicationContext(), "70d76b8f7b", true);
 //        BlockCanary.install(this, new AppContext()).start();
     }
 
