@@ -16,8 +16,7 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="50dp">
+            android:layout_height="match_parent">
 
             <com.ucloudrtclib.sdkengine.define.UCloudRtcRenderView
                 android:id="@+id/localvideoview"
@@ -130,52 +129,45 @@
             android:id="@+id/tool_bar"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@color/lsq_color_white"
-            android:layout_weight="1"
             android:layout_gravity="bottom">
             <ImageButton
                 android:id="@+id/img_btn_toggle_mic"
-                android:background="@drawable/publish_layer"
                 android:src="@mipmap/mic"
                 android:contentDescription="@string/toggle_mic"
                 android:layout_width="48dp"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:layout_weight="1"/>
 
             <ImageButton
                 android:id="@+id/img_btn_toggle_video"
-                android:background="@drawable/publish_layer"
                 android:src="@mipmap/camera"
                 android:contentDescription="toggle video"
                 android:layout_width="48dp"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:layout_weight="1"/>
 
             <ImageButton
                 android:id="@+id/img_btn_endcall"
-                android:background="@drawable/publish_layer"
                 android:src="@mipmap/end"
                 android:contentDescription="@string/disconnect_call"
                 android:layout_width="48dp"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:layout_centerInParent="true"
                 android:layout_weight="1"/>
 
             <ImageButton
                 android:id="@+id/img_btn_speaker"
-                android:background="@drawable/publish_layer"
                 android:src="@mipmap/speaker"
                 android:contentDescription="speaker on/off"
                 android:layout_width="48dp"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:layout_weight="1"/>
             <ImageButton
                 android:id="@+id/img_btn_mirror"
-                android:background="@drawable/publish_layer"
                 android:src="@mipmap/mirror"
                 android:contentDescription="@string/mirror"
                 android:layout_width="48dp"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:layout_weight="1"/>
         </LinearLayout>
     </FrameLayout>

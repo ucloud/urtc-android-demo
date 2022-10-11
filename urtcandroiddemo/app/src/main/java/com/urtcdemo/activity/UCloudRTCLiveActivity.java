@@ -94,7 +94,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import core.common.LogUtils;
 import core.renderer.SurfaceViewGroup;
 
 import static com.ucloudrtclib.sdkengine.define.UCloudRtcSdkErrorCode.NET_ERR_CODE_OK;
@@ -1894,6 +1893,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
         return false;
     }
 
+    int type = 0;
     private void muteSpeaker(boolean enable) { //喇叭听筒切换
         if (mSpeakerOn) {
             ToastUtils.shortShow(UCloudRTCLiveActivity.this, "关闭喇叭");
@@ -1903,7 +1903,10 @@ public class UCloudRTCLiveActivity extends BaseActivity
         mSpeakerOn = !mSpeakerOn;
         sdkEngine.setSpeakerOn(enable);
         mImgBtnMuteSpeaker.setImageResource(enable ? R.mipmap.speaker : R.mipmap.speaker_off);
-        sdkEngine.setDetectSolution(mSpeakerOn ? 0 : 1);
+
+        type++;
+        type = type %3;
+        sdkEngine.setDetectSolution(type);
     }
 
     private void onMuteVideoResult(boolean mute) {
@@ -1961,7 +1964,6 @@ public class UCloudRTCLiveActivity extends BaseActivity
             mLeaveRoomFlag = true;
             if (sdkEngine != null) {
                 int result = sdkEngine.leaveChannel().ordinal();
-                LogUtils.d(TAG,"leaveChannel result: "+result);
                 queueEvent(new Runnable() {
                     @Override
                     public void run() {
