@@ -396,9 +396,9 @@ public class UCloudRTCLiveActivity extends BaseActivity
         sdkEngine.setClassType(mClass);
         sdkEngine.setAutoPublish(mPublishMode == CommonUtils.AUTO_MODE ? true : false);
         sdkEngine.setAutoSubscribe(mScribeMode == CommonUtils.AUTO_MODE ? true : false);
-        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
-//        sdkEngine.setScreenProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1920_1080);
-        sdkEngine.setScreenProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1280_720);
+        sdkEngine.setCustomizedVideoParam(UCloudRtcSdkVideoProfile.matchValue(0).extendParams(15,1920,1080));
+//        sdkEngine.setVideoProfile(UCloudRtcSdkVideoProfile.matchValue(mVideoProfileSelect));
+//        sdkEngine.setScreenProfile(UCloudRtcSdkVideoProfile.UCLOUD_RTC_SDK_VIDEO_PROFILE_1280_720);
 
         synchronized (extendByteBufferSync) {
             videoSourceData = ByteBuffer.allocate(1920 * 1080 * 4);
@@ -716,6 +716,7 @@ public class UCloudRTCLiveActivity extends BaseActivity
 //            mLocalVideoView.setVisibility(View.VISIBLE);
         }
         setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        sdkEngine.cropPushResolution(640,360);
     }
 
     @Override
