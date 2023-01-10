@@ -23,7 +23,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.urtcdemo.Application.UCloudRtcApplication;
 import com.urtcdemo.R;
 import com.urtcdemo.utils.CommonUtils;
 import com.urtcdemo.utils.PermissionUtils;
@@ -33,7 +32,6 @@ import com.ucloudrtclib.sdkengine.UCloudRtcSdkEngine;
 import com.ucloudrtclib.sdkengine.UCloudRtcSdkEnv;
 import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkMode;
 import com.urtcdemo.utils.URTCFileUtil;
-
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -62,7 +60,6 @@ public class ConnectActivity extends AppCompatActivity {
     private Handler mMainHandler = new Handler(Looper.getMainLooper());
     private boolean mStartSuccess = false;
     private boolean mJoinChannel = true;
-    private ImageView mAnimal;
 
     @Override
     @TargetApi(21)
@@ -78,7 +75,6 @@ public class ConnectActivity extends AppCompatActivity {
             return;
         }
         UCloudRtcSdkEngine.onScreenCaptureResult(data);
-//        startRoomActivity();
         startLivingActivity();
     }
 
@@ -94,8 +90,6 @@ public class ConnectActivity extends AppCompatActivity {
                 Context.MODE_PRIVATE);
         mAppid = preferences.getString(CommonUtils.APP_ID_TAG, CommonUtils.APP_ID);
         UCloudRtcSdkEnv.setLogReport(true);
-        mAnimal = findViewById(R.id.userporta);
-        //((AnimationDrawable) mAnimal.getBackground()).start();
 
         setButton = findViewById(R.id.setting_btn);
         userEditText = findViewById(R.id.user_edittext);
@@ -106,7 +100,6 @@ public class ConnectActivity extends AppCompatActivity {
         connectButton = findViewById(R.id.connect_button);
         previewButton = findViewById(R.id.preview_button);
         exportButton = findViewById(R.id.log_output_button);
-//        exportButton.setVisibility(View.GONE);
         StatusBarUtils.setAndroidNativeLightStatusBar(this,true);
 
         connectButton.setOnClickListener(new View.OnClickListener() {
@@ -125,56 +118,12 @@ public class ConnectActivity extends AppCompatActivity {
                             boolean mVideoHwAcc = preferences.getBoolean(CommonUtils.VIDEO_HW_ACC, CommonUtils.HARDWARE_ACC);
                             UCloudRtcSdkEnv.setVideoHardWareAcceleration(mVideoHwAcc);
                             UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
-//                            startLivingActivity();
                         } else {
                             startLivingActivity();
                         }
                     } else {
-                        //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
                         ToastUtils.shortShow(ConnectActivity.this, "正式环境下请获取自己服务器的token");
-//                    new Thread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            try {
-//
-//                                String result = AppHttpUtil.getInstance().getTestRoomToken(mUserId, mRoomid, mAppid) ;
-//                                runOnUiThread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        Log.d(TAG, " gettokenresult "+ result) ;
-//                                        if (result != null && result.length()>0) {
-//                                            try {
-//                                                JSONObject jsonObject = new JSONObject(result);
-//                                                if (jsonObject != null) {
-//                                                    JSONObject data = jsonObject.getJSONObject("data") ;
-//                                                    if (data != null) {
-//                                                        mRoomToken = data.getString("access_token" );
-//                                                        Log.d(TAG, " token "+ mRoomToken) ;
-//                                                        if (mRoomToken.length()>0) {
-//                                                            UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
-//                                                        }
-//                                                    }
-//                                                }
-//                                            }catch (JSONException e) {
-//                                                e.printStackTrace();
-//                                            }
-//
-//                                        }else {
-//                                            ToastUtils.shortShow(getApplicationContext(),"解析token 失败");
-//                                        }
-//                                    }
-//                                });
-//                            }catch (Exception e) {
-//                                runOnUiThread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        ToastUtils.shortShow(getApplicationContext(),"请求失败 "+ e.getMessage());
-//                                    }
-//                                });
-//
-//                            }
                     }
-//                    }).start() ;
                 }
             }
         });
@@ -195,12 +144,10 @@ public class ConnectActivity extends AppCompatActivity {
                             boolean mVideoHwAcc = preferences.getBoolean(CommonUtils.VIDEO_HW_ACC, CommonUtils.HARDWARE_ACC);
                             UCloudRtcSdkEnv.setVideoHardWareAcceleration(mVideoHwAcc);
                             UCloudRtcSdkEngine.requestScreenCapture(ConnectActivity.this);
-//                            startLivingActivity();
                         } else {
                             startLivingActivity();
                         }
                     } else {
-                        //正式环境请参考下述代码传入用户自己的userId,roomId,appId来获取自己服务器上的返回token
                         ToastUtils.shortShow(ConnectActivity.this, "正式环境下请获取自己服务器的token");
                     }
                 }
@@ -277,39 +224,12 @@ public class ConnectActivity extends AppCompatActivity {
         thread.start();
     }
 
-    private void startWebViewActivity(){
-         Intent intent = new Intent(ConnectActivity.this, WebViewActivity.class);
-         startActivity(intent);
-         finish();
-    }
-    private void startRoomActivity() {
-        if (!mStartSuccess) {
-            mStartSuccess = true;
-            final Intent intent = new Intent(ConnectActivity.this, RoomActivity.class);
-            intent.putExtra("room_id", mRoomid);
-            String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
-            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
-            intent.putExtra("user_id", mUserId);
-            intent.putExtra("app_id", mAppid);
-            intent.putExtra("token", mRoomToken);
-            mMainHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startActivity(intent);
-                    finish();
-                    mStartSuccess = false;
-                }
-            }, 500);
-        }
-    }
-
     private void startLivingActivity() {
         if (!mStartSuccess) {
             mStartSuccess = true;
             final Intent intent = new Intent(ConnectActivity.this, UCloudRTCLiveActivity.class);
             intent.putExtra("room_id", mRoomid);
             String autoGenUserId = "android_" + UUID.randomUUID().toString().replace("-", "");
-//            mUserId = UCloudRtcApplication.getUserId() != null ? UCloudRtcApplication.getUserId() : autoGenUserId;
             mUserId = !TextUtils.isEmpty(userEditText.getText()) ? userEditText.getText().toString() : autoGenUserId;
             intent.putExtra("user_id", mUserId);
             intent.putExtra("app_id", mAppid);
@@ -330,14 +250,12 @@ public class ConnectActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        //((AnimationDrawable) mAnimal.getBackground()).start();
     }
 
     @Override
     protected void onStop() {
         Log.d(TAG, "activity onStop");
         super.onStop();
-        //((AnimationDrawable) mAnimal.getBackground()).stop();
     }
 
     static class CopyMixFileTask implements Runnable {
@@ -374,12 +292,6 @@ public class ConnectActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-//                    handler.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            ToastUtils.shortShow(UCloudRtcSdkEnv.getApplication(),"mix file already exist");
-//                        }
-//                    });
                 }
                 context.clear();
                 context = null;
@@ -422,9 +334,6 @@ public class ConnectActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-//        Log.d(TAG, "onBackPressed: destroy engine start");
-//        UCloudRtcApplication.getInstance().destroyEngine();
-//        Log.d(TAG, "onBackPressed: destroy engine finish");
     }
 
     @Override

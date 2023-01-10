@@ -7,13 +7,12 @@
 
   ![](libs.png)
 
-  其中ucloudrtclib-xxx.aar 是urtc 的sdk，xxx为版本号，支持本地和jcenter引用，common-2.12.4.aar，libyuvcamera-release.aar 为辅助验证自定义外部摄像头（例如usb摄像头）的输入功能的，引用方式参考如下：
+  其中ucloudrtclib-xxx.aar 是urtc 的sdk，xxx为版本号，common-2.12.4.aar，libyuvcamera-release.aar 为辅助验证自定义外部摄像头（例如usb摄像头）的输入功能的，引用方式参考如下：
 
   ```
       implementation (name: 'ucloudrtclib-2.0.0', ext: 'aar')
       implementation(name: 'libuvccamera-release', ext: 'aar')
       implementation(name: 'common-2.12.4', ext: 'aar')
-  //  implementation 'com.ucloud:ucloudrtclib:2.0.0'
   ```
 
 - ### 配置APP_ID&APP_KEY
@@ -123,6 +122,6 @@ URTCAndroid 是UCloud推出的一款适用于android平台的实时音视频 SDK
 
 * sdk通用功能使用请参考[URTC SDK集成指南](https://docs.ucloud.cn/urtc/sdk/index)
 
-* android api 文档 请参考随 demo 所附 的ucloud_rtc_android_api_xxx.zip  javadoc文档，xxx 代表sdk版本号或者
+* android api 文档 请参考随 demo 所附 的ucloud_rtc_android_api.zip 
 
 * 对于urtc 一些常见术语，概念的解释亦可参考demo 所附URTC Android_master.docx 文档

@@ -790,21 +790,6 @@ public class UCloudRTCLiveActivity extends BaseActivity
 
     private UCloudRtcSdkEventListener eventListener = new UCloudRtcSdkEventListener() {
         @Override
-        public void onPeerReconnected(int type, UCloudRtcSdkStreamInfo info) {
-
-        }
-
-        @Override
-        public void onFirstLocalVideoFrame() {
-
-        }
-
-        @Override
-        public void onStartLocalRenderFailed(String reason) {
-
-        }
-
-        @Override
         public void onServerDisconnect() {
             runOnUiThread(new Runnable() {
                 @Override
